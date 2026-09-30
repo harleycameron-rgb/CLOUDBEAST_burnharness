@@ -137,6 +137,21 @@ class SystemValidationTests(unittest.TestCase):
                     self.assertFalse(report["environment_ready"])
                     self.assertFalse(report["system_ready"])
 
+    def test_chaotic_integrity_stress(self):
+        chaotic_fields = [
+            {"stability": 0.5 + math.sin(i), "curvature": 0.2, "provenance": 0.1}
+            for i in range(10)
+        ]
+
+        for data in chaotic_fields:
+            with self.subTest(data=data):
+                verified, digest = validation.check_integrity(data)
+                # Hash must always be 128 chars
+                self.assertEqual(len(digest), 128)
+                # Integrity must fail if stability leaves valid range
+                if not (0 <= data["stability"] <= 1):
+                    self.assertFalse(verified)
+
     def test_canonical_hash_is_repeatable_and_input_sensitive(self):
         self.assertTrue(validation.check_consistency(FIELD))
         verified, digest = validation.check_integrity(FIELD)

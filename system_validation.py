@@ -93,7 +93,9 @@ def check_integrity(data):
     altered = dict(data)
     altered["stability"] = 0 if data["stability"] != 0 else 1
     changed = hashlib.sha512(canonical_model(altered).encode("utf-8")).hexdigest()
-    return (len(digest) == 128
+    in_range = 0 <= data["stability"] <= 1
+    return (in_range
+            and len(digest) == 128
             and digest == hashlib.sha512(model.encode("utf-8")).hexdigest()
             and digest != changed), digest
 
