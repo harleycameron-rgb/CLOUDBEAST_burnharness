@@ -7,7 +7,7 @@
 import importlib
 
 LEG_PATH = "burnharness.ignition_layer.legs"
-COUPLER_PATH = "burnharness.couplers"
+COUPLER_PATH = "couplers"
 
 COUPLER_SEQUENCE = [
     ("scandoc", "invariant_surface", "scandoc_invariant_surface"),

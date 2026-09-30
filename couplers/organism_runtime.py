@@ -12,7 +12,7 @@
 import time
 import importlib
 
-CYCLE_PATH = "burnharness.couplers.coupler_cycle"
+CYCLE_PATH = "coupler_cycle"
 
 class OrganismRuntime:
     def __init__(self, tick_rate=1.0):
