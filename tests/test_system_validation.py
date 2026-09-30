@@ -9,6 +9,23 @@ FIELD = {"stability": 0.5, "curvature": 0.2, "provenance": 0.1}
 
 
 class SystemValidationTests(unittest.TestCase):
+    def test_system_heartbeat_requires_every_readiness_check(self):
+        passing_report = {
+            check: True for check in (
+                "environment_ready", "boundary_valid", "stable", "consistent",
+                "integrity_verified"
+            )
+        }
+        with patch.object(validation, "validate_system", return_value=passing_report):
+            self.assertTrue(validation.system_heartbeat())
+
+        for failed_check in passing_report:
+            with self.subTest(failed_check=failed_check):
+                failing_report = {**passing_report, failed_check: False}
+                with patch.object(validation, "validate_system",
+                                  return_value=failing_report):
+                    self.assertFalse(validation.system_heartbeat())
+
     def test_local_system_is_ready(self):
         report = validation.validate_system()
         self.assertTrue(report["system_ready"])
