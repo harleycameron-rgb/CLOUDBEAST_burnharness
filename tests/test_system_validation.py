@@ -80,6 +80,24 @@ class SystemValidationTests(unittest.TestCase):
                 self.assertEqual(report["system_ready"], expected)
                 self.assertTrue(math.isclose(report["drift"], difference))
 
+    def test_chaotic_drift_detection(self):
+        chaotic_values = [0.5, 0.5001, 0.47, 0.61, 0.499, 0.8]
+
+        for value in chaotic_values:
+            with self.subTest(value=value):
+                changed = {**FIELD, "stability": value}
+                with patch.object(validation, "run_cycle",
+                                  side_effect=[FIELD, FIELD, changed]):
+                    report = validation.validate_system()
+
+                drift = abs(value - FIELD["stability"])
+                if drift < 0.05:
+                    self.assertTrue(report["stable"])
+                    self.assertTrue(report["system_ready"])
+                else:
+                    self.assertFalse(report["stable"])
+                    self.assertFalse(report["system_ready"])
+
     def test_cycle_failure_and_malformed_output_fail_closed(self):
         with patch.object(validation, "run_cycle", side_effect=RuntimeError("failed")):
             self.assertFalse(validation.validate_system()["system_ready"])
