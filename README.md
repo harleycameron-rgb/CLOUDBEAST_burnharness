@@ -61,6 +61,10 @@ canonical JSON is included in the report. A failed check yields
 
 Run tests with `python -m unittest discover -s tests -v`.
 
+Run `python runtime_monitor.py` from the repository root to print live
+readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
+the hash of the fixed `"sphere_interior"` marker, not a hash of live system state.
+
 ---
 
 ## How It Connects to Sentinel_dot
