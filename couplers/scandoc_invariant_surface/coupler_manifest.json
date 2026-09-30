@@ -1,0 +1,7 @@
+{
+    "coupler": "scandoc_invariant_surface",
+    "legs": [
+        "scandoc",
+        "invariant_surface"
+    ]
+}

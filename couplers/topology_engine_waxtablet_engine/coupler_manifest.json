@@ -1,0 +1,7 @@
+{
+    "coupler": "topology_engine_waxtablet_engine",
+    "legs": [
+        "topology_engine",
+        "waxtablet_engine"
+    ]
+}

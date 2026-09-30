@@ -1,0 +1,7 @@
+{
+    "coupler": "orrery_sentinel_dot",
+    "legs": [
+        "orrery",
+        "sentinel_dot"
+    ]
+}
