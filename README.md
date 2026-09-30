@@ -48,6 +48,8 @@ readiness report, or call `validate_system(input_data=None)` from
 `environment_ready`, `boundary_valid`, `stable`, `consistent`, and
 `integrity_verified`. The validator uses local modules and configuration only;
 it makes no network calls.
+Call `system_heartbeat()` from `system_validation` for a boolean indicating
+whether all five readiness checks pass.
 
 The optional input is a dictionary with exactly `stability`, `curvature`, and
 `provenance` keys, each a finite number in `[0, 1]`. Its canonical JSON encoding
