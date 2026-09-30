@@ -1,0 +1,84 @@
+BURNHARNESS MASTER FILE
+=======================
+
+The Burnharness is the shared substrate that connects all repos. It behaves like thick fluid between bubbles. Each bubble is one repo or one AI system. The Burnharness is the world they all live inside.
+
+This file defines how the Burnharness works and how all other repos link to it.
+
+------------------------------------------------------------
+1. SENTINEL DOT CONNECTION
+------------------------------------------------------------
+
+Sentinel_dot is the spark or zero point ignition constant.
+
+The Burnharness grows from that spark.
+
+Correct generational order:
+Sentinel_dot -> Burnharness -> Super_Block -> Engines -> Sphere_Model
+
+------------------------------------------------------------
+2. WHAT THE BURNHARNESS HOLDS
+------------------------------------------------------------
+
+Shared invariant state across all repos.
+Drift dampening rules to prevent divergence.
+Temporal alignment so all components move forward together.
+Residue of motion left behind as the system evolves.
+Super block generation logic.
+Bridges to all other repos.
+
+------------------------------------------------------------
+3. HOW OTHER REPOS CONNECT
+------------------------------------------------------------
+
+ScanDoc:
+    root_scan -> provenance_bridge
+    surface_scan -> invariant_state
+
+Invariant_Surface:
+    invariant_core -> engine_alignment
+
+Topology_Engine:
+    amplified_manifolds -> temporal_anchor
+
+Waxtablet_Engine:
+    ignition_substrate -> sentinel_link
+
+Orrery:
+    sphere_model_trajectory -> temporal_anchor
+
+------------------------------------------------------------
+4. SUPER BLOCK GENERATION
+------------------------------------------------------------
+
+As the system moves forward, the Burnharness collects residue left behind.
+This residue forms the first super block.
+
+The super block is the first large structure engines attach to.
+
+------------------------------------------------------------
+5. WHY THIS REPO MUST BE SINGLE AND MODULAR
+------------------------------------------------------------
+
+The Burnharness must exist once, not copied or duplicated.
+
+If duplicated:
+Temporal alignment breaks.
+Drift increases.
+Invariant state fragments.
+Sentinel anchoring becomes inconsistent.
+Sphere model pull becomes unstable.
+
+All repos must plug into this single Burnharness.
+
+------------------------------------------------------------
+6. SUMMARY
+------------------------------------------------------------
+
+Burnharness = world between all repos.
+Sentinel_dot = spark.
+Burnharness builds the first super block.
+Engines attach to the super block.
+Sphere model pulls everything forward.
+
+This file tells Copilot how to use Burnharness to link the entire system.
