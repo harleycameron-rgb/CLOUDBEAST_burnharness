@@ -40,6 +40,27 @@ the “trajectory” for the whole system.
 
 ---
 
+## System validation
+
+Run `python system_validation.py` from the repository root to obtain a JSON
+readiness report, or call `validate_system(input_data=None)` from
+`system_validation`. Readiness requires all five checks to pass:
+`environment_ready`, `boundary_valid`, `stable`, `consistent`, and
+`integrity_verified`. The validator uses local modules and configuration only;
+it makes no network calls.
+
+The optional input is a dictionary with exactly `stability`, `curvature`, and
+`provenance` keys, each a finite number in `[0, 1]`. Its canonical JSON encoding
+must fit within 4096 UTF-8 bytes. Without an input, the first local coupler cycle
+output is used. Three cycles are compared; the maximum field deviation from
+the first must be strictly below `0.05`. The SHA-512 digest of the sorted-key
+canonical JSON is included in the report. A failed check yields
+`system_ready: false`.
+
+Run tests with `python -m unittest discover -s tests -v`.
+
+---
+
 ## How It Connects to Sentinel_dot
 
 Sentinel_dot is the zero‑state or spark.
@@ -47,4 +68,3 @@ Sentinel_dot is the zero‑state or spark.
 The Burnharness grows from that spark.
 
 The order is:
-
