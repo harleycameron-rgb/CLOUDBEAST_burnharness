@@ -119,6 +119,24 @@ class SystemValidationTests(unittest.TestCase):
         self.assertFalse(report["environment_ready"])
         self.assertFalse(report["system_ready"])
 
+    def test_chaotic_configuration_mutation(self):
+        chaotic_configs = [
+            ("before",),
+            ("before", "extra"),
+            ("after",),
+            ("before", "before"),
+            ("random",),
+        ]
+
+        for snapshot in chaotic_configs:
+            with self.subTest(snapshot=snapshot):
+                with patch.object(validation, "_configuration_snapshot",
+                                  side_effect=[("baseline",), snapshot]):
+                    report = validation.validate_system()
+                if snapshot != ("baseline",):
+                    self.assertFalse(report["environment_ready"])
+                    self.assertFalse(report["system_ready"])
+
     def test_canonical_hash_is_repeatable_and_input_sensitive(self):
         self.assertTrue(validation.check_consistency(FIELD))
         verified, digest = validation.check_integrity(FIELD)
