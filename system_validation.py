@@ -150,5 +150,15 @@ def validate_system(input_data=None):
     return report
 
 
+def system_heartbeat():
+    """Return whether every system readiness check passes."""
+    report = validate_system()
+    checks = (
+        "environment_ready", "boundary_valid", "stable", "consistent",
+        "integrity_verified"
+    )
+    return all(report.get(check) is True for check in checks)
+
+
 if __name__ == "__main__":
     print(json.dumps(validate_system(), indent=2))
