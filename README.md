@@ -53,9 +53,10 @@ whether all five readiness checks pass.
 
 The optional input is a dictionary with exactly `stability`, `curvature`, and
 `provenance` keys, each a finite number in `[0, 1]`. Its canonical JSON encoding
-must fit within 4096 UTF-8 bytes. Without an input, the first local coupler cycle
-output is used. Three cycles are compared; the maximum field deviation from
-the first must be strictly below `0.05`. The SHA-512 digest of the sorted-key
+must fit within 4096 UTF-8 bytes. A supplied input must also match the first
+local coupler cycle output within `1e-9` for every field; without an input, that
+output is used directly. Three cycles are compared; the maximum field deviation
+from the first must be strictly below `0.05`. The SHA-512 digest of the sorted-key
 canonical JSON is included in the report. A failed check yields
 `system_ready: false`.
 

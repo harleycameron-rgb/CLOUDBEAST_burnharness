@@ -48,6 +48,27 @@ class SystemValidationTests(unittest.TestCase):
         with patch.object(validation, "MAX_INPUT_BYTES", 1):
             self.assertFalse(validation.check_boundary(FIELD))
 
+    def test_chaotic_input_is_rejected_as_inconsistent(self):
+        def chaotic_sequence(seed, r=3.99, steps=64):
+            x = seed
+            out = []
+            for _ in range(steps):
+                x = r * x * (1 - x)
+                out.append(x)
+            return out
+
+        chaotic_inputs = [
+            {"stability": x, "curvature": 0.2, "provenance": 0.1}
+            for x in chaotic_sequence(0.123)
+        ]
+
+        for data in chaotic_inputs:
+            with self.subTest(data=data):
+                self.assertTrue(validation.check_boundary(data))
+                report = validation.validate_system(data)
+                self.assertFalse(report["consistent"])
+                self.assertFalse(report["system_ready"])
+
     def test_drift_is_strictly_below_limit(self):
         for difference, expected in ((0.049, True), (0.05, False)):
             with self.subTest(difference=difference):
