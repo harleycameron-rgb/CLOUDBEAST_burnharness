@@ -1,0 +1,7 @@
+{
+    "coupler": "waxtablet_engine_orrery",
+    "legs": [
+        "waxtablet_engine",
+        "orrery"
+    ]
+}

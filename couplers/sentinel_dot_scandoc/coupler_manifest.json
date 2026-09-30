@@ -1,0 +1,7 @@
+{
+    "coupler": "sentinel_dot_scandoc",
+    "legs": [
+        "sentinel_dot",
+        "scandoc"
+    ]
+}
