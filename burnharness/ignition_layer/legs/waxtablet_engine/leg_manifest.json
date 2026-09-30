@@ -1,0 +1,14 @@
+{
+    "leg": "waxtablet_engine",
+    "ignition_state": {
+        "substrate_zero": {
+            "density": 0.8,
+            "porosity": 0.02
+        },
+        "pre_atomic_imprint": {
+            "pattern": "proto",
+            "depth": 0.01
+        },
+        "sentinel_prelink": 0.001
+    }
+}
