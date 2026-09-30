@@ -1,0 +1,136 @@
+MULTI-REPO CONNECTIVITY PATCH
+=============================
+
+This file defines the connectivity chain between the following repos:
+Sentinel_dot
+Invariant Engine
+Burnharness
+Orrery
+Invariant-Surface
+ScanDoc
+Waxtablet
+
+The chain is:
+Sentinel_dot -> Invariant Engine -> Burnharness -> Orrery -> Invariant-Surface -> Waxtablet
+
+------------------------------------------------------------
+PATCH 1 — ORRERY CONNECTIVITY
+------------------------------------------------------------
+
+Orrery outputs forward-motion trajectory vectors derived from the sphere-model.
+
+Test vector:
+trajectory = {
+    t0: [0, 0, 1],
+    t1: [0.1, 0.2, 1.05],
+    t2: [0.2, 0.4, 1.1]
+}
+
+Burnharness receives this vector through /temporal_anchor/.
+Burnharness converts trajectory into residue:
+R(t) = trajectory(t) - trajectory(t - 1)
+
+Invariant-Surface reads residue through /engine_alignment/.
+Invariant Engine stabilises residue into invariant_core.
+
+If all repos accept this object without error,
+Orrery connectivity is confirmed.
+
+------------------------------------------------------------
+PATCH 2 — BURNHARNESS TRAJECTORY INTAKE
+------------------------------------------------------------
+
+Burnharness accepts Orrery trajectory vectors and converts them into residue.
+
+Residue definition:
+R(t) = trajectory(t) - trajectory(t - 1)
+
+Residue is stored for Invariant-Surface to stabilise.
+
+------------------------------------------------------------
+PATCH 3 — INVARIANT-SURFACE RESIDUE BRIDGE
+------------------------------------------------------------
+
+Invariant-Surface reads residue from Burnharness.
+
+Residue stabilisation:
+invariant_core = f(R(t))
+
+The invariant_core is passed to the Invariant Engine for ignition alignment.
+
+------------------------------------------------------------
+PATCH 4 — INVARIANT ENGINE STABILISER
+------------------------------------------------------------
+
+The Invariant Engine receives invariant_core from Invariant-Surface.
+
+Stabilisation rule:
+I_stable = g(invariant_core)
+
+This produces the ignition-stable substrate used by Burnharness.
+
+------------------------------------------------------------
+PATCH 5 — SCANDOC PROVENANCE LINK
+------------------------------------------------------------
+
+ScanDoc provides root_scan and surface_scan data to Burnharness.
+
+root_scan -> burnharness/provenance_bridge/
+surface_scan -> burnharness/invariant_state/
+
+These scans do not modify Orrery trajectory.
+
+------------------------------------------------------------
+PATCH 6 — WAXTABLET INSTRUMENT LAYER
+------------------------------------------------------------
+
+Waxtablet is the instrument and UI layer.
+
+It does not generate trajectory or residue.
+It reads stabilised output from the Invariant Engine.
+
+Display chain:
+Invariant Engine -> Waxtablet
+
+------------------------------------------------------------
+PATCH 7 — SENTINEL_DOT ROOT ANCHOR
+------------------------------------------------------------
+
+Sentinel_dot provides the zero-state ignition constant.
+
+Burnharness uses this as the continuity-root for all trajectory alignment.
+Orrery does not modify Sentinel_dot.
+
+------------------------------------------------------------
+FULL CONNECTIVITY SUMMARY
+------------------------------------------------------------
+
+Sentinel_dot = zero-state
+Invariant Engine = ignition substrate
+Burnharness = shared substrate
+Orrery = trajectory generator
+Invariant-Surface = stability layer
+ScanDoc = provenance input
+Waxtablet = instrument layer
+
+Connectivity chain:
+Sentinel_dot -> Invariant Engine -> Burnharness -> Orrery -> Invariant-Surface -> Waxtablet
+
+------------------------------------------------------------
+COPILOT INTEGRATION INSTRUCTION
+------------------------------------------------------------
+
+Copilot, integrate this patch across all connected repos.
+
+Actions:
+1. Ensure each repo contains the relevant patch section.
+2. Link Orrery trajectory intake to burnharness/temporal_anchor/.
+3. Link residue output to invariant_surface/engine_alignment/.
+4. Link invariant_core to invariant_engine/stabiliser.md.
+5. Link ScanDoc root_scan and surface_scan to Burnharness.
+6. Link Waxtablet display layer to Invariant Engine output.
+7. Maintain the connectivity chain exactly as defined.
+8. Do not duplicate Burnharness or Sentinel_dot in other repos.
+9. Confirm cross-repo visibility and stable integration.
+
+End of patch.
