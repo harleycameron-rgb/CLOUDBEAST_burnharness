@@ -41,7 +41,7 @@ def check_environment():
             if (not isinstance(config, dict) or config.get("coupler") != coupler
                     or list(config.get("legs", [])) != [first, second]):
                 return False
-    except (OSError, ValueError, TypeError, KeyError, ImportError, AttributeError):
+    except Exception:
         return False
     return True
 
@@ -49,6 +49,20 @@ def check_environment():
 def canonical_model(data):
     """Serialize the resonance field with deterministic key ordering."""
     return json.dumps(data, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
+def _configuration_snapshot():
+    root = Path(REPOSITORY_ROOT)
+    legs = {leg for first, second, _ in COUPLER_SEQUENCE for leg in (first, second)}
+    paths = [
+        root / "burnharness" / "ignition_layer" / "legs" / leg / "leg_manifest.json"
+        for leg in sorted(legs)
+    ]
+    paths.extend(
+        root / "couplers" / coupler / "coupler_manifest.json"
+        for _, _, coupler in COUPLER_SEQUENCE
+    )
+    return get_manifest(), tuple(path.read_bytes() for path in paths)
 
 
 def check_boundary(data):
@@ -65,9 +79,9 @@ def check_boundary(data):
 
 
 def check_consistency(data):
-    """Convert a field forward to an ordered vector, then back to a field."""
-    forward_result = tuple(data[key] for key in FIELD_NAMES)
-    reverse_result = dict(zip(FIELD_NAMES, forward_result))
+    """Serialize a field forward, then reconstruct it from that representation."""
+    forward_result = canonical_model(data)
+    reverse_result = json.loads(forward_result)
     return all(math.isclose(data[key], reverse_result[key], rel_tol=0,
                             abs_tol=TOLERANCE) for key in FIELD_NAMES)
 
@@ -106,7 +120,13 @@ def validate_system(input_data=None):
     if input_data is not None and not check_boundary(input_data):
         return report
     try:
+        initial_config = _configuration_snapshot()
         samples = [run_cycle() for _ in range(3)]
+        report["environment_ready"] = (
+            check_environment() and _configuration_snapshot() == initial_config
+        )
+        if not report["environment_ready"]:
+            return report
         data = samples[0] if input_data is None else input_data
         report["boundary_valid"] = check_boundary(data) and all(
             check_boundary(sample) for sample in samples
@@ -121,8 +141,7 @@ def validate_system(input_data=None):
         report["consistent"] = check_consistency(data)
         report["integrity_verified"], report["sha512"] = check_integrity(data)
         report["canonical_model"] = canonical_model(data)
-    except (OSError, ValueError, TypeError, KeyError, ImportError, AttributeError,
-            ZeroDivisionError, OverflowError):
+    except Exception:
         return report
     report["system_ready"] = all(report[key] for key in (
         "environment_ready", "boundary_valid", "stable", "consistent",
