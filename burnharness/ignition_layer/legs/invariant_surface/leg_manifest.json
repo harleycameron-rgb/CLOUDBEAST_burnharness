@@ -1,0 +1,14 @@
+{
+    "leg": "invariant_surface",
+    "ignition_state": {
+        "invariant_core": {
+            "stability": 0.999,
+            "phase": 0.0
+        },
+        "wobble_state": 0.0003,
+        "gesture_map": {
+            "vector_count": 32,
+            "curvature": 0.02
+        }
+    }
+}

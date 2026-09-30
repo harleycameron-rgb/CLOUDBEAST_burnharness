@@ -1,0 +1,14 @@
+{
+    "leg": "scandoc",
+    "ignition_state": {
+        "root_scan_state": 1.0,
+        "surface_topology": {
+            "grid": [
+                64,
+                64
+            ],
+            "roughness": 0.01
+        },
+        "provenance_delta": 0.0001
+    }
+}
