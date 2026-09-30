@@ -138,7 +138,11 @@ def validate_system(input_data=None):
             for sample in samples[1:] for key in FIELD_NAMES
         )
         report["stable"] = report["drift"] < DRIFT_LIMIT
-        report["consistent"] = check_consistency(data)
+        report["consistent"] = (
+            check_consistency(data)
+            and all(math.isclose(data[key], samples[0][key], rel_tol=0,
+                                 abs_tol=TOLERANCE) for key in FIELD_NAMES)
+        )
         report["integrity_verified"], report["sha512"] = check_integrity(data)
         report["canonical_model"] = canonical_model(data)
     except Exception:
