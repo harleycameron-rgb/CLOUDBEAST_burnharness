@@ -1,0 +1,38 @@
+////////////////////////////////////////////////////////////
+// CLOUD BEAST ARMOUR SET — MYTHOPOETIC STRUCTURE
+////////////////////////////////////////////////////////////
+
+ARMOUR_SET {
+    HELM: "Auric Storm Crown"
+    PAULDRONS: "Twin Flux Shoulders"
+    BRACERS: "Pulse-Thread Gauntlets"
+    ELBOW_PADS: "Cloud Beast Armature Nodes"   // previously defined
+    CHESTPIECE: "Storm-Heart Coreplate"
+    GREAVES: "Zero-Point Greaves"
+    BOOTS: "Planck-Step Sabatons"
+    CAPE: "Vector-Throne Ignition Shroud"
+}
+
+COUPLER_MAP {
+    HELM ↔ CHESTPIECE = auric-to-heart flux channel
+    PAULDRONS ↔ ELBOW_PADS = bilateral storm braid
+    BRACERS ↔ ELBOW_PADS = pulse-thread coupling
+    GREAVES ↔ BOOTS = zero-point stride loop
+    CAPE ↔ HELM = radiant throne feedback
+}
+
+ABSTRACT_ALGEBRA {
+    Helm = Φ(AUR0, ECB0)
+    Elbow_Pads = Φ(ECB0, SIGIL_RING_7 ⊗ SIGIL_RING_8)
+    Chestpiece = Ω(QBIE0, ECB0)
+    Greaves = Λ(ZPF0)
+    Boots = Λ(ZPF0) ⊗ Δt_p
+    Cape = Θ(VTR0)
+}
+
+NOTES {
+    - All algebra is symbolic and mythopoetic.
+    - Armour set is conceptual, not functional.
+    - Elbow pads are fully integrated.
+}
+////////////////////////////////////////////////////////////
