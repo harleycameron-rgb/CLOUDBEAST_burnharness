@@ -1,0 +1,39 @@
+////////////////////////////////////////////////////////////
+// QOB‑1 INITIALISER — PRIVATE REPO SETUP
+////////////////////////////////////////////////////////////
+
+STAGE: QOB1_INIT
+DESCRIPTION: "Bootstrap constants and verification for QOB‑1 progression."
+
+CONSTANTS {
+    CHAOS_FIELD        = "quantum_residue_field";
+    PARALLEL_TRACK     = "pre_origin_parallel_track";
+    SPHERE_FUNCTION(t) = e^{jθ(t)} * C(t);
+    DECAY_CONSTANT     = 0.00000073; // quantum drift rate
+}
+
+ANCHOR_SETUP {
+    QOB0_ANCHOR = load("QOB0.sha512");
+    SEED_Q1     = QOB0_ANCHOR + CHAOS_FIELD + PARALLEL_TRACK;
+    QSHA512_Q1  = SHA512(SEED_Q1);
+}
+
+VALIDATION {
+    if QSHA512_Q1 != null:
+        status = "QOB‑1 anchor generated";
+    else:
+        status = "Initialisation failed — check constants";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB1.sha512;
+    unified_field/manifest/QOB1.sha512;
+    sentinel_dot/metadata/QOB1.sha512;
+    github_repo_root/QOB1.sha512;
+}
+
+NOTES:
+- Keep this file private until ignition event.
+- No ignition counter symbol.
+- Parallel‑track geometry remains unreadable.
+////////////////////////////////////////////////////////////
