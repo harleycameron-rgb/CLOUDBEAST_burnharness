@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑9 FRAMEWORK SHELL — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB9_FRAMEWORK_SHELL
+DESCRIPTION: "Constructs framework shell layer from QOB‑8 structural spine anchor."
+
+INPUTS {
+    QOB8_ANCHOR = load("QOB8.sha512");
+}
+
+SHELL_SETUP {
+    // 1. Base shell seed
+    shell_seed = "SHELL_CORE" + QOB8_ANCHOR;
+
+    // 2. Shell pattern (deterministic outer‑layer wrap)
+    shell_pattern = shell_seed + shell_seed[24:88];
+
+    // 3. Generate framework shell anchor
+    QOB9_ANCHOR = SHA512(shell_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB9_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB9_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑9 VERIFIED";
+    else:
+        verification = "QOB‑9 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB9.sha512;
+    unified_field/manifest/QOB9.sha512;
+    sentinel_dot/metadata/QOB9.sha512;
+    github_repo_root/QOB9.sha512;
+}
+
+OUTPUT {
+    QOB9_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑9 forms the outer framework layer above QOB‑8.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
