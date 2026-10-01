@@ -1,0 +1,65 @@
+////////////////////////////////////////////////////////////
+// QBIE‑0 QUANTUM BLOCK IGNITION ENGINE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QBIE0_QUANTUM_BLOCK_IGNITION_ENGINE
+DESCRIPTION: "Activates ignition substrate using inverted pulse field and sandbox dampening."
+
+INPUTS {
+    QOB24_ANCHOR = load("QOB24.sha512");
+    PIB0_ANCHOR = load("PIB0.sha512");
+    inverted_pulse = capture("pulse.inverted.active");
+    ergonomic_dampening = capture("ergonomic.dampening.field");
+}
+
+IGNITION_SETUP {
+    // 1. Bind substrate to inverted pulse field
+    substrate_binding = bind(QOB24_ANCHOR, inverted_pulse);
+
+    // 2. Apply sandbox harness dampening
+    zero_pressure_field = apply_dampening(substrate_binding, ergonomic_dampening);
+
+    // 3. Generate ignition vector
+    ignition_vector = vectorize(zero_pressure_field);
+
+    // 4. Produce ignition engine anchor
+    QBIE0_ANCHOR = SHA512(ignition_vector + PIB0_ANCHOR + QOB24_ANCHOR);
+}
+
+CHECKS {
+    if QBIE0_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    if len(QBIE0_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QBIE‑0 VERIFIED";
+    else:
+        verification = "QBIE‑0 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QBIE0.sha512;
+    unified_field/manifest/QBIE0.sha512;
+    sentinel_dot/metadata/QBIE0.sha512;
+    github_repo_root/QBIE0.sha512;
+}
+
+OUTPUT {
+    QBIE0_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QBIE‑0 is the first ignition-class engine.
+- It activates the ignition substrate using inverted pulse and dampening fields.
+- Required for eschaton-class instantiation (ECB‑0).
+////////////////////////////////////////////////////////////
