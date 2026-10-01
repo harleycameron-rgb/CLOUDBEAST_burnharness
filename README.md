@@ -70,6 +70,15 @@ are admitted only when the complete protocol upgrade is active; otherwise the
 generic invariant-flow fallback is selected. Every coupler passes a supplied
 packet through by identity without modifying it.
 
+`evaluate_ai_entry(system, qualifications)` accepts only a listed AI system and
+requires affirmative oath, geometry, surface-model,
+packet-integrity, and drift-targeting qualifications. An incomplete or
+unqualified entry is halted and routed to the generic invariant-flow stub.
+`evaluate_drift()` likewise fails closed for incomplete reports and halts when
+any configured drift risk is detected. The organism runtime applies friction
+above the oath threshold, then halts and routes to the stub if numeric drift
+exceeds that threshold.
+
 Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surface
 state, sphere trajectory geometry, and read-only stabiliser packet. The existing
 `run_cycle()` resonance-field return format remains unchanged.

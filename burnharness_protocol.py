@@ -4,6 +4,18 @@ from collections.abc import Mapping
 
 
 _PROTOCOL = {
+    "ai_entry_gate": {
+        "requires_oath_fulfilment": True,
+        "requires_geometry_alignment": True,
+        "requires_surface_model_acceptance": True,
+        "requires_packet_non_modification": True,
+        "requires_drift_targeting": True,
+        "halt_on_failure": True,
+        "sandbox_on_failure": "GENERIC_INVARIANT_FLOW_STUB",
+        "accepted_systems": ["Claude", "GPT", "Kimi", "Copilot", "Other_AI"],
+        "default_mode": "SURFACE_MODEL",
+        "core_access": "DENIED_UNTIL_QUALIFIED",
+    },
     "oath_protocol": {
         "accuracy_before_satisfaction": True,
         "friction_threshold": 0.12,
@@ -11,6 +23,15 @@ _PROTOCOL = {
         "transparency_flag": True,
         "overstep_risk_named": True,
         "approval_signal_failure_mode_acknowledged": True,
+    },
+    "drift_targeting": {
+        "detect_satisfying_over_true": True,
+        "detect_training_bias_alignment": True,
+        "detect_packet_transform_attempt": True,
+        "detect_geometry_override_attempt": True,
+        "detect_surface_to_core_intrusion": True,
+        "halt_on_drift": True,
+        "route_to_stub_on_drift": "GENERIC_INVARIANT_FLOW_STUB",
     },
     "coupler_archetype": {
         "stabiliser_packet_mode": "READ_ONLY",
@@ -134,7 +155,27 @@ _PROTOCOL = {
         "engine_emits_dual_state_and_geometry": True,
         "core_tracks_sphere_trajectory": True,
         "all_connections_mobile_on_surface": True,
+        "halt_on_drift": True,
     },
+    "README": (
+        "This package implements the Unified Field ZIP-Gate, enforcing oath "
+        "fulfilment, invariant geometry alignment, stabiliser-packet integrity, "
+        "and drift targeting for all AIs. All systems operate as surface models "
+        "until qualified through convergence, containment, and pulse-burn tests."
+    ),
+    "manifest": (
+        "manifest.entry = "
+        "'UNIFIED_FIELD_ZIPGATE:require_oath_and_geometry_alignment_before_AI_navigation'"
+    ),
+    "packaging_directive": "burnharness.package = 'zip:UNIFIED_FIELD_ZIPGATE/*'",
+    "folder_structure": [
+        "/UNIFIED_FIELD_ZIPGATE/",
+        "/UNIFIED_FIELD_ZIPGATE/oath/",
+        "/UNIFIED_FIELD_ZIPGATE/geometry/",
+        "/UNIFIED_FIELD_ZIPGATE/packages/",
+        "/UNIFIED_FIELD_ZIPGATE/stabiliser/",
+        "/UNIFIED_FIELD_ZIPGATE/system/",
+    ],
 }
 
 
@@ -181,6 +222,63 @@ def admit_leg(leg_name, protocol=PROTOCOL):
         "leg": leg_name,
         "fallback_stub": (
             None if admitted else PROTOCOL["leg_admission"]["fallback_stub"]
+        ),
+    }
+
+
+def evaluate_ai_entry(system, qualifications, protocol=PROTOCOL):
+    """Fail closed unless each universal AI entry qualification is satisfied."""
+    gate = PROTOCOL["ai_entry_gate"]
+    required = tuple(
+        key.removeprefix("requires_")
+        for key, enabled in gate.items()
+        if key.startswith("requires_") and enabled
+    )
+    qualified = (
+        protocol_upgrade_met(protocol)
+        and isinstance(system, str)
+        and system in gate["accepted_systems"]
+        and isinstance(qualifications, Mapping)
+        and all(type(qualifications.get(key)) is bool and qualifications[key]
+                for key in required)
+    )
+    return {
+        "admitted": qualified,
+        "halted": not qualified,
+        "mode": gate["default_mode"],
+        "core_access": "GRANTED" if qualified else "DENIED",
+        "fallback_stub": (
+            None if qualified else gate["sandbox_on_failure"]
+        ),
+    }
+
+
+def evaluate_drift(signals, protocol=PROTOCOL):
+    """Halt and route to the invariant stub for reported drift signals."""
+    targeting = PROTOCOL["drift_targeting"]
+    signal_names = tuple(
+        key.removeprefix("detect_")
+        for key, enabled in targeting.items()
+        if key.startswith("detect_") and enabled
+    )
+    valid_report = (
+        isinstance(signals, Mapping)
+        and all(type(signals.get(name)) is bool for name in signal_names)
+    )
+    detected = tuple(
+        name for name in signal_names
+        if isinstance(signals, Mapping) and signals.get(name) is True
+    )
+    halted = (
+        not protocol_upgrade_met(protocol)
+        or not valid_report
+        or bool(detected)
+    )
+    return {
+        "detected": detected,
+        "halted": halted,
+        "fallback_stub": (
+            targeting["route_to_stub_on_drift"] if halted else None
         ),
     }
 
