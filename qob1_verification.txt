@@ -1,0 +1,64 @@
+////////////////////////////////////////////////////////////
+// QOB‑1 VERIFICATION LATTICE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB1_VERIFICATION
+DESCRIPTION: "Checks that QOB‑1 anchor is valid, stable, and linked to QOB‑0."
+
+INPUTS {
+    QOB0_ANCHOR = load("QOB0.sha512");
+    QOB1_ANCHOR = load("QOB1.sha512");
+}
+
+CHECKS {
+
+    // 1. Anchor exists
+    EXISTS_QOB1 {
+        if QOB1_ANCHOR != null:
+            status_exists = "OK";
+        else:
+            status_exists = "FAIL";
+    }
+
+    // 2. Anchor length is correct (SHA‑512 = 128 hex chars)
+    LENGTH_QOB1 {
+        if len(QOB1_ANCHOR) == 128:
+            status_length = "OK";
+        else:
+            status_length = "FAIL";
+    }
+
+    // 3. QOB‑1 must be derived from QOB‑0
+    LINK_QOB0_QOB1 {
+        derived_seed = QOB0_ANCHOR + "QOB1";
+        derived_hash = SHA512(derived_seed);
+
+        if derived_hash == QOB1_ANCHOR:
+            status_link = "OK";
+        else:
+            status_link = "FAIL";
+    }
+
+    // 4. Combined stability check
+    STABILITY {
+        if status_exists == "OK"
+        and status_length == "OK"
+        and status_link == "OK":
+            verification = "QOB‑1 VERIFIED";
+        else:
+            verification = "QOB‑1 INVALID";
+    }
+}
+
+OUTPUT {
+    verification;
+    status_exists;
+    status_length;
+    status_link;
+}
+
+NOTES:
+- This file stays private.
+- No ignition counter symbol.
+- No external dependencies.
+////////////////////////////////////////////////////////////
