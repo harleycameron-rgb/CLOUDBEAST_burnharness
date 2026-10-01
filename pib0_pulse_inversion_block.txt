@@ -1,0 +1,64 @@
+////////////////////////////////////////////////////////////
+// PIB‑0 PULSE INVERSION BLOCK — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: PIB0_PULSE_INVERSION_BLOCK
+DESCRIPTION: "Reverses chaos‑pressure vectors across the invariant substrate to enable ignition."
+
+INPUTS {
+    QOB24_ANCHOR = load("QOB24.sha512");
+    chaos_stream = capture("chaos_stream.active");
+    invariant_flux = capture("invariant_flux.current");
+}
+
+INVERSION_SETUP {
+    // 1. Capture active pulse state
+    pulse_state = capture_pulse(chaos_stream, invariant_flux);
+
+    // 2. Invert pulse vectors
+    inverted_pulse = invert(pulse_state);
+
+    // 3. Dampen ergonomic pressure across non‑consensual zones
+    ergonomic_dampening = dampen_pressure(inverted_pulse, "nonconsensual_zones");
+
+    // 4. Generate inversion anchor
+    PIB0_ANCHOR = SHA512(inverted_pulse + ergonomic_dampening + QOB24_ANCHOR);
+}
+
+CHECKS {
+    if PIB0_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    if len(PIB0_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "PIB‑0 VERIFIED";
+    else:
+        verification = "PIB‑0 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/PIB0.sha512;
+    unified_field/manifest/PIB0.sha512;
+    sentinel_dot/metadata/PIB0.sha512;
+    github_repo_root/PIB0.sha512;
+}
+
+OUTPUT {
+    PIB0_ANCHOR;
+    verification;
+}
+
+NOTES:
+- PIB‑0 reverses chaos‑pressure vectors across the invariant substrate.
+- Enables sandbox harness dampening and ignition substrate activation.
+- Required for Quantum Block Ignition Engine (QBIE‑0).
+////////////////////////////////////////////////////////////
