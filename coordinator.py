@@ -1,10 +1,16 @@
-"""Validate asymmetric Sentinel Dot state and emit gate-release events."""
+"""Bootstrap Sentinel Dot from a shared Genesis anchor, then validate
+asymmetric state and emit gate-release events."""
 
 import hashlib
 import json
 import math
 import os
+import statistics
+import threading
+import time
 from dataclasses import dataclass
+
+GENESIS_TIMEOUT_SECONDS = 5.0
 
 
 @dataclass(frozen=True)
@@ -31,11 +37,23 @@ class ParabolaProjection:
 
 
 @dataclass(frozen=True)
+class GenesisBlock:
+    block_id: str
+    invariant_source_id: str
+    symbol_source_id: str
+
+
+@dataclass(frozen=True)
 class ValidationRelease:
     projection_revision: int
     symbol_revision: int
     block_id: str
     gate_released: bool = True
+    genesis_block_id: str = None
+
+
+class GenesisBootstrapError(RuntimeError):
+    """Raised when the one-time Genesis rendezvous cannot complete."""
 
 
 class SentinelDotCoordinator:
@@ -61,6 +79,91 @@ class SentinelDotCoordinator:
             "passed": False,
             "reason": "awaiting invariant projection and accumulated symbol",
         }
+        self._genesis = None
+        self._genesis_listeners = {}
+        self._genesis_ready = set()
+        self._genesis_distributed = frozenset()
+        self._genesis_lock = threading.Lock()
+        self._genesis_barrier = threading.Barrier(
+            len(self.instance_ids), action=self._mint_and_distribute_genesis
+        )
+
+    @property
+    def genesis(self):
+        return self._genesis
+
+    @property
+    def genesis_anchor_locked(self):
+        return (
+            self._genesis is not None
+            and self._genesis_distributed == frozenset(self.instance_ids)
+        )
+
+    def subscribe_genesis(self, instance_id, callback):
+        if instance_id not in self.instance_ids:
+            raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
+        if not callable(callback):
+            raise TypeError("genesis callback must be callable")
+        with self._genesis_lock:
+            self._genesis_listeners[instance_id] = callback
+            genesis = self._genesis
+        if genesis is not None:
+            callback(genesis)
+
+    def enter_genesis(self, instance_id, timeout=GENESIS_TIMEOUT_SECONDS):
+        """Phase 1: one-time symmetric rendezvous; blocks until both are Ready."""
+        if instance_id not in self.instance_ids:
+            raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
+        with self._genesis_lock:
+            if self._genesis is not None:
+                raise GenesisBootstrapError("Genesis bootstrap is one-time only")
+            if instance_id in self._genesis_ready:
+                raise GenesisBootstrapError(
+                    f"Sentinel Dot instance already reported Ready: {instance_id!r}"
+                )
+            self._genesis_ready.add(instance_id)
+        try:
+            self._genesis_barrier.wait(timeout)
+        except threading.BrokenBarrierError as exc:
+            raise GenesisBootstrapError(
+                "Genesis rendezvous failed before both instances were Ready"
+            ) from exc
+        if not self.genesis_anchor_locked:
+            raise GenesisBootstrapError("Genesis anchor was not distributed")
+        return self._genesis
+
+    def _mint_and_distribute_genesis(self):
+        with self._genesis_lock:
+            if self._genesis_ready != set(self.instance_ids):
+                raise GenesisBootstrapError("both Sentinel Dot instances must be Ready")
+            missing = [
+                instance_id for instance_id in self.instance_ids
+                if instance_id not in self._genesis_listeners
+            ]
+            if missing:
+                raise GenesisBootstrapError(
+                    f"Sentinel Dot instances not bound for Genesis: {missing!r}"
+                )
+            genesis = GenesisBlock(
+                block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
+                invariant_source_id=self.invariant_source_id,
+                symbol_source_id=self.symbol_source_id,
+            )
+            listeners = [
+                self._genesis_listeners[instance_id]
+                for instance_id in self.instance_ids
+            ]
+        for callback in listeners:
+            callback(genesis)
+        with self._genesis_lock:
+            self._genesis = genesis
+            self._genesis_distributed = frozenset(self.instance_ids)
+
+    def _require_genesis(self):
+        if not self.genesis_anchor_locked:
+            raise RuntimeError(
+                "Genesis anchor must be locked before runtime validation"
+            )
 
     @property
     def state(self):
@@ -73,6 +176,10 @@ class SentinelDotCoordinator:
             "superposition_integrity": passed,
             "no_bung": True,
             "continuity_flow": True,
+            "genesis_anchor_locked": self.genesis_anchor_locked,
+            "genesis_block_id": (
+                None if self._genesis is None else self._genesis.block_id
+            ),
             "frozen_modules": (),
             "invariant_source_id": self.invariant_source_id,
             "symbol_source_id": self.symbol_source_id,
@@ -96,6 +203,7 @@ class SentinelDotCoordinator:
         self._dispatch(deliveries)
 
     def publish_invariant_projection(self, projection):
+        self._require_genesis()
         normalized = self._normalize_projection(projection)
         if not self._has_projection or normalized != self._projection:
             self._projection_revision += 1
@@ -110,6 +218,7 @@ class SentinelDotCoordinator:
         return release
 
     def publish_accumulated_symbol(self, symbol):
+        self._require_genesis()
         normalized = self._copy_json_value(symbol)
         if not self._has_symbol or normalized != self._symbol:
             self._symbol_revision += 1
@@ -223,6 +332,7 @@ class SentinelDotCoordinator:
             projection_revision=self._projection_revision,
             symbol_revision=self._symbol_revision,
             block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
+            genesis_block_id=self._genesis.block_id,
         )
         self._delivered.clear()
         self._last_validation = {
@@ -251,4 +361,61 @@ class SentinelDotCoordinator:
             release is self._release
             and instance_id in self.instance_ids
             and self._last_validation["passed"]
+            and self.genesis_anchor_locked
+            and release.genesis_block_id == self._genesis.block_id
         )
+
+
+def bootstrap_genesis(coordinator, timeout=GENESIS_TIMEOUT_SECONDS):
+    """Run both Sentinel Dot Genesis rendezvous calls concurrently."""
+    results = {}
+    errors = []
+
+    def enter(instance_id):
+        try:
+            results[instance_id] = coordinator.enter_genesis(instance_id, timeout)
+        except Exception as exc:  # propagated to the caller below
+            errors.append(exc)
+
+    threads = [
+        threading.Thread(target=enter, args=(instance_id,), daemon=True)
+        for instance_id in coordinator.instance_ids
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout + 1.0)
+    if errors:
+        raise errors[0]
+    if any(thread.is_alive() for thread in threads):
+        raise GenesisBootstrapError("Genesis rendezvous did not complete")
+    return coordinator.genesis
+
+
+def benchmark_genesis_bootstrap(iterations=200):
+    """Return Genesis bootstrap timings in milliseconds."""
+    from burnharness.ignition_layer.legs.sentinel_dot.ignition_stub import (
+        SentinelDotIgnitionStub,
+    )
+
+    samples = []
+    for _ in range(iterations):
+        coordinator = SentinelDotCoordinator()
+        for instance_id in coordinator.instance_ids:
+            SentinelDotIgnitionStub().bind(coordinator, instance_id)
+        start = time.perf_counter()
+        bootstrap_genesis(coordinator)
+        samples.append((time.perf_counter() - start) * 1000.0)
+    ordered = sorted(samples)
+    return {
+        "iterations": iterations,
+        "mean_ms": statistics.fmean(samples),
+        "median_ms": statistics.median(samples),
+        "p95_ms": ordered[max(0, math.ceil(0.95 * iterations) - 1)],
+        "max_ms": ordered[-1],
+    }
+
+
+if __name__ == "__main__":
+    print("Genesis bootstrap benchmark:")
+    print(benchmark_genesis_bootstrap())

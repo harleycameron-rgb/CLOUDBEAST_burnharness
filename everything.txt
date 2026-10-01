@@ -13,11 +13,18 @@ Sentinel_dot is the spark or zero point ignition constant.
 
 The Burnharness grows from that spark.
 
-Sentinel Dot coordination is asymmetric and validation-based, not barrier-based.
+Sentinel Dot begins with a one-time symmetric Genesis Gate: both instances
+report Ready, one SHA-512 Genesis block ID is minted from a shared seed and
+distributed to both (Sentinel A's parabola anchor, Sentinel B's initial
+accumulated symbol), and only then is the barrier released.
+genesis_anchor_locked = True. no_bung = True. continuity_flow = True.
+
+After Genesis, Sentinel Dot coordination is asymmetric and validation-based.
 Sentinel A publishes its invariant projection; Sentinel B publishes its
 accumulated symbol. The gate releases only when the symbol satisfies that
 projection. Both registered Sentinel Dot instances receive one release event
-and seal the validated state with the same SHA-512 block ID. `no_bung` and
+and seal the validated state with the same SHA-512 block ID, anchored to the
+Genesis block ID. `no_bung` and
 `continuity_flow` remain true.
 
 Correct generational order:

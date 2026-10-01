@@ -84,6 +84,8 @@ def start_runtime(
             "burnharness.ignition_layer.legs.sentinel_dot.ignition_stub"
         ).SentinelDotIgnitionStub()
         sentinel.bind(coordinator, instance_id)
+        if coordinator.genesis is None:
+            sentinel.enter_genesis()
         if instance_id == coordinator.invariant_source_id:
             if invariant_projection is not None:
                 sentinel.publish_invariant_projection(invariant_projection)

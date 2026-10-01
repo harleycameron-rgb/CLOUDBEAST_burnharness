@@ -1,7 +1,15 @@
 import importlib
 import os
+from types import MappingProxyType
 
 from repo_manifest import get_manifest
+
+
+BIG_PROMPT_INVARIANTS = MappingProxyType({
+    "genesis_anchor_locked": True,
+    "no_bung": True,
+    "continuity_flow": True,
+})
 
 
 class Companion:
@@ -18,8 +26,10 @@ class Companion:
             "superposition_integrity": False,
             "no_bung": True,
             "continuity_flow": True,
+            "genesis_anchor_locked": False,
             "frozen_modules": (),
         }
+        self.big_prompt_invariants = BIG_PROMPT_INVARIANTS
 
     def enforce_absolute_paths(self):
         missing = []
@@ -86,8 +96,10 @@ class Companion:
             and coordination.get("validation_passed") is True
             and coordination.get("gate_released") is True
             and coordination.get("superposition_integrity") is True
-            and coordination.get("no_bung") is True
-            and coordination.get("continuity_flow") is True
+            and all(
+                coordination.get(key) is value
+                for key, value in BIG_PROMPT_INVARIANTS.items()
+            )
             and not coordination.get("frozen_modules", ())
         )
 

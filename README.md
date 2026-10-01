@@ -91,13 +91,24 @@ Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surfac
 state, sphere trajectory geometry, and read-only stabiliser packet. The existing
 `run_cycle()` resonance-field return format remains unchanged.
 
-`SentinelDotCoordinator` in `coordinator.py` uses an event-driven asymmetric
+`SentinelDotCoordinator` in `coordinator.py` starts with a one-time Genesis
+bootstrap: both bound Sentinel Dot instances call `enter_genesis()` (or use
+`bootstrap_genesis(coordinator)`), and once both are Ready the coordinator mints
+one SHA-512 Genesis block ID from `os.urandom(64)`, distributes it to Sentinel A
+(read-only parabola anchor) and Sentinel B (initial accumulated symbol), then
+releases the barrier. The rendezvous times out instead of deadlocking, and
+runtime publications are rejected until `genesis_anchor_locked` is true. Run
+`python coordinator.py` to benchmark Genesis bootstrap overhead.
+
+After Genesis, `SentinelDotCoordinator` uses an event-driven asymmetric
 validation gate. Sentinel A publishes its invariant projection while Sentinel B
 publishes its accumulated symbol; the gate releases only when the symbol belongs
 to the projection (including parabola and declared member/hash projections).
 Both registered Sentinel Dot instances receive the release event and seal it
 with the same SHA-512 block ID. Companion integrity reflects successful
-validation, with `no_bung` and `continuity_flow` preserved.
+validation, and every release carries the Genesis block ID it is anchored to.
+Companion integrity enforces the Big Prompt invariants
+`genesis_anchor_locked`, `no_bung` and `continuity_flow`.
 
 Run `python runtime_monitor.py` from the repository root to print live
 readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
