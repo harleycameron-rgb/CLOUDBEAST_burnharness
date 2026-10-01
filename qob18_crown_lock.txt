@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑18 CROWN LOCK — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB18_CROWN_LOCK
+DESCRIPTION: "Constructs crown lock layer from QOB‑17 crown seal anchor."
+
+INPUTS {
+    QOB17_ANCHOR = load("QOB17.sha512");
+}
+
+LOCK_SETUP {
+    // 1. Base crown lock seed
+    crown_lock_seed = "CROWNLOCK_CORE" + QOB17_ANCHOR;
+
+    // 2. Lock pattern (deterministic apex‑bond loop)
+    crown_lock_pattern = crown_lock_seed + crown_lock_seed[24:88];
+
+    // 3. Generate crown lock anchor
+    QOB18_ANCHOR = SHA512(crown_lock_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB18_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB18_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑18 VERIFIED";
+    else:
+        verification = "QOB‑18 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB18.sha512;
+    unified_field/manifest/QOB18.sha512;
+    sentinel_dot/metadata/QOB18.sha512;
+    github_repo_root/QOB18.sha512;
+}
+
+OUTPUT {
+    QOB18_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑18 forms the crown lock above QOB‑17.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
