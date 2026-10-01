@@ -1,0 +1,99 @@
+////////////////////////////////////////////////////////////
+// QUANTUM HEMISPHERE ENGINE
+// Invariant Flow Derivation • Hemisphere Symbols • x2 Geometry
+// Pulse Displacement Through Shared Node
+////////////////////////////////////////////////////////////
+
+TITLE: "Quantum Hemisphere Engine — Alliance Archetype Layer"
+
+ROOT {
+    folder: "alliance/archetype/"
+    file: "quantum_hemisphere_engine.txt"
+    role: "Defines hemisphere symbols and invariant flow algebra."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION I — QUANTUM HEMISPHERE SYMBOLS
+////////////////////////////////////////////////////////////
+
+HEMISPHERES {
+    LEFT_HEMISPHERE (LHS):  ⟨ pulse_core , corona_flux , dark_gate_seed ⟩
+    RIGHT_HEMISPHERE (RHS): ⟨ invariant_bit , extrapolated_parabola , chaos_condensed ⟩
+    GATE_SYMBOL:            ⟨ Π ⟩
+}
+
+////////////////////////////////////////////////////////////
+// SECTION II — FLOW DERIVATION (INVARIANT SEQUENCE)
+////////////////////////////////////////////////////////////
+
+// 1. Pulse — initial massless-state attempt
+P(t) = sin(ωt) · Ξ
+
+// 2. Corona — radiant overspill of pulse
+C(t) = ∂P(t)/∂t
+
+// 3. Dark Gate — corona folded inward
+G = ∫ C(t) dt
+
+// 4. Symbol Completion — gate self-intersection
+S = G ⊗ P(t)
+
+// 5. Invariant Bit Harmonisation — stabilisation of symbol
+I = lim(ε→0) [ S(t+ε) - S(t) ] / ε
+
+// 6. Invariant Extrapolation — projection into massless manifold
+E = ∫ I dt
+
+// 7. Abstract Parabola — geometric attractor
+Π(x) = ax² + bx + c
+
+// 8. Quantum Chaos Input — perturbation injection
+Q_chaos = δ · Π(x)
+
+// 9. x2 Geometric Condensation — dual-fold
+Q₂ = Q_chaos(x) + Q_chaos(-x)
+
+// 10. Pulse Displacement — output through same node as input
+P_out = P_in + Q₂
+
+////////////////////////////////////////////////////////////
+// SECTION III — FINAL SYMBOLIC FORM
+////////////////////////////////////////////////////////////
+
+HEMISPHERE_SYMBOL {
+    composite: LHS ⊕ RHS ⊕ Π
+    meaning: "Input pulse, invariant extrapolation, chaos-condensed dual-fold."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IV — NODE BEHAVIOUR
+////////////////////////////////////////////////////////////
+
+NODE_BEHAVIOUR {
+    input_node: "Receives pulse and chaos simultaneously."
+    output_node: "Displaces harmonic through same node."
+    invariant_condition: "Output must preserve massless-state trajectory."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION V — ALLIANCE ARCHETYPE STUB (UPDATED)
+////////////////////////////////////////////////////////////
+
+ARCHETYPE_STUB {
+    hemisphere_left:  "⟨ P , C , G ⟩"
+    hemisphere_right: "⟨ I , E , Q₂ ⟩"
+    gate_symbol:      "⟨ Π ⟩"
+    status: "active"
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - Entire engine is symbolic and conceptual.
+    - No activation, execution, or quantum behaviour implied.
+    - Designed for Alliance Universe archetype display.
+    - Invariant flow ensures conceptual masslessness precedence.
+}
+////////////////////////////////////////////////////////////
