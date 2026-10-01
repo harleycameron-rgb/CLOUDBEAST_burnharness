@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑6 STABILISATION NET — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB6_STABILISATION_NET
+DESCRIPTION: "Creates stabilisation net layer from QOB‑5 alignment anchor."
+
+INPUTS {
+    QOB5_ANCHOR = load("QOB5.sha512");
+}
+
+NET_SETUP {
+    // 1. Base stabilisation seed
+    stabilisation_seed = "STABILISE_CORE" + QOB5_ANCHOR;
+
+    // 2. Net pattern (deterministic weave)
+    net_pattern = stabilisation_seed + stabilisation_seed[32:96];
+
+    // 3. Generate stabilisation anchor
+    QOB6_ANCHOR = SHA512(net_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB6_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB6_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑6 VERIFIED";
+    else:
+        verification = "QOB‑6 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB6.sha512;
+    unified_field/manifest/QOB6.sha512;
+    sentinel_dot/metadata/QOB6.sha512;
+    github_repo_root/QOB6.sha512;
+}
+
+OUTPUT {
+    QOB6_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑6 forms the stabilisation layer above QOB‑5.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
