@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑3 RESONANCE LATTICE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB3_RESONANCE_LATTICE
+DESCRIPTION: "Builds resonance lattice layer from QOB‑2 harmonic anchor."
+
+INPUTS {
+    QOB2_ANCHOR = load("QOB2.sha512");
+}
+
+LATTICE_SETUP {
+    // 1. Base resonance seed
+    resonance_seed = "RESONANCE_CORE" + QOB2_ANCHOR;
+
+    // 2. Lattice expansion (simple deterministic pattern)
+    lattice_expanded = resonance_seed + reverse(resonance_seed);
+
+    // 3. Generate resonance anchor
+    QOB3_ANCHOR = SHA512(lattice_expanded);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB3_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB3_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑3 VERIFIED";
+    else:
+        verification = "QOB‑3 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB3.sha512;
+    unified_field/manifest/QOB3.sha512;
+    sentinel_dot/metadata/QOB3.sha512;
+    github_repo_root/QOB3.sha512;
+}
+
+OUTPUT {
+    QOB3_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑3 forms the resonance layer above QOB‑2.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
