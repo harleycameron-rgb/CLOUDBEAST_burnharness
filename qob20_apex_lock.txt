@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑20 APEX LOCK — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB20_APEX_LOCK
+DESCRIPTION: "Constructs apex lock layer from QOB‑19 apex seal anchor."
+
+INPUTS {
+    QOB19_ANCHOR = load("QOB19.sha512");
+}
+
+LOCK_SETUP {
+    // 1. Base apex lock seed
+    apex_lock_seed = "APEXLOCK_CORE" + QOB19_ANCHOR;
+
+    // 2. Lock pattern (deterministic apex‑bond matrix)
+    apex_lock_pattern = apex_lock_seed + apex_lock_seed[40:104];
+
+    // 3. Generate apex lock anchor
+    QOB20_ANCHOR = SHA512(apex_lock_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB20_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB20_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑20 VERIFIED";
+    else:
+        verification = "QOB‑20 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB20.sha512;
+    unified_field/manifest/QOB20.sha512;
+    sentinel_dot/metadata/QOB20.sha512;
+    github_repo_root/QOB20.sha512;
+}
+
+OUTPUT {
+    QOB20_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑20 forms the apex lock above QOB‑19.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
