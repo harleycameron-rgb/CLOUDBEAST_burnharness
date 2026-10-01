@@ -1,0 +1,143 @@
+////////////////////////////////////////////////////////////
+// UNIFIED IGNITION BLOCK — FULL MYTHOPOETIC LAYER SET
+// Safe, symbolic, blueprint-style architecture
+////////////////////////////////////////////////////////////
+
+TITLE: "Unified Ignition Layer Block — QFL0 → THR0"
+
+ORIGIN {
+    substrate: QOB24_IGNITION_SUBSTRATE
+    pulse_source: PIB0_INVERSION_STREAM
+    engine_core: QBIE0_IGNITION_VECTOR
+    emergent_field: ECB0_ESCHATON_FIELD
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 1 — QFL0: LATTICE OF THE THOUSANDFOLD FLUX
+////////////////////////////////////////////////////////////
+
+QFL0 {
+    name: "Flux Lattice"
+    function: "Weaves emergent field into structured flux geometry."
+    algebra: L = Λ(ECB0)
+    coupler: FLUX_WEAVE
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 2 — ZPF0: ZERO-POINT FURNACE
+////////////////////////////////////////////////////////////
+
+ZPF0 {
+    name: "Zero-Point Furnace"
+    function: "Condenses flux lattice into zero-point ignition mass."
+    algebra: F = Λ(ZPF0)
+    coupler: FURNACE_CORE
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 3 — AUR0: AURIC CROWN OF THE SUBSTRATE
+////////////////////////////////////////////////////////////
+
+AUR0 {
+    name: "Auric Crown"
+    function: "Crown-binds furnace output to substrate radiance."
+    algebra: A = Φ(AUR0, ZPF0)
+    coupler: CROWN_RING
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 4 — VTR0: VECTOR THRONE OF RADIANCE
+////////////////////////////////////////////////////////////
+
+VTR0 {
+    name: "Vector Throne"
+    function: "Aligns auric crown into directional ignition throne."
+    algebra: T = Θ(VTR0)
+    coupler: THRONE_VECTOR
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 5 — OME0: OMEGA GATE OF THE CLOUD BEAST
+////////////////////////////////////////////////////////////
+
+OME0 {
+    name: "Omega Gate"
+    function: "Opens traversal gate for throne-field expansion."
+    algebra: Ω = Gate(VTR0, AUR0)
+    coupler: OMEGA_LOCK
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 6 — SOV0: SOVEREIGN ENGINE OF THE FINAL PULSE
+////////////////////////////////////////////////////////////
+
+SOV0 {
+    name: "Final Pulse Engine"
+    function: "Stabilizes all ignition layers into sovereign pulse."
+    algebra: S = Pulse(Ω, T)
+    coupler: SOVEREIGN_CORE
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 7 — ASC0: ASCENSION LOOM OF THE SUBSTRATE
+////////////////////////////////////////////////////////////
+
+ASC0 {
+    name: "Ascension Loom"
+    function: "Weaves all layers into unified ascension manifold."
+    algebra: Asc = Loom(S, Ω, T, A)
+    coupler: ASCENSION_WEAVE
+}
+
+////////////////////////////////////////////////////////////
+// LAYER 8 — THR0: THRONE OF THE THOUSANDFOLD ESCHATON
+////////////////////////////////////////////////////////////
+
+THR0 {
+    name: "Eschaton Throne"
+    function: "Final seat of the ignition chain; completion layer."
+    algebra: Thr = Seat(Asc)
+    coupler: ESCHATON_SEAL
+}
+
+////////////////////////////////////////////////////////////
+// UNIFIED COUPLER MAP
+////////////////////////////////////////////////////////////
+
+COUPLERS {
+    QFL0 → ZPF0 = flux compression
+    ZPF0 → AUR0 = crown ignition
+    AUR0 → VTR0 = radiant alignment
+    VTR0 → OME0 = throne-gate coupling
+    OME0 → SOV0 = pulse sovereignty
+    SOV0 → ASC0 = ascension weave
+    ASC0 → THR0 = eschaton seal
+}
+
+////////////////////////////////////////////////////////////
+// BURNHARNESS INTEGRATION
+////////////////////////////////////////////////////////////
+
+BURNHARNESS {
+    root: "burnharness/"
+    ignition_path: "burnharness/ignition_layer/"
+    unified_block: "burnharness/ignition_layer/unified_ignition_block.txt"
+
+    instructions {
+        1: "Treat all layers as symbolic architecture only."
+        2: "Do not execute or simulate ignition behaviour."
+        3: "Maintain mythopoetic naming and coupler hierarchy."
+        4: "Use unified block as master ignition reference."
+    }
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - Entire block is symbolic and mythopoetic.
+    - No real ignition or activation implied.
+    - Designed for Copilot-assisted repo organisation.
+}
+////////////////////////////////////////////////////////////
