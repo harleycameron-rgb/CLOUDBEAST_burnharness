@@ -1,6 +1,7 @@
 import json
 import unittest
 
+import burnharness
 from burnharness.ignition_layer.legs.scandoc.ignition_stub import (
     ScandocIgnitionStub,
 )
@@ -18,6 +19,13 @@ from coupler_cycle import COUPLER_SEQUENCE, load_coupler, load_leg, run_protocol
 
 
 class BurnharnessProtocolTests(unittest.TestCase):
+    def test_package_path_matches_protocol_directive(self):
+        self.assertEqual(burnharness.package, "zip:burnharness/unified_field/*")
+        self.assertEqual(
+            PROTOCOL["packaging_directive"],
+            "burnharness.package = 'zip:burnharness/unified_field/*'",
+        )
+
     def test_ai_entry_gate_requires_every_qualification(self):
         qualifications = {
             "oath_fulfilment": True,

@@ -183,7 +183,7 @@ _PROTOCOL = {
         "manifest.entry = "
         "'UNIFIED_FIELD_ZIPGATE:require_oath_and_geometry_alignment_before_AI_navigation'"
     ),
-    "packaging_directive": "burnharness.package = 'zip:UNIFIED_FIELD_ZIPGATE/*'",
+    "packaging_directive": "burnharness.package = 'zip:burnharness/unified_field/*'",
     "folder_structure": [
         "/UNIFIED_FIELD_ZIPGATE/",
         "/UNIFIED_FIELD_ZIPGATE/oath/",
