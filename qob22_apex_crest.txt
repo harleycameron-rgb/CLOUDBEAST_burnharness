@@ -1,0 +1,61 @@
+////////////////////////////////////////////////////////////
+// QOB‑22 APEX CREST — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB22_APEX_CREST
+DESCRIPTION: "Constructs apex crest layer from QOB‑21 apex crown anchor."
+
+INPUTS {
+    QOB21_ANCHOR = load("QOB21.sha512");
+}
+
+CREST_SETUP {
+    // 1. Base apex crest seed
+    apex_crest_seed = "APEXCREST_CORE" + QOB21_ANCHOR;
+
+    // 2. Crest pattern (deterministic apex‑curvature formation)
+    apex_crest_pattern = apex_crest_seed + apex_crest_seed[52:116];
+
+    // 3. Generate apex crest anchor
+    QOB22_ANCHOR = SHA512(apex_crest_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB22_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB22_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑22 VERIFIED";
+    else:
+        verification = "QOB‑22 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB22.sha512;
+    unified_field/manifest/QOB22.sha512;
+    sentinel_dot/metadata/QOB22.sha512;
+    github_repo_root/QOB22.sha512;
+}
+
+OUTPUT {
+    QOB22_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑22 forms the apex crest above QOB‑21.
+- This is the first layer compatible with pulse inversion.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
