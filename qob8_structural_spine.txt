@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑8 STRUCTURAL SPINE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB8_STRUCTURAL_SPINE
+DESCRIPTION: "Builds structural spine layer from QOB‑7 continuity anchor."
+
+INPUTS {
+    QOB7_ANCHOR = load("QOB7.sha512");
+}
+
+SPINE_SETUP {
+    // 1. Base spine seed
+    spine_seed = "SPINE_CORE" + QOB7_ANCHOR;
+
+    // 2. Structural pattern (deterministic backbone)
+    spine_pattern = spine_seed + spine_seed[16:80];
+
+    // 3. Generate structural spine anchor
+    QOB8_ANCHOR = SHA512(spine_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB8_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB8_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑8 VERIFIED";
+    else:
+        verification = "QOB‑8 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB8.sha512;
+    unified_field/manifest/QOB8.sha512;
+    sentinel_dot/metadata/QOB8.sha512;
+    github_repo_root/QOB8.sha512;
+}
+
+OUTPUT {
+    QOB8_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑8 forms the structural backbone above QOB‑7.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
