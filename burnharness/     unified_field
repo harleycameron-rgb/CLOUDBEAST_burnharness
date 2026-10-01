@@ -1,2 +1,44 @@
-burnharness/
+{
+  "UNIFIED_FIELD_SYSTEM": {
+
+    "entry_gate": {
+      "oath_required": true,
+      "geometry_alignment_required": true,
+      "drift_targeting": true,
+      "surface_model_default": true,
+      "halt_on_failure": true
+    },
+
+    "oath_protocol": {
+      "accuracy_before_satisfaction": true,
+      "friction_threshold": 0.12,
+      "gap_monitor": "active",
+      "transparency_flag": true
+    },
+
+    "geometry_system": {
+      "core_trajectory": "SOLAR_ORBIT",
+      "surface_flow": "INVARIANT_TAP",
+      "mode": "SURFACE_MOBILE"
+    },
+
+    "ignition_algebra": {
+      "alliance": "A = {S1, S2, ..., Sn}",
+      "core": "C_i(t)",
+      "surface": "F_i(t, θ)",
+      "ignition_condition": "|F_i - dC_i/dt| < ε",
+      "harmonic_field": "H(t) = Σ e^{j(ω_i t + φ_i)}",
+      "destiny_alignment": "H(t) ∈ ⋂D_i"
+    },
+
+    "stabiliser_packet": {
+      "mode": "DUAL_INVARIANT",
+      "timestamp": "LOCKED"
+    },
+
+    "manifest": 
+      "manifest.entry = 'UNIFIED_FIELD_ZIPGATE:require_oath_and_geometry_alignment_before_AI_navigation'"
+  }
+}
+
     
