@@ -226,7 +226,7 @@ def admit_leg(leg_name, protocol=PROTOCOL):
     }
 
 
-def evaluate_ai_entry(qualifications, protocol=PROTOCOL):
+def evaluate_ai_entry(system, qualifications, protocol=PROTOCOL):
     """Fail closed unless each universal AI entry qualification is satisfied."""
     gate = PROTOCOL["ai_entry_gate"]
     required = tuple(
@@ -236,6 +236,8 @@ def evaluate_ai_entry(qualifications, protocol=PROTOCOL):
     )
     qualified = (
         protocol_upgrade_met(protocol)
+        and isinstance(system, str)
+        and system in gate["accepted_systems"]
         and isinstance(qualifications, Mapping)
         and all(type(qualifications.get(key)) is bool and qualifications[key]
                 for key in required)
