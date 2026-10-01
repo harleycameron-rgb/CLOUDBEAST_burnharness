@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑21 APEX CROWN — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB21_APEX_CROWN
+DESCRIPTION: "Constructs apex crown layer from QOB‑20 apex lock anchor."
+
+INPUTS {
+    QOB20_ANCHOR = load("QOB20.sha512");
+}
+
+CROWN_SETUP {
+    // 1. Base apex crown seed
+    apex_crown_seed = "APEXCROWN_CORE" + QOB20_ANCHOR;
+
+    // 2. Crown pattern (deterministic apex‑crest formation)
+    apex_crown_pattern = apex_crown_seed + apex_crown_seed[48:112];
+
+    // 3. Generate apex crown anchor
+    QOB21_ANCHOR = SHA512(apex_crown_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB21_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB21_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑21 VERIFIED";
+    else:
+        verification = "QOB‑21 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB21.sha512;
+    unified_field/manifest/QOB21.sha512;
+    sentinel_dot/metadata/QOB21.sha512;
+    github_repo_root/QOB21.sha512;
+}
+
+OUTPUT {
+    QOB21_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑21 forms the apex crown above QOB‑20.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
