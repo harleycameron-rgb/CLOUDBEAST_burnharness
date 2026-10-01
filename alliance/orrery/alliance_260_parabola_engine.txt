@@ -1,0 +1,36 @@
+////////////////////////////////////////////////////////////
+// ALLIANCE 260 PARABOLA ENGINE
+// Symbolic phase mapping • Non-temporal convergence model
+////////////////////////////////////////////////////////////
+
+TITLE: "Alliance 260 Parabola Engine"
+
+ROOT {
+    folder: "alliance/orrery/"
+    file: "alliance_260_parabola_engine.txt"
+    role: "Maps symbolic phase indices onto a bounded 260-step cycle."
+}
+
+MODEL {
+    cycle_length: 260
+    phase_index: "n ∈ {0, 1, ..., 259}"
+    wrapped_phase: "phase(n) = n mod 260"
+    parabola: "Π(x) = ax² + bx + c"
+}
+
+RULES {
+    1: "Phase indices are symbolic labels, not timestamps."
+    2: "The parabola is a descriptive mapping, not an orbital model."
+    3: "No prediction or physical interpretation is implied."
+}
+
+OUTPUT {
+    phase_index
+    wrapped_phase
+    symbolic_parabola
+}
+
+NOTES {
+    - The cycle length follows the Alliance Orrery Phase Codex.
+    - This engine is conceptual and non-executable.
+}

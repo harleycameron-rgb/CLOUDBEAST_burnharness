@@ -1,0 +1,26 @@
+////////////////////////////////////////////////////////////
+// QOB GLYPH PROMPT
+////////////////////////////////////////////////////////////
+
+TITLE: "QOB Visual Glyph Prompt"
+
+SUBJECT {
+    symbol: "QOB"
+    meaning: "Quantum-Origin Burnharness invariant anchor."
+}
+
+VISUAL_GUIDANCE {
+    composition: "Concentric boundary rings around a bisected central sphere."
+    accents: "Six perimeter nodes and a nested triangular base."
+    palette: "Cyan linework on a deep blue-black field."
+    constraints: [
+        "Use geometric linework only.",
+        "Keep the central axis and bilateral symmetry legible.",
+        "Avoid text, photorealism, and implied physical functionality."
+    ]
+}
+
+SOURCE {
+    svg: "qob_visual_glyph.svg"
+    algebra: "qob_glyph_algebra.txt"
+}

@@ -7,7 +7,7 @@
 TITLE: "Burnharness–Alliance Integration — Invariant Checksum QOB"
 
 ROOT {
-    folder: "burnharness/integration/"
+    folder: "integration/"
     file: "burnharness_alliance_invariant_checksum.txt"
     role: "Defines unified invariant checksum between Burnharness substrate and Alliance exclusion layer."
 }

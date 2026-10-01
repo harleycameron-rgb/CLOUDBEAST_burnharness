@@ -1,0 +1,25 @@
+////////////////////////////////////////////////////////////
+// BURNHARNESS–ALLIANCE INTEGRATION MANIFEST
+////////////////////////////////////////////////////////////
+
+ROOT {
+    folder: "integration/"
+    role: "Indexes the symbolic checksum and validation artifacts."
+}
+
+ARTIFACTS {
+    invariant_checksum: "burnharness_alliance_invariant_checksum.txt"
+    checksum_gate: "on_checksum_stub.txt"
+    validator: "on_checksum_validator_engine.txt"
+}
+
+INVARIANT {
+    symbol: "QOB"
+    minimum_coherence: 0.73
+    rule: "Reject frames below the stated coherence threshold."
+}
+
+NOTES {
+    - This manifest describes conceptual artifacts only.
+    - It does not execute validation or compute a checksum.
+}

@@ -1,0 +1,41 @@
+////////////////////////////////////////////////////////////
+// ALLIANCE STUB COUPLER TOPOLOGY MAP
+// Symbolic adjacency • No data transfer or execution
+////////////////////////////////////////////////////////////
+
+TITLE: "Alliance Stub Coupler Topology Map"
+
+ROOT {
+    folder: "alliance/couplers/"
+    file: "stub_coupler_topology_map.txt"
+    role: "Records the six-leg closed adjacency of the stub topology."
+}
+
+LEGS {
+    scandoc
+    invariant_surface
+    topology_engine
+    waxtablet_engine
+    orrery
+    sentinel_dot
+}
+
+COUPLERS {
+    scandoc ↔ invariant_surface
+    invariant_surface ↔ topology_engine
+    topology_engine ↔ waxtablet_engine
+    waxtablet_engine ↔ orrery
+    orrery ↔ sentinel_dot
+    sentinel_dot ↔ scandoc
+}
+
+INVARIANTS {
+    topology: "Closed ring"
+    packet_policy: "Any supplied stabiliser packet is treated as immutable."
+    scope: "Adjacency is descriptive; this map does not connect systems."
+}
+
+NOTES {
+    - Pair names match the repository coupler manifests.
+    - This map is symbolic and non-executable.
+}

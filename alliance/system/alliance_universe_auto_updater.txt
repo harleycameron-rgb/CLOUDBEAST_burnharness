@@ -1,0 +1,38 @@
+////////////////////////////////////////////////////////////
+// ALLIANCE UNIVERSE AUTO-UPDATER
+// Declarative refresh policy • Manual, non-executable artifact
+////////////////////////////////////////////////////////////
+
+TITLE: "Alliance Universe Auto-Updater"
+
+ROOT {
+    folder: "alliance/system/"
+    file: "alliance_universe_auto_updater.txt"
+    role: "Specifies safe conditions for proposing an Alliance artifact refresh."
+}
+
+UPDATE_POLICY {
+    trigger: "A human-reviewed change to a listed Alliance artifact"
+    inputs: [
+        "alliance/archetype/quantum_hemisphere_engine.txt",
+        "alliance/orrery/alliance_orrery_phase_codex.txt",
+        "alliance/orrery/alliance_260_parabola_engine.txt",
+        "alliance/couplers/stub_coupler_topology_map.txt"
+    ]
+    action: "Record a proposed revision; never modify files automatically."
+}
+
+GUARDS {
+    1: "Preserve symbolic, non-executable semantics."
+    2: "Require human review before accepting any proposed revision."
+    3: "Do not invoke network, shell, or repository-write operations."
+}
+
+OUTPUT {
+    proposed_revision
+    review_required: true
+}
+
+NOTES {
+    - The updater is a policy description, not an executable updater.
+}

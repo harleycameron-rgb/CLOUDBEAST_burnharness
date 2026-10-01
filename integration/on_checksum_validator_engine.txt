@@ -7,7 +7,7 @@
 TITLE: "ON-CHECKSUM VALIDATOR ENGINE — Invariant Gate"
 
 ROOT {
-    folder: "burnharness/integration/"
+    folder: "integration/"
     file: "on_checksum_validator_engine.txt"
     role: "Primary validator for all incoming frames in Burnharness."
 }

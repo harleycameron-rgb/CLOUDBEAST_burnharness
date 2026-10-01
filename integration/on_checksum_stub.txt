@@ -7,7 +7,7 @@
 TITLE: "ON-CHECKSUM STUB — Total-System Invariant Gate"
 
 ROOT {
-    folder: "burnharness/integration/"
+    folder: "integration/"
     file: "on_checksum_stub.txt"
     role: "Primary gate linking Burnharness substrate to Alliance exclusion layer."
 }

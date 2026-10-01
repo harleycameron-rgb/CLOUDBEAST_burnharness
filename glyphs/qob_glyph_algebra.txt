@@ -1,0 +1,33 @@
+////////////////////////////////////////////////////////////
+// QOB GLYPH ALGEBRA
+////////////////////////////////////////////////////////////
+
+TITLE: "QOB Visual Glyph Algebra"
+
+SYMBOL {
+    name: "QOB"
+    components: [
+        "outer boundary",
+        "nested resonance rings",
+        "left and right hemispheres",
+        "six perimeter nodes",
+        "central anchor",
+        "triangular base"
+    ]
+}
+
+RELATIONS {
+    bilateral_axis: "The central vertical axis separates paired hemispheres."
+    nested_rings: "Each ring is a boundary layer around the central anchor."
+    nodes: "Three paired nodes mark corresponding perimeter positions."
+    base: "The nested triangle closes the lower structural motif."
+}
+
+INVARIANT {
+    expression: "QOB = boundary ⊕ hemispheres ⊕ nodes ⊕ anchor ⊕ base"
+    meaning: "A visual composition rule, not a checksum algorithm."
+}
+
+NOTES {
+    - All components are symbolic and non-executable.
+}
