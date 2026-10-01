@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑16 CROWN LAYER — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB16_CROWN_LAYER
+DESCRIPTION: "Constructs crown layer from QOB‑15 final seal lattice anchor."
+
+INPUTS {
+    QOB15_ANCHOR = load("QOB15.sha512");
+}
+
+CROWN_SETUP {
+    // 1. Base crown seed
+    crown_seed = "CROWN_CORE" + QOB15_ANCHOR;
+
+    // 2. Crown pattern (deterministic apex formation)
+    crown_pattern = crown_seed + crown_seed[44:108];
+
+    // 3. Generate crown layer anchor
+    QOB16_ANCHOR = SHA512(crown_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB16_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB16_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑16 VERIFIED";
+    else:
+        verification = "QOB‑16 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB16.sha512;
+    unified_field/manifest/QOB16.sha512;
+    sentinel_dot/metadata/QOB16.sha512;
+    github_repo_root/QOB16.sha512;
+}
+
+OUTPUT {
+    QOB16_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑16 forms the crown layer above QOB‑15.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
