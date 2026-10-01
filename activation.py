@@ -67,18 +67,34 @@ def generate_sha512_block():
     return hashlib.sha512(os.urandom(64)).hexdigest()
 
 
-def start_runtime(coupler_state):
+def start_runtime(
+    coupler_state, coordinator=None, instance_id=None, *, p_i=None, p_j=None,
+    a_i=None, a_j=None, timeout=None
+):
     stabiliser = SuperpositionStabiliser()
     companion = Companion()
 
     stabiliser_report = stabiliser.stabilise()
     companion.enforce()
 
-    if not companion.superposition_integrity(stabiliser_report["state"]):
-        raise RuntimeError("Superposition integrity failed.")
-
     if sentinel_dot_event(coupler_state):
-        seal = generate_sha512_block()
+        if coordinator is None or instance_id is None:
+            raise RuntimeError("Sentinel Dot activation requires the shared barrier")
+        release = coordinator.report_alignment(
+            instance_id, p_i=p_i, p_j=p_j, a_i=a_i, a_j=a_j, timeout=timeout
+        )
+        if release is None:
+            return False
+        coordination_state = coordinator.state
+        if not companion.superposition_integrity(
+            stabiliser_report["state"], coordination_state
+        ):
+            raise RuntimeError("Superposition integrity failed.")
+        sentinel = importlib.import_module(
+            "burnharness.ignition_layer.legs.sentinel_dot.ignition_stub"
+        ).SentinelDotIgnitionStub()
+        sentinel.fire(coordinator, release, instance_id)
+        seal = release.block_id
         print("New block generated with SHA-512 seal:")
         print(seal)
 
