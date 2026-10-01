@@ -1,6 +1,5 @@
 """Governance and packet helpers for the unified Burnharness protocol."""
 
-from types import MappingProxyType
 from collections.abc import Mapping
 
 
@@ -139,9 +138,19 @@ _PROTOCOL = {
 }
 
 
+class _FrozenDict(dict):
+    """A JSON-compatible read-only mapping used for protocol snapshots."""
+
+    def _immutable(self, *args, **kwargs):
+        raise TypeError("mapping is read-only")
+
+    __setitem__ = __delitem__ = clear = pop = popitem = setdefault = update = _immutable
+    __ior__ = _immutable
+
+
 def _freeze(value):
     if isinstance(value, dict):
-        return MappingProxyType({key: _freeze(item) for key, item in value.items()})
+        return _FrozenDict({key: _freeze(item) for key, item in value.items()})
     if isinstance(value, list):
         return tuple(_freeze(item) for item in value)
     if isinstance(value, tuple):
@@ -183,7 +192,7 @@ def create_stabiliser_packet():
 
 def propagate_stabiliser_packet(packet):
     """Pass an immutable packet through unchanged; reject mutable packet data."""
-    if (not isinstance(packet, MappingProxyType)
+    if (not isinstance(packet, _FrozenDict)
             or dict(packet) != dict(PROTOCOL["stabiliser_packet"])):
         raise TypeError("stabiliser packet must be created by create_stabiliser_packet")
     return packet
