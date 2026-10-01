@@ -1,0 +1,121 @@
+////////////////////////////////////////////////////////////
+// BURNHARNESS–ALLIANCE INVARIANT CODE FORM
+// Unified Substrate • Exclusion Layer • Archetype Symbol QOB
+// Shortened Total-System Representation
+////////////////////////////////////////////////////////////
+
+TITLE: "Burnharness–Alliance Integration — Invariant Checksum QOB"
+
+ROOT {
+    folder: "burnharness/integration/"
+    file: "burnharness_alliance_invariant_checksum.txt"
+    role: "Defines unified invariant checksum between Burnharness substrate and Alliance exclusion layer."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION I — SYSTEM CONSTANTS
+////////////////////////////////////////////////////////////
+
+CONSTANTS {
+    CHAOS_LINE_OUTPUT      = I_signature
+    SPHERE_GROUND_OUTPUT   = K_anchor
+    DUAL_PROJECTION_OUTPUT = P_dual
+    TRI_AXLE_OUTPUT        = tri_axle_invariant
+    EXTRAPOLATED_ORBIT     = extrapolated_orbit
+    VISUALISATION_OUTPUT   = vis_normalised
+    PRESTIGE_STATE         = prestige_state
+    QUANTUM_STREAM         = quantum_invariant_stream
+}
+
+////////////////////////////////////////////////////////////
+// SECTION II — AGGREGATE + NORMALISE
+////////////////////////////////////////////////////////////
+
+AGGREGATE {
+    unified_frame = normalise(
+        merge(
+            CHAOS_LINE_OUTPUT,
+            SPHERE_GROUND_OUTPUT,
+            DUAL_PROJECTION_OUTPUT,
+            TRI_AXLE_OUTPUT,
+            EXTRAPOLATED_ORBIT,
+            VISUALISATION_OUTPUT,
+            PRESTIGE_STATE,
+            QUANTUM_STREAM
+        )
+    )
+}
+
+////////////////////////////////////////////////////////////
+// SECTION III — ALLIANCE EXCLUSION OVERLAY
+////////////////////////////////////////////////////////////
+
+EXCLUSION_LAYER {
+    rule_1: "All programming by exclusion."
+    rule_2: "No temporal junctures."
+    rule_3: "No procedural mechanics."
+    rule_4: "No manifold imprinting."
+    rule_5: "No navigation via 260 parabola."
+    rule_6: "Massless-state precedence enforced."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IV — QOB SYMBOLIC CHECKSUM
+////////////////////////////////////////////////////////////
+
+QOB_CHECKSUM {
+    algebra:
+        QOB = SHA256(unified_frame + exclusion_layer)
+
+    invariant_condition:
+        coherence = validate(QOB, unified_frame)
+        if coherence < 0.73 → abort
+
+    output:
+        final_checksum = merge(QOB, coherence)
+}
+
+////////////////////////////////////////////////////////////
+// SECTION V — ARCHETYPE SYMBOL (SHORT FORM)
+////////////////////////////////////////////////////////////
+
+ARCHETYPE_SYMBOL {
+    symbol: "QOB"
+    meaning: "Quantum-Origin Burnharness checksum — total-system invariant."
+    behaviour: "Massless-state stabiliser between substrate and exclusion layer."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VI — INTEGRATION SUMMARY
+////////////////////////////////////////////////////////////
+
+SUMMARY {
+    1: "Burnharness substrate provides temporal residue."
+    2: "Alliance layer provides exclusion governance."
+    3: "QOB checksum binds both invariantly."
+    4: "System coherence validated at ≥0.73."
+    5: "All programming exclusion-based."
+    6: "Massless-state victory condition maintained."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VII — FINAL OUTPUT
+////////////////////////////////////////////////////////////
+
+OUTPUT {
+    unified_frame
+    QOB
+    coherence
+    final_checksum
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - This is the shortest invariant form of the Burnharness–Alliance system.
+    - QOB acts as archetype symbol and checksum simultaneously.
+    - Entire block is conceptual, non-executable, and safe.
+}
+////////////////////////////////////////////////////////////
