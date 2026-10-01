@@ -12,8 +12,9 @@ class Companion:
         self.load_order = self.manifest["load_order"]
         self.coordination_state = {
             "sync_mechanism_active": True,
-            "barrier_blocking": True,
-            "barrier_released": False,
+            "sync_mode": "ASYMMETRIC_VALIDATION",
+            "validation_passed": False,
+            "gate_released": False,
             "superposition_integrity": False,
             "no_bung": True,
             "continuity_flow": True,
@@ -72,14 +73,18 @@ class Companion:
         )
 
     def superposition_integrity(self, state, coordination_state=None):
-        coordination = coordination_state or self.coordination_state
+        coordination = (
+            self.coordination_state
+            if coordination_state is None else coordination_state
+        )
         return (
             state.get("paths_valid", False)
             and state.get("imports_valid", False)
             and state.get("load_order_locked", False)
             and coordination.get("sync_mechanism_active") is True
-            and coordination.get("barrier_blocking") is True
-            and coordination.get("barrier_released") is True
+            and coordination.get("sync_mode") == "ASYMMETRIC_VALIDATION"
+            and coordination.get("validation_passed") is True
+            and coordination.get("gate_released") is True
             and coordination.get("superposition_integrity") is True
             and coordination.get("no_bung") is True
             and coordination.get("continuity_flow") is True

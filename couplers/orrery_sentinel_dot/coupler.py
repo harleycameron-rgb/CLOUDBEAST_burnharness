@@ -5,14 +5,20 @@ from burnharness_protocol import packet_output
 class OrrerySentinelDotCoupler:
     def __init__(
         self, legA, legB, stabiliser_packet=None, coordinator=None,
-        sentinel_instance_id=None, timeout=None
+        invariant_projection=None, accumulated_symbol=None,
     ):
         self.A = legA.ignite()
         self.B = legB.ignite()
         self.stabiliser_packet = stabiliser_packet
         self.coordinator = coordinator
-        self.sentinel_instance_id = sentinel_instance_id
-        self.timeout = timeout
+        self.invariant_projection = (
+            self.A.get("invariant_projection")
+            if invariant_projection is None else invariant_projection
+        )
+        self.accumulated_symbol = (
+            self.B.get("accumulated_symbol")
+            if accumulated_symbol is None else accumulated_symbol
+        )
 
     def couple(self):
         output = {
@@ -22,18 +28,16 @@ class OrrerySentinelDotCoupler:
             **packet_output(self.stabiliser_packet),
         }
         if self.coordinator is not None:
-            if self.sentinel_instance_id is None:
-                raise ValueError("a Sentinel Dot instance ID is required")
-            release = self.coordinator.report_alignment(
-                self.sentinel_instance_id,
-                p_i=self.A.get("p"),
-                p_j=self.B.get("p"),
-                a_i=self.A.get("a"),
-                a_j=self.B.get("a"),
-                timeout=self.timeout,
-            )
-            output["sentinel_ready"] = release is not None
-            output["sentinel_release"] = release
+            if self.invariant_projection is not None:
+                self.coordinator.publish_invariant_projection(
+                    self.invariant_projection
+                )
+            if self.accumulated_symbol is not None:
+                self.coordinator.publish_accumulated_symbol(
+                    self.accumulated_symbol
+                )
+            output["sentinel_validation"] = self.coordinator.state["validation"]
+            output["sentinel_release"] = self.coordinator.release
         return output
 
     def _harmonise_stability(self):

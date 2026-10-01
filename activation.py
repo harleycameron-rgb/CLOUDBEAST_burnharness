@@ -68,8 +68,8 @@ def generate_sha512_block():
 
 
 def start_runtime(
-    coupler_state, coordinator=None, instance_id=None, *, p_i=None, p_j=None,
-    a_i=None, a_j=None, timeout=None
+    coupler_state, coordinator=None, instance_id=None, *,
+    invariant_projection=None, accumulated_symbol=None
 ):
     stabiliser = SuperpositionStabiliser()
     companion = Companion()
@@ -79,21 +79,26 @@ def start_runtime(
 
     if sentinel_dot_event(coupler_state):
         if coordinator is None or instance_id is None:
-            raise RuntimeError("Sentinel Dot activation requires the shared barrier")
-        release = coordinator.report_alignment(
-            instance_id, p_i=p_i, p_j=p_j, a_i=a_i, a_j=a_j, timeout=timeout
-        )
-        if release is None:
-            return False
-        coordination_state = coordinator.state
-        if not companion.superposition_integrity(
-            stabiliser_report["state"], coordination_state
-        ):
-            raise RuntimeError("Superposition integrity failed.")
+            raise RuntimeError("Sentinel Dot activation requires the validation gate")
         sentinel = importlib.import_module(
             "burnharness.ignition_layer.legs.sentinel_dot.ignition_stub"
         ).SentinelDotIgnitionStub()
-        sentinel.fire(coordinator, release, instance_id)
+        sentinel.bind(coordinator, instance_id)
+        if instance_id == coordinator.invariant_source_id:
+            if invariant_projection is not None:
+                sentinel.publish_invariant_projection(invariant_projection)
+        elif instance_id == coordinator.symbol_source_id:
+            if accumulated_symbol is not None:
+                sentinel.publish_accumulated_symbol(accumulated_symbol)
+        else:
+            raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
+        release = coordinator.release
+        if release is None:
+            return False
+        if not companion.superposition_integrity(
+            stabiliser_report["state"], coordinator.state
+        ):
+            raise RuntimeError("Superposition integrity failed.")
         seal = release.block_id
         print("New block generated with SHA-512 seal:")
         print(seal)
