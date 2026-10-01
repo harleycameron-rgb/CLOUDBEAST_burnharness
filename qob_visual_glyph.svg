@@ -22,7 +22,7 @@
     <path d="M278 484 Q400 622 522 484" stroke-width="1.5" opacity=".35"/>
 
     <path d="M316 452 L484 452 L400 612 Z" stroke-width="1.5" opacity=".8"/>
-    <path d="M356 482 L444 482 L400 568 Z" fill="#020b12" stroke-width="2.5"/>
+    <path d="M338.68 466.4 L461.32 466.4 L400 583.2 Z" fill="#020b12" stroke-width="2.5"/>
 
     <path d="M397 196 l8 -3"/>
     <path d="M503 226 l5 7"/>
