@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑7 CONTINUITY FRAME — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB7_CONTINUITY_FRAME
+DESCRIPTION: "Builds continuity frame layer from QOB‑6 stabilisation anchor."
+
+INPUTS {
+    QOB6_ANCHOR = load("QOB6.sha512");
+}
+
+FRAME_SETUP {
+    // 1. Base continuity seed
+    continuity_seed = "CONTINUITY_CORE" + QOB6_ANCHOR;
+
+    // 2. Frame pattern (deterministic structural loop)
+    frame_pattern = continuity_seed + continuity_seed[48:112];
+
+    // 3. Generate continuity anchor
+    QOB7_ANCHOR = SHA512(frame_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB7_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB7_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑7 VERIFIED";
+    else:
+        verification = "QOB‑7 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB7.sha512;
+    unified_field/manifest/QOB7.sha512;
+    sentinel_dot/metadata/QOB7.sha512;
+    github_repo_root/QOB7.sha512;
+}
+
+OUTPUT {
+    QOB7_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑7 forms the continuity layer above QOB‑6.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
