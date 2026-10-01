@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑14 OUTER SEAL FRAME — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB14_OUTER_SEAL_FRAME
+DESCRIPTION: "Constructs outer seal frame layer from QOB‑13 perimeter seal grid anchor."
+
+INPUTS {
+    QOB13_ANCHOR = load("QOB13.sha512");
+}
+
+FRAME_SETUP {
+    // 1. Base outer seal frame seed
+    outer_seal_seed = "SEALFRAME_CORE" + QOB13_ANCHOR;
+
+    // 2. Frame pattern (deterministic perimeter framing loop)
+    outer_seal_pattern = outer_seal_seed + outer_seal_seed[12:76];
+
+    // 3. Generate outer seal frame anchor
+    QOB14_ANCHOR = SHA512(outer_seal_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB14_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB14_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑14 VERIFIED";
+    else:
+        verification = "QOB‑14 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB14.sha512;
+    unified_field/manifest/QOB14.sha512;
+    sentinel_dot/metadata/QOB14.sha512;
+    github_repo_root/QOB14.sha512;
+}
+
+OUTPUT {
+    QOB14_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑14 forms the outer seal frame above QOB‑13.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
