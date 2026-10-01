@@ -4,6 +4,8 @@
 import os
 import json
 
+from burnharness_protocol import admit_leg
+
 BASE = "legs"
 LEGS = {
     "scandoc": {
@@ -55,6 +57,8 @@ def ensure_base():
         os.makedirs(BASE)
 
 def generate_leg(name, state):
+    if not admit_leg(name)["admitted"]:
+        raise ValueError("leg admission requires the unified protocol upgrade")
     folder = os.path.join(BASE, name)
     os.makedirs(folder, exist_ok=True)
 

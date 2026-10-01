@@ -16,16 +16,21 @@ COUPLER_MAP = {
 }
 
 COUPLER_TEMPLATE = """
+from burnharness_protocol import packet_output
+
+
 class {ClassName}Coupler:
-    def __init__(self, legA, legB):
+    def __init__(self, legA, legB, stabiliser_packet=None):
         self.A = legA.ignite()
         self.B = legB.ignite()
+        self.stabiliser_packet = stabiliser_packet
 
     def couple(self):
         return {{
             "stability": self._harmonise_stability(),
             "curvature": self._blend_curvature(),
-            "provenance": self._merge_provenance()
+            "provenance": self._merge_provenance(),
+            **packet_output(self.stabiliser_packet),
         }}
 
     def _harmonise_stability(self):

@@ -62,6 +62,18 @@ canonical JSON is included in the report. A failed check yields
 
 Run tests with `python -m unittest discover -s tests -v`.
 
+## Unified field oath protocol
+
+`burnharness_protocol.py` defines the protocol policy, admission gate, immutable
+stabiliser packet, and mobile sphere-surface geometry header. New generated legs
+are admitted only when the complete protocol upgrade is active; otherwise the
+generic invariant-flow fallback is selected. Every coupler passes a supplied
+packet through by identity without modifying it.
+
+Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surface
+state, sphere trajectory geometry, and read-only stabiliser packet. The existing
+`run_cycle()` resonance-field return format remains unchanged.
+
 Run `python runtime_monitor.py` from the repository root to print live
 readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
 the hash of the fixed `"sphere_interior"` marker, not a hash of live system state.

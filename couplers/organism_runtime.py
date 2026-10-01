@@ -12,6 +12,8 @@
 import time
 import importlib
 
+from burnharness_protocol import PROTOCOL
+
 CYCLE_PATH = "coupler_cycle"
 
 class OrganismRuntime:
@@ -38,11 +40,11 @@ class OrganismRuntime:
         return drift
 
     def _stabilise(self, field, drift):
-        # Simple stabiliser: reduce wobble if drift spikes
-        if drift > 0.05:
-            field["stability"] *= 0.98
-            field["curvature"] *= 0.98
-        return field
+        stabilised = dict(field)
+        if drift > PROTOCOL["oath_protocol"]["friction_threshold"]:
+            stabilised["stability"] *= 0.98
+            stabilised["curvature"] *= 0.98
+        return stabilised
 
     def tick(self):
         current_field = self.cycle()

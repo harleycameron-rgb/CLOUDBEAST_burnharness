@@ -28,6 +28,7 @@ def get_manifest():
             },
         },
         "imports": {
+            "burnharness_protocol": "burnharness_protocol",
             "coupler_cycle": "coupler_cycle",
             "organism_runtime": "couplers.organism_runtime",
             "scandoc": (

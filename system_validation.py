@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 
 from coupler_cycle import COUPLER_SEQUENCE, load_leg, run_cycle
+from burnharness_protocol import protocol_upgrade_met
 from repo_manifest import REPOSITORY_ROOT, get_manifest
 
 FIELD_NAMES = ("stability", "curvature", "provenance")
@@ -17,6 +18,8 @@ TOLERANCE = 1e-9
 
 def check_environment():
     """Check local modules, paths, and leg/coupler configuration."""
+    if not protocol_upgrade_met():
+        return False
     manifest = get_manifest()
     try:
         for section in manifest["paths"].values():
