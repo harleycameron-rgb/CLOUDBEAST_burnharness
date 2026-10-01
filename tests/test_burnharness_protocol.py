@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from burnharness.ignition_layer.legs.scandoc.ignition_stub import (
@@ -17,6 +18,13 @@ from coupler_cycle import COUPLER_SEQUENCE, load_coupler, load_leg, run_protocol
 class BurnharnessProtocolTests(unittest.TestCase):
     def test_protocol_requires_all_upgrade_conditions(self):
         self.assertTrue(protocol_upgrade_met())
+        json_protocol = {
+            key: dict(value) for key, value in PROTOCOL.items()
+        }
+        json_protocol["leg_admission"]["reject_if"] = list(
+            PROTOCOL["leg_admission"]["reject_if"]
+        )
+        self.assertTrue(protocol_upgrade_met(json.loads(json.dumps(json_protocol))))
         altered = {
             **PROTOCOL,
             "geometry_system": {
@@ -47,7 +55,9 @@ class BurnharnessProtocolTests(unittest.TestCase):
                 coupler = load_coupler(name)(
                     load_leg(first), load_leg(second), packet
                 )
-                self.assertIs(coupler.couple()["stabiliser_packet"], packet)
+                result = coupler.couple()
+                self.assertIs(result["stabiliser_packet"], packet)
+                self.assertEqual(result["geometry_header"], geometry_header())
 
     def test_scandoc_ingests_packet_without_replacement(self):
         packet = create_stabiliser_packet()
@@ -64,6 +74,22 @@ class BurnharnessProtocolTests(unittest.TestCase):
             result["geometry"]["trajectory"], [0.1, 0.2, 0.3]
         )
         self.assertEqual(result["stabiliser_packet"]["mode"], "DUAL_INVARIANT")
+
+
+class RuntimeFrictionTests(unittest.TestCase):
+    def test_friction_threshold_preserves_input_and_uses_protocol_limit(self):
+        from couplers.organism_runtime import OrganismRuntime
+
+        runtime = OrganismRuntime()
+        field = {"stability": 0.5, "curvature": 0.4, "provenance": 0.2}
+        unchanged = runtime._stabilise(field, 0.12)
+        self.assertEqual(unchanged, field)
+        self.assertIsNot(unchanged, field)
+
+        adjusted = runtime._stabilise(field, 0.1201)
+        self.assertEqual(adjusted["stability"], 0.49)
+        self.assertEqual(adjusted["curvature"], 0.392)
+        self.assertEqual(field["stability"], 0.5)
 
 
 if __name__ == "__main__":

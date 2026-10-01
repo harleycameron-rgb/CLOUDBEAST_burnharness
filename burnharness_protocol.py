@@ -73,17 +73,12 @@ PROTOCOL = _freeze(_PROTOCOL)
 
 def protocol_upgrade_met(protocol=PROTOCOL):
     """Return whether the supplied governance policy meets the full upgrade."""
-    return (
-        isinstance(protocol, Mapping)
-        and protocol.get("oath_protocol") == PROTOCOL["oath_protocol"]
-        and protocol.get("coupler_archetype") == PROTOCOL["coupler_archetype"]
-        and protocol.get("geometry_system") == PROTOCOL["geometry_system"]
-        and protocol.get("waxtablet_mobile_connect")
-        == PROTOCOL["waxtablet_mobile_connect"]
-        and protocol.get("leg_admission") == PROTOCOL["leg_admission"]
-        and protocol.get("stabiliser_packet") == PROTOCOL["stabiliser_packet"]
-        and protocol.get("system_rules") == PROTOCOL["system_rules"]
-    )
+    if not isinstance(protocol, Mapping):
+        return False
+    try:
+        return _freeze(dict(protocol)) == PROTOCOL
+    except (RecursionError, TypeError, ValueError):
+        return False
 
 
 def admit_leg(leg_name, protocol=PROTOCOL):
@@ -116,7 +111,10 @@ def packet_output(packet):
     """Return an optional packet field for a coupler result without copying it."""
     if packet is None:
         return {}
-    return {"stabiliser_packet": propagate_stabiliser_packet(packet)}
+    return {
+        "stabiliser_packet": propagate_stabiliser_packet(packet),
+        "geometry_header": geometry_header(),
+    }
 
 
 def geometry_header():
