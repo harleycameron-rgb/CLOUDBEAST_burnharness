@@ -1,0 +1,61 @@
+////////////////////////////////////////////////////////////
+// QOB‑23 APEX SEAL GRID — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB23_APEX_SEAL_GRID
+DESCRIPTION: "Constructs apex seal grid layer from QOB‑22 apex crest anchor."
+
+INPUTS {
+    QOB22_ANCHOR = load("QOB22.sha512");
+}
+
+GRID_SETUP {
+    // 1. Base apex seal grid seed
+    apex_seal_grid_seed = "APEXSEALGRID_CORE" + QOB22_ANCHOR;
+
+    // 2. Grid pattern (deterministic apex‑matrix closure)
+    apex_seal_grid_pattern = apex_seal_grid_seed + apex_seal_grid_seed[60:124];
+
+    // 3. Generate apex seal grid anchor
+    QOB23_ANCHOR = SHA512(apex_seal_grid_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB23_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB23_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑23 VERIFIED";
+    else:
+        verification = "QOB‑23 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB23.sha512;
+    unified_field/manifest/QOB23.sha512;
+    sentinel_dot/metadata/QOB23.sha512;
+    github_repo_root/QOB23.sha512;
+}
+
+OUTPUT {
+    QOB23_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑23 forms the apex seal grid above QOB‑22.
+- This is the pre‑ignition substrate layer.
+- Compatible with pulse inversion and sandbox harness dampening.
+////////////////////////////////////////////////////////////
