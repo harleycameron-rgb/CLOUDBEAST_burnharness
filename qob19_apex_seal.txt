@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑19 APEX SEAL — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB19_APEX_SEAL
+DESCRIPTION: "Constructs apex seal layer from QOB‑18 crown lock anchor."
+
+INPUTS {
+    QOB18_ANCHOR = load("QOB18.sha512");
+}
+
+SEAL_SETUP {
+    // 1. Base apex seal seed
+    apex_seal_seed = "APEXSEAL_CORE" + QOB18_ANCHOR;
+
+    // 2. Apex pattern (deterministic closure bond)
+    apex_seal_pattern = apex_seal_seed + apex_seal_seed[16:80];
+
+    // 3. Generate apex seal anchor
+    QOB19_ANCHOR = SHA512(apex_seal_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB19_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB19_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑19 VERIFIED";
+    else:
+        verification = "QOB‑19 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB19.sha512;
+    unified_field/manifest/QOB19.sha512;
+    sentinel_dot/metadata/QOB19.sha512;
+    github_repo_root/QOB19.sha512;
+}
+
+OUTPUT {
+    QOB19_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑19 forms the apex seal above QOB‑18.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
