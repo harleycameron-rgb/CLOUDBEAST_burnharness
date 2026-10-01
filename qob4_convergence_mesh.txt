@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑4 CONVERGENCE MESH — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB4_CONVERGENCE_MESH
+DESCRIPTION: "Forms convergence mesh layer from QOB‑3 resonance anchor."
+
+INPUTS {
+    QOB3_ANCHOR = load("QOB3.sha512");
+}
+
+MESH_SETUP {
+    // 1. Base mesh seed
+    mesh_seed = "MESH_CORE" + QOB3_ANCHOR;
+
+    // 2. Convergence pattern (deterministic merge)
+    convergence_pattern = mesh_seed + mesh_seed[0:64];
+
+    // 3. Generate convergence anchor
+    QOB4_ANCHOR = SHA512(convergence_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB4_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB4_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑4 VERIFIED";
+    else:
+        verification = "QOB‑4 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB4.sha512;
+    unified_field/manifest/QOB4.sha512;
+    sentinel_dot/metadata/QOB4.sha512;
+    github_repo_root/QOB4.sha512;
+}
+
+OUTPUT {
+    QOB4_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑4 forms the convergence layer above QOB‑3.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
