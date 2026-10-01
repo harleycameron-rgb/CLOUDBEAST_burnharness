@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑17 CROWN SEAL — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB17_CROWN_SEAL
+DESCRIPTION: "Constructs crown seal layer from QOB‑16 crown anchor."
+
+INPUTS {
+    QOB16_ANCHOR = load("QOB16.sha512");
+}
+
+SEAL_SETUP {
+    // 1. Base crown seal seed
+    crown_seal_seed = "CROWNSEAL_CORE" + QOB16_ANCHOR;
+
+    // 2. Seal pattern (deterministic apex‑closure loop)
+    crown_seal_pattern = crown_seal_seed + crown_seal_seed[32:96];
+
+    // 3. Generate crown seal anchor
+    QOB17_ANCHOR = SHA512(crown_seal_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB17_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB17_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑17 VERIFIED";
+    else:
+        verification = "QOB‑17 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB17.sha512;
+    unified_field/manifest/QOB17.sha512;
+    sentinel_dot/metadata/QOB17.sha512;
+    github_repo_root/QOB17.sha512;
+}
+
+OUTPUT {
+    QOB17_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑17 forms the crown seal above QOB‑16.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
