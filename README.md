@@ -95,6 +95,22 @@ Run `python runtime_monitor.py` from the repository root to print live
 readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
 the hash of the fixed `"sphere_interior"` marker, not a hash of live system state.
 
+## Conceptual Alliance sequence
+
+Run `python conceptual_runtime.py` to report which reference artifacts for the
+Burnharness–Alliance sequence are present. This is a read-only symbolic status
+report: it does not run the coherence check or checksum validator, request an
+agent trigger, generate a glyph, or activate the runtime. Missing artifacts are
+reported without being synthesized.
+
+## Symbolic transduction demo
+
+Run `./transduction_runtime.sh` to display the inert transduction sequence.
+The coherence, checksum, and feedback values are symbolic constants; no
+validator, ignition, or manifestation operation is performed. Continuing past
+the dormant state requires typing `ignite`, and the continuation remains
+symbolic.
+
 ---
 
 ## How It Connects to Sentinel_dot
