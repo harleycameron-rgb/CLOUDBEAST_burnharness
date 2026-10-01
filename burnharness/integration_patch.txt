@@ -133,4 +133,8 @@ Actions:
 8. Do not duplicate Burnharness or Sentinel_dot in other repos.
 9. Confirm cross-repo visibility and stable integration.
 
+link unified_field -> ignition_layer
+activate oath_protocol
+enable drift_targeting
+
 End of patch.
