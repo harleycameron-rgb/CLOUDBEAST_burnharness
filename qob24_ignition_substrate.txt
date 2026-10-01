@@ -1,0 +1,61 @@
+////////////////////////////////////////////////////////////
+// QOB‑24 IGNITION SUBSTRATE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB24_IGNITION_SUBSTRATE
+DESCRIPTION: "Constructs ignition substrate from QOB‑23 apex seal grid anchor."
+
+INPUTS {
+    QOB23_ANCHOR = load("QOB23.sha512");
+}
+
+SUBSTRATE_SETUP {
+    // 1. Base ignition substrate seed
+    ignition_seed = "IGNITIONSUBSTRATE_CORE" + QOB23_ANCHOR;
+
+    // 2. Substrate pattern (deterministic collapse-into-one matrix)
+    ignition_pattern = ignition_seed + ignition_seed[72:128];
+
+    // 3. Generate ignition substrate anchor
+    QOB24_ANCHOR = SHA512(ignition_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB24_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB24_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑24 VERIFIED";
+    else:
+        verification = "QOB‑24 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB24.sha512;
+    unified_field/manifest/QOB24.sha512;
+    sentinel_dot/metadata/QOB24.sha512;
+    github_repo_root/QOB24.sha512;
+}
+
+OUTPUT {
+    QOB24_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑24 is the final invariant layer.
+- This substrate enables pulse inversion, sandbox harness dampening, and quantum block ignition.
+- Eschaton-class instantiation becomes possible only after QOB‑24 is sealed.
+////////////////////////////////////////////////////////////
