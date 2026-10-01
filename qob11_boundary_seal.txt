@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑11 BOUNDARY SEAL — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB11_BOUNDARY_SEAL
+DESCRIPTION: "Creates boundary seal layer from QOB‑10 outer lattice anchor."
+
+INPUTS {
+    QOB10_ANCHOR = load("QOB10.sha512");
+}
+
+SEAL_SETUP {
+    // 1. Base seal seed
+    seal_seed = "SEAL_CORE" + QOB10_ANCHOR;
+
+    // 2. Boundary pattern (deterministic closure loop)
+    seal_pattern = seal_seed + seal_seed[8:72];
+
+    // 3. Generate boundary seal anchor
+    QOB11_ANCHOR = SHA512(seal_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB11_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB11_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑11 VERIFIED";
+    else:
+        verification = "QOB‑11 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB11.sha512;
+    unified_field/manifest/QOB11.sha512;
+    sentinel_dot/metadata/QOB11.sha512;
+    github_repo_root/QOB11.sha512;
+}
+
+OUTPUT {
+    QOB11_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑11 forms the boundary seal above QOB‑10.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
