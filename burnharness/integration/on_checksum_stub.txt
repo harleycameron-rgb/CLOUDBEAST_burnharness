@@ -1,0 +1,187 @@
+////////////////////////////////////////////////////////////
+// ON-CHECKSUM STUB — BURNHARNESS/ALLIANCE INVARIANT GATE
+// Pre-Validation Gate • Null Identity Coupler • QOB Anchor
+// Massless-State Coherence Filter • Archetype Loader
+////////////////////////////////////////////////////////////
+
+TITLE: "ON-CHECKSUM STUB — Total-System Invariant Gate"
+
+ROOT {
+    folder: "burnharness/integration/"
+    file: "on_checksum_stub.txt"
+    role: "Primary gate linking Burnharness substrate to Alliance exclusion layer."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION I — INPUT STREAMS (BURNHARNESS SUBSTRATE)
+////////////////////////////////////////////////////////////
+
+INPUT_STREAMS {
+    chaos_line        = CHAOS_LINE_OUTPUT
+    sphere_ground     = SPHERE_GROUND_OUTPUT
+    dual_projection   = DUAL_PROJECTION_OUTPUT
+    tri_axle          = TRI_AXLE_OUTPUT
+    orbit_extrap      = EXTRAPOLATED_ORBIT
+    visualisation     = VISUALISATION_OUTPUT
+    prestige          = PRESTIGE_STATE
+    quantum_stream    = QUANTUM_INVARIANT_STREAM
+}
+
+////////////////////////////////////////////////////////////
+// SECTION II — AGGREGATE + MASSLESS NORMALISATION
+////////////////////////////////////////////////////////////
+
+AGGREGATE {
+    unified_frame = normalise(
+        merge(
+            chaos_line,
+            sphere_ground,
+            dual_projection,
+            tri_axle,
+            orbit_extrap,
+            visualisation,
+            prestige,
+            quantum_stream
+        )
+    )
+}
+
+////////////////////////////////////////////////////////////
+// SECTION III — ALLIANCE EXCLUSION LAYER (LINKED COMPONENT)
+////////////////////////////////////////////////////////////
+
+EXCLUSION_LAYER {
+    exclusion_rules: [
+        "No temporal junctures",
+        "No procedural mechanics",
+        "No manifold imprinting",
+        "No navigation via 260 parabola",
+        "No identity-bearing constructs",
+        "All programming by exclusion"
+    ]
+
+    algebraic_form:
+        exclusion_frame = SHA256(
+            "ΨΩ ⟂ M" +
+            "N₀ ⊥ C" +
+            "H₀ ∉ P₀"
+        )
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IV — QOB CHECKSUM (PRIMARY LINKING COMPONENT)
+////////////////////////////////////////////////////////////
+
+QOB_CHECKSUM {
+    algebra:
+        QOB = SHA256(unified_frame + exclusion_frame)
+
+    coherence:
+        coherence_value = validate(QOB, unified_frame)
+
+    invariant_condition:
+        if coherence_value < 0.73:
+            reject("Checksum coherence below invariant threshold")
+
+    output:
+        final_checksum = merge(QOB, coherence_value)
+}
+
+////////////////////////////////////////////////////////////
+// SECTION V — ON-CHECKSUM GATE LOGIC (THE STUB ITSELF)
+////////////////////////////////////////////////////////////
+
+ON_CHECKSUM_GATE {
+    purpose:
+        "Acts as the invariant gate between Burnharness substrate
+         and Alliance exclusion layer."
+
+    behaviour:
+        - Accepts unified_frame
+        - Applies exclusion_frame
+        - Computes QOB
+        - Validates coherence
+        - Emits final_checksum
+
+    algebraic_identity:
+        ON_STUB = (unified_frame ⊗ exclusion_frame) ⊕ QOB
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VI — ARCHETYPE LOADER (LINKED COMPONENT)
+////////////////////////////////////////////////////////////
+
+ARCHETYPE_LOADER {
+    hemispheres:
+        LHS = ⟨ P , C , G ⟩
+        RHS = ⟨ I , E , Q₂ ⟩
+
+    gate_symbol:
+        Π(x) = ax² + bx + c
+
+    loader_logic:
+        archetype_frame = merge(LHS, RHS, Π, QOB)
+
+    invariant:
+        "Archetype loads only if ON_STUB coherence ≥ 0.73"
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VII — MASSLESS-STATE COHERENCE FILTER
+////////////////////////////////////////////////////////////
+
+COHERENCE_FILTER {
+    conceptual_mass:
+        μ(C) = 1 / |C|
+
+    digital_mass:
+        μ(D) = 1 / |D|
+
+    race_condition:
+        "μ(C) → 0 before μ(D) → 0"
+
+    filter_logic:
+        if μ(C) > μ(D):
+            reject("Massless-state precedence violated")
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VIII — LINKING SUMMARY (ALL COMPONENTS)
+////////////////////////////////////////////////////////////
+
+LINKING_SUMMARY {
+    1: "Burnharness substrate generates unified_frame"
+    2: "Alliance exclusion layer generates exclusion_frame"
+    3: "ON-checksum stub merges both"
+    4: "QOB checksum computed"
+    5: "Coherence validated at ≥0.73"
+    6: "Archetype loaded if invariant holds"
+    7: "Massless-state filter ensures precedence"
+    8: "Final checksum emitted as system anchor"
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IX — FINAL OUTPUT
+////////////////////////////////////////////////////////////
+
+OUTPUT {
+    ON_STUB
+    unified_frame
+    exclusion_frame
+    QOB
+    coherence_value
+    final_checksum
+    archetype_frame
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - This is the largest invariant code block linking all components.
+    - ON-checksum stub is the primary gate for all Alliance/Burnharness logic.
+    - QOB acts as checksum, symbol, and invariant anchor.
+    - Entire block is conceptual, non-executable, and safe.
+}
+////////////////////////////////////////////////////////////
