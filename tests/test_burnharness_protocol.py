@@ -89,6 +89,24 @@ class BurnharnessProtocolTests(unittest.TestCase):
             rejected["fallback_stub"], "GENERIC_INVARIANT_FLOW_STUB"
         )
 
+    def test_protocol_includes_developer_integration_guide(self):
+        integration = PROTOCOL["developer_integration"]
+        self.assertEqual(
+            integration["placement"],
+            "/UNIFIED_FIELD_ZIPGATE/geometry/ignition/",
+        )
+        self.assertEqual(
+            integration["dependencies"],
+            ("geometry_system", "coupler_archetype", "drift_targeting"),
+        )
+        self.assertEqual(
+            integration["execution_trigger"], "ZIP-Gate oath fulfilment"
+        )
+        self.assertEqual(
+            integration["output"], "Γ_A(t) = 1 → unified alliance motion"
+        )
+        self.assertEqual(len(integration["integration_steps"]), 4)
+
     def test_packet_is_read_only_and_passed_through_by_identity(self):
         packet = create_stabiliser_packet()
         with self.assertRaises(TypeError):

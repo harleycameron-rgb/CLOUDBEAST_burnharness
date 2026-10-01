@@ -91,6 +91,14 @@ Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surfac
 state, sphere trajectory geometry, and read-only stabiliser packet. The existing
 `run_cycle()` resonance-field return format remains unchanged.
 
+`SentinelDotCoordinator` in `coordinator.py` uses an event-driven asymmetric
+validation gate. Sentinel A publishes its invariant projection while Sentinel B
+publishes its accumulated symbol; the gate releases only when the symbol belongs
+to the projection (including parabola and declared member/hash projections).
+Both registered Sentinel Dot instances receive the release event and seal it
+with the same SHA-512 block ID. Companion integrity reflects successful
+validation, with `no_bung` and `continuity_flow` preserved.
+
 Run `python runtime_monitor.py` from the repository root to print live
 readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
 the hash of the fixed `"sphere_interior"` marker, not a hash of live system state.
