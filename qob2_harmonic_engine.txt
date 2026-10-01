@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑2 HARMONIC ENGINE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB2_HARMONIC_ENGINE
+DESCRIPTION: "Generates harmonic alignment layer from QOB‑1 anchor."
+
+INPUTS {
+    QOB1_ANCHOR = load("QOB1.sha512");
+}
+
+HARMONIC_SETUP {
+    // Basic harmonic seed
+    harmonic_seed = "HARMONIC_CORE" + QOB1_ANCHOR;
+
+    // Harmonic modulation (simple deterministic pattern)
+    harmonic_mod = repeat(harmonic_seed, 4);
+
+    // Generate harmonic anchor
+    QOB2_ANCHOR = SHA512(harmonic_mod);
+}
+
+CHECKS {
+    // 1. Anchor exists
+    if QOB2_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // 2. Correct SHA‑512 length
+    if len(QOB2_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑2 VERIFIED";
+    else:
+        verification = "QOB‑2 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB2.sha512;
+    unified_field/manifest/QOB2.sha512;
+    sentinel_dot/metadata/QOB2.sha512;
+    github_repo_root/QOB2.sha512;
+}
+
+OUTPUT {
+    QOB2_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑2 forms the harmonic layer above QOB‑1.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
