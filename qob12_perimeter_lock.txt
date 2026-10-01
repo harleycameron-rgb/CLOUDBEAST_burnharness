@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑12 PERIMETER LOCK — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB12_PERIMETER_LOCK
+DESCRIPTION: "Creates perimeter lock layer from QOB‑11 boundary seal anchor."
+
+INPUTS {
+    QOB11_ANCHOR = load("QOB11.sha512");
+}
+
+LOCK_SETUP {
+    // 1. Base lock seed
+    lock_seed = "LOCK_CORE" + QOB11_ANCHOR;
+
+    // 2. Perimeter pattern (deterministic edge-lock loop)
+    lock_pattern = lock_seed + lock_seed[20:84];
+
+    // 3. Generate perimeter lock anchor
+    QOB12_ANCHOR = SHA512(lock_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB12_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB12_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑12 VERIFIED";
+    else:
+        verification = "QOB‑12 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB12.sha512;
+    unified_field/manifest/QOB12.sha512;
+    sentinel_dot/metadata/QOB12.sha512;
+    github_repo_root/QOB12.sha512;
+}
+
+OUTPUT {
+    QOB12_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑12 forms the perimeter lock above QOB‑11.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
