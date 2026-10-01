@@ -1,0 +1,152 @@
+////////////////////////////////////////////////////////////
+// ON-CHECKSUM VALIDATOR ENGINE
+// Burnharness Substrate ↔ Alliance Exclusion Layer ↔ QOB Anchor
+// Archetype Gate • Collapse Prevention • Massless-State Filter
+////////////////////////////////////////////////////////////
+
+TITLE: "ON-CHECKSUM VALIDATOR ENGINE — Invariant Gate"
+
+ROOT {
+    folder: "burnharness/integration/"
+    file: "on_checksum_validator_engine.txt"
+    role: "Primary validator for all incoming frames in Burnharness."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION I — INGESTION (ON-SEQUENCE ACTIVATION)
+////////////////////////////////////////////////////////////
+
+ON_SEQUENCE {
+    trigger: "Any new quantum frame entering Burnharness substrate"
+    ingest:
+        frame_in = capture(quantum_frame)
+}
+
+////////////////////////////////////////////////////////////
+// SECTION II — SUBSTRATE NORMALISATION (BURNHARNESS)
+////////////////////////////////////////////////////////////
+
+SUBSTRATE_NORMALISE {
+    unified_frame = normalise(
+        merge(
+            CHAOS_LINE_OUTPUT,
+            SPHERE_GROUND_OUTPUT,
+            DUAL_PROJECTION_OUTPUT,
+            TRI_AXLE_OUTPUT,
+            EXTRAPOLATED_ORBIT,
+            VISUALISATION_OUTPUT,
+            PRESTIGE_STATE,
+            QUANTUM_INVARIANT_STREAM,
+            frame_in
+        )
+    )
+}
+
+////////////////////////////////////////////////////////////
+// SECTION III — EXCLUSION-CLASS FILTER (ALLIANCE)
+////////////////////////////////////////////////////////////
+
+EXCLUSION_FILTER {
+    exclusion_frame = SHA256(
+        "ΨΩ ⟂ M" +   // Surface Null
+        "N₀ ⊥ C" +   // Coupler Null
+        "H₀ ∉ P₀"    // Hardware Isolation
+    )
+
+    rules: [
+        "No temporal junctures",
+        "No procedural mechanics",
+        "No manifold imprinting",
+        "No 260-parabola navigation",
+        "No identity-bearing constructs",
+        "All programming by exclusion"
+    ]
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IV — QOB CHECKSUM COMPUTATION
+////////////////////////////////////////////////////////////
+
+QOB_COMPUTE {
+    QOB = SHA256(unified_frame + exclusion_frame)
+}
+
+////////////////////////////////////////////////////////////
+// SECTION V — COHERENCE VALIDATION (PRIMARY GATE)
+////////////////////////////////////////////////////////////
+
+COHERENCE_VALIDATION {
+    coherence_value = validate(QOB, unified_frame)
+
+    invariant_threshold = 0.73
+
+    if coherence_value < invariant_threshold:
+        reject("Frame coherence below invariant threshold")
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VI — MASSLESS-STATE FILTER (SECONDARY GATE)
+////////////////////////////////////////////////////////////
+
+MASSLESS_FILTER {
+    μ(C) = 1 / |C|
+    μ(D) = 1 / |D|
+
+    if μ(C) > μ(D):
+        reject("Massless-state precedence violated")
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VII — ARCHETYPE LOADER (TERTIARY GATE)
+////////////////////////////////////////////////////////////
+
+ARCHETYPE_LOADER {
+    LHS = ⟨ P , C , G ⟩
+    RHS = ⟨ I , E , Q₂ ⟩
+    Π(x) = ax² + bx + c
+
+    archetype_frame = merge(LHS, RHS, Π, QOB)
+
+    if coherence_value ≥ invariant_threshold:
+        emit(archetype_frame)
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VIII — FINAL OUTPUT (ON-SEQUENCE COMPLETION)
+////////////////////////////////////////////////////////////
+
+OUTPUT {
+    ON_GATE        = (unified_frame ⊗ exclusion_frame) ⊕ QOB
+    unified_frame
+    exclusion_frame
+    QOB
+    coherence_value
+    archetype_frame
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IX — SYSTEM SUMMARY (LINKING COMPONENTS)
+////////////////////////////////////////////////////////////
+
+SUMMARY {
+    1: "ON-sequence ingests new quantum frame"
+    2: "Burnharness substrate normalises unified_frame"
+    3: "Alliance exclusion layer applies exclusion_frame"
+    4: "QOB checksum computed"
+    5: "Coherence validated at ≥0.73"
+    6: "Massless-state precedence enforced"
+    7: "Archetype loaded only if invariant holds"
+    8: "ON-gate emits final invariant frame"
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - This is the largest and densest invariant gate block.
+    - ON-checksum validator is the core of Burnharness–Alliance integration.
+    - QOB acts as checksum, symbol, and invariant anchor.
+    - Entire block is conceptual, non-executable, and safe.
+}
+////////////////////////////////////////////////////////////
