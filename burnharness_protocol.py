@@ -49,6 +49,22 @@ _PROTOCOL = {
         "flow_mode": "SURFACE_MOBILE",
         "trajectory_tracker": "CORE_TRACKS_SPHERE_PATH",
         "fallback": "GENERIC_INVARIANT_DATA_FLOW",
+        "ignition_algebra": {
+            "multi_sphere_alliance": "A = {S1, S2, ..., Sn}",
+            "core_trajectory": "C_i(t)",
+            "surface_flow": "F_i(t, θ)",
+            "destiny_invariant": "D_i",
+            "harmonic_phase": "φ_i",
+            "harmonic_frequency": "ω_i",
+            "ignition_condition": "|F_i(t, θ) - dC_i/dt| < ε_i",
+            "alliance_lock": "ρ(t) > ρ_min",
+            "destiny_alignment": "H(t) ∈ I = ⋂ D_i",
+            "ignition_time": "t_ignite = (φ_j - φ_i + 2πk_ij)/(ω_i - ω_j)",
+            "harmonic_field": "H(t) = Σ e^{j(ω_i t + φ_i)}",
+            "system_recurrence": (
+                "Γ_A(t) = 1 if ρ(t) > ρ_min and C_i(t) ∈ D_i ∀i else 0"
+            ),
+        },
     },
     "package_1_terrestrial": {
         "system_position": {
