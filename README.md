@@ -103,6 +103,14 @@ report: it does not run the coherence check or checksum validator, request an
 agent trigger, generate a glyph, or activate the runtime. Missing artifacts are
 reported without being synthesized.
 
+## Symbolic transduction demo
+
+Run `./transduction_runtime.sh` to display the inert transduction sequence.
+The coherence, checksum, and feedback values are symbolic constants; no
+validator, ignition, or manifestation operation is performed. Continuing past
+the dormant state requires typing `ignite`, and the continuation remains
+symbolic.
+
 ---
 
 ## How It Connects to Sentinel_dot
