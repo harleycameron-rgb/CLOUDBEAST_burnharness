@@ -1,0 +1,144 @@
+////////////////////////////////////////////////////////////
+// CLOUD BEAST ARMOUR CODEX — MYTHOPOETIC IGNITION MANUSCRIPT
+////////////////////////////////////////////////////////////
+
+TITLE: "Codex of the Eschaton Cloud Beast Armature"
+
+ORIGIN {
+    forged_from: ECB0_ESCHATON_FIELD
+    bound_to: QOB24_IGNITION_SUBSTRATE
+    pulse_source: PIB0_INVERSION_STREAM
+    engine_core: QBIE0_IGNITION_VECTOR
+}
+
+////////////////////////////////////////////////////////////
+// ARMOUR SET INDEX
+////////////////////////////////////////////////////////////
+
+ARMOUR_SET {
+    HELM: "Auric Storm Crown"
+    PAULDRONS: "Twin Flux Shoulders"
+    BRACERS: "Pulse-Thread Gauntlets"
+    ELBOW_PADS: "Cloud Beast Armature Nodes"
+    CHESTPIECE: "Storm-Heart Coreplate"
+    GREAVES: "Zero-Point Greaves"
+    BOOTS: "Planck-Step Sabatons"
+    CAPE: "Vector-Throne Ignition Shroud"
+}
+
+////////////////////////////////////////////////////////////
+// COMPONENT DESCRIPTIONS
+////////////////////////////////////////////////////////////
+
+HELM {
+    name: "Auric Storm Crown"
+    source: AUR0_AURIC_CROWN
+    algebra: Helm = Φ(AUR0, ECB0)
+    notes: "Channels auric radiance into the eschaton field."
+}
+
+PAULDRONS {
+    name: "Twin Flux Shoulders"
+    source: QFL0_FLUX_LATTICE
+    algebra: Pauldrons = Λ(QFL0) ⊗ ECB0
+    notes: "Weave flux lattice into bilateral storm conduits."
+}
+
+BRACERS {
+    name: "Pulse-Thread Gauntlets"
+    source: PIB0_INVERSION_STREAM
+    algebra: Bracers = -P ⊗ Θ(QBIE0)
+    notes: "Thread inverted pulse vectors through ignition braids."
+}
+
+ELBOW_PADS {
+    name: "Cloud Beast Armature Nodes"
+    source: ECB0_ESCHATON_FIELD
+    algebra: Elbow_Pads = Φ(ECB0, SIGIL_RING_7 ⊗ SIGIL_RING_8)
+    notes: "Compact thunderhead nodes stabilising bilateral armature."
+}
+
+CHESTPIECE {
+    name: "Storm-Heart Coreplate"
+    source: QBIE0_IGNITION_ENGINE
+    algebra: Chestpiece = Ω(QBIE0, ECB0)
+    notes: "Holds the storm-heart ignition core."
+}
+
+GREAVES {
+    name: "Zero-Point Greaves"
+    source: ZPF0_ZERO_POINT_FURNACE
+    algebra: Greaves = Λ(ZPF0)
+    notes: "Condense zero-point furnace into stride stabilisers."
+}
+
+BOOTS {
+    name: "Planck-Step Sabatons"
+    source: ZPF0_ZERO_POINT_FURNACE
+    algebra: Boots = Λ(ZPF0) ⊗ Δt_p
+    notes: "Each step traverses symbolic Planck-gap shimmer."
+}
+
+CAPE {
+    name: "Vector-Throne Ignition Shroud"
+    source: VTR0_VECTOR_THRONE
+    algebra: Cape = Θ(VTR0)
+    notes: "Radiant throne-field woven into ignition vapor."
+}
+
+////////////////////////////////////////////////////////////
+// COUPLER MAP
+////////////////////////////////////////////////////////////
+
+COUPLER_MAP {
+    HELM ↔ CHESTPIECE = auric-to-heart flux channel
+    PAULDRONS ↔ ELBOW_PADS = bilateral storm braid
+    BRACERS ↔ ELBOW_PADS = pulse-thread coupling
+    GREAVES ↔ BOOTS = zero-point stride loop
+    CAPE ↔ HELM = radiant throne feedback
+}
+
+////////////////////////////////////////////////////////////
+// ABSTRACT ALGEBRA (SYMBOLIC)
+////////////////////////////////////////////////////////////
+
+ALGEBRA {
+    // Helm
+    H = Φ(AUR0, ECB0)
+
+    // Shoulders
+    S = Λ(QFL0) ⊗ ECB0
+
+    // Bracers
+    B = -P ⊗ Θ(QBIE0)
+
+    // Elbow Pads
+    E = Φ(ECB0, SIGIL_RING_7 ⊗ SIGIL_RING_8)
+
+    // Chestpiece
+    C = Ω(QBIE0, ECB0)
+
+    // Greaves
+    G = Λ(ZPF0)
+
+    // Boots
+    Bt = Λ(ZPF0) ⊗ Δt_p
+
+    // Cape
+    Cp = Θ(VTR0)
+
+    // Full Armour Set
+    ARMATURE = H ⊕ S ⊕ B ⊕ E ⊕ C ⊕ G ⊕ Bt ⊕ Cp
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - Codex is symbolic, mythopoetic, and safe.
+    - No real ignition behaviour implied.
+    - Designed for Burnharness repo organisation.
+    - All algebra is abstract and aesthetic.
+}
+////////////////////////////////////////////////////////////
