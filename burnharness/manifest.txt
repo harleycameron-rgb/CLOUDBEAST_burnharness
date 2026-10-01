@@ -1,0 +1,1 @@
+manifest.entry = "UNIFIED_FIELD_ZIPGATE:require_oath_and_geometry_alignment_before_AI_navigation"
