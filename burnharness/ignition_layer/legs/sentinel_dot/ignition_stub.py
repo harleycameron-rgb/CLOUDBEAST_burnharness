@@ -36,6 +36,7 @@ class SentinelDotIgnitionStub:
         else:
             self.state["initial_symbol_state"] = anchor.block_id
             self.state["accumulated_symbol"] = anchor.block_id
+        coordinator.confirm_genesis_distributed(instance_id, anchor)
         coordinator.subscribe(instance_id, self._on_gate_release)
 
     def publish_invariant_projection(self, projection):

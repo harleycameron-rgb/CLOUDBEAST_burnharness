@@ -56,7 +56,10 @@ class SentinelDotCoordinator:
         self.invariant_source_id, self.symbol_source_id = tuple(instance_ids)
         self.instance_ids = tuple(instance_ids)
         self._genesis_barrier = threading.Barrier(len(self.instance_ids))
-        self._genesis_lock = threading.Lock()
+        self._genesis_distribution_barrier = threading.Barrier(
+            len(self.instance_ids)
+        )
+        self._lock = threading.RLock()
         self._genesis_ready = set()
         self._genesis_distributed = set()
         self._genesis_anchor = None
@@ -76,42 +79,43 @@ class SentinelDotCoordinator:
 
     @property
     def state(self):
-        passed = self._release is not None
-        return {
-            "genesis_anchor_locked": (
-                self._genesis_anchor is not None
-                and self._genesis_distributed == set(self.instance_ids)
-            ),
-            "genesis_block_id": (
-                None if self._genesis_anchor is None
-                else self._genesis_anchor.block_id
-            ),
-            "sync_mechanism_active": True,
-            "sync_mode": "ASYMMETRIC_VALIDATION",
-            "validation_passed": passed,
-            "gate_released": passed,
-            "superposition_integrity": passed,
-            "no_bung": True,
-            "continuity_flow": True,
-            "frozen_modules": (),
-            "invariant_source_id": self.invariant_source_id,
-            "symbol_source_id": self.symbol_source_id,
-            "projection_revision": self._projection_revision,
-            "symbol_revision": self._symbol_revision,
-            "validation": dict(self._last_validation),
-            "block_id": None if self._release is None else self._release.block_id,
-        }
+        with self._lock:
+            passed = self._release is not None
+            return {
+                "genesis_anchor_locked": (
+                    self._genesis_anchor is not None
+                    and self._genesis_distributed == set(self.instance_ids)
+                ),
+                "genesis_block_id": (
+                    None if self._genesis_anchor is None
+                    else self._genesis_anchor.block_id
+                ),
+                "sync_mechanism_active": True,
+                "sync_mode": "ASYMMETRIC_VALIDATION",
+                "validation_passed": passed,
+                "gate_released": passed,
+                "superposition_integrity": passed,
+                "no_bung": True,
+                "continuity_flow": True,
+                "frozen_modules": (),
+                "invariant_source_id": self.invariant_source_id,
+                "symbol_source_id": self.symbol_source_id,
+                "projection_revision": self._projection_revision,
+                "symbol_revision": self._symbol_revision,
+                "validation": dict(self._last_validation),
+                "block_id": None if self._release is None else self._release.block_id,
+            }
 
     @property
     def release(self):
-        return self._release
+        with self._lock:
+            return self._release
 
     def report_genesis_ready(self, instance_id, timeout=None):
         if instance_id not in self.instance_ids:
             raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
-        with self._genesis_lock:
+        with self._lock:
             if self._genesis_anchor is not None:
-                self._genesis_distributed.add(instance_id)
                 return self._genesis_anchor
             if instance_id in self._genesis_ready:
                 raise RuntimeError(
@@ -124,59 +128,79 @@ class SentinelDotCoordinator:
         except threading.BrokenBarrierError:
             raise TimeoutError("both Sentinel Dot instances must reach genesis") from None
 
-        with self._genesis_lock:
+        with self._lock:
             if self._genesis_anchor is None:
                 self._genesis_anchor = GenesisAnchor(
                     hashlib.sha512(os.urandom(64)).hexdigest()
                 )
-            self._genesis_distributed.add(instance_id)
             return self._genesis_anchor
+
+    def confirm_genesis_distributed(self, instance_id, anchor, timeout=None):
+        if instance_id not in self.instance_ids:
+            raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
+        with self._lock:
+            if anchor is not self._genesis_anchor:
+                raise ValueError("only the coordinator's Genesis anchor can be distributed")
+            if instance_id in self._genesis_distributed:
+                raise RuntimeError(
+                    f"Sentinel Dot instance {instance_id!r} already received Genesis"
+                )
+            self._genesis_distributed.add(instance_id)
+        try:
+            self._genesis_distribution_barrier.wait(timeout)
+        except threading.BrokenBarrierError:
+            raise TimeoutError("both Sentinel Dot instances must receive Genesis") from None
+        return anchor
 
     def subscribe(self, instance_id, callback):
         if instance_id not in self.instance_ids:
             raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
         if not callable(callback):
             raise TypeError("gate event callback must be callable")
-        self._listeners[instance_id] = callback
-        deliveries = self._pending_deliveries()
-        self._dispatch(deliveries)
+        with self._lock:
+            self._listeners[instance_id] = callback
+            deliveries = self._pending_deliveries()
+            self._dispatch(deliveries)
 
     def publish_invariant_projection(self, projection):
         self._require_genesis_anchor()
         normalized = self._normalize_projection(projection)
-        if not self._has_projection or normalized != self._projection:
-            self._projection_revision += 1
-            self._projection = normalized
-            self._has_projection = True
-            self._release = None
-            self._delivered.clear()
-        self._evaluate()
-        release = self._release
-        deliveries = self._pending_deliveries()
-        self._dispatch(deliveries)
-        return release
+        with self._lock:
+            if not self._has_projection or normalized != self._projection:
+                self._projection_revision += 1
+                self._projection = normalized
+                self._has_projection = True
+                self._release = None
+                self._delivered.clear()
+            self._evaluate()
+            release = self._release
+            deliveries = self._pending_deliveries()
+            self._dispatch(deliveries)
+            return release
 
     def publish_accumulated_symbol(self, symbol):
         self._require_genesis_anchor()
         normalized = self._copy_json_value(symbol)
-        if not self._has_symbol or normalized != self._symbol:
-            self._symbol_revision += 1
-            self._symbol = normalized
-            self._has_symbol = True
-            self._release = None
-            self._delivered.clear()
-        self._evaluate()
-        release = self._release
-        deliveries = self._pending_deliveries()
-        self._dispatch(deliveries)
-        return release
+        with self._lock:
+            if not self._has_symbol or normalized != self._symbol:
+                self._symbol_revision += 1
+                self._symbol = normalized
+                self._has_symbol = True
+                self._release = None
+                self._delivered.clear()
+            self._evaluate()
+            release = self._release
+            deliveries = self._pending_deliveries()
+            self._dispatch(deliveries)
+            return release
 
     def _require_genesis_anchor(self):
-        if (self._genesis_anchor is None
-                or self._genesis_distributed != set(self.instance_ids)):
-            raise RuntimeError(
-                "both Sentinel Dot instances must receive the Genesis anchor first"
-            )
+        with self._lock:
+            if (self._genesis_anchor is None
+                    or self._genesis_distributed != set(self.instance_ids)):
+                raise RuntimeError(
+                    "both Sentinel Dot instances must receive the Genesis anchor first"
+                )
 
     def _normalize_projection(self, projection):
         if isinstance(projection, ParabolaProjection):
@@ -311,8 +335,9 @@ class SentinelDotCoordinator:
             callback(release)
 
     def accepts_release(self, release, instance_id):
-        return (
-            release is self._release
-            and instance_id in self.instance_ids
-            and self._last_validation["passed"]
-        )
+        with self._lock:
+            return (
+                release is self._release
+                and instance_id in self.instance_ids
+                and self._last_validation["passed"]
+            )

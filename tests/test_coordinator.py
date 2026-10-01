@@ -161,6 +161,7 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
 
     def test_companion_integrity_requires_validation_gate_release(self):
         companion = Companion()
+        self.assertTrue(companion.required_invariants["genesis_anchor_locked"])
         valid_system_state = {
             "paths_valid": True,
             "imports_valid": True,
@@ -179,6 +180,13 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
                 valid_system_state, self.coordinator.state
             )
         )
+
+    def test_runtime_publication_is_rejected_before_genesis_distribution(self):
+        coordinator = SentinelDotCoordinator()
+        with self.assertRaises(RuntimeError):
+            coordinator.publish_invariant_projection({"members": ["seed"]})
+        with self.assertRaises(RuntimeError):
+            coordinator.publish_accumulated_symbol("seed")
 
 
 if __name__ == "__main__":

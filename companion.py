@@ -10,6 +10,11 @@ class Companion:
         self.paths = self.manifest["paths"]
         self.imports = self.manifest["imports"]
         self.load_order = self.manifest["load_order"]
+        self.required_invariants = {
+            "genesis_anchor_locked": True,
+            "no_bung": True,
+            "continuity_flow": True,
+        }
         self.coordination_state = {
             "genesis_anchor_locked": False,
             "sync_mechanism_active": True,
@@ -82,14 +87,15 @@ class Companion:
             state.get("paths_valid", False)
             and state.get("imports_valid", False)
             and state.get("load_order_locked", False)
-            and coordination.get("genesis_anchor_locked") is True
+            and all(
+                coordination.get(key) is required
+                for key, required in self.required_invariants.items()
+            )
             and coordination.get("sync_mechanism_active") is True
             and coordination.get("sync_mode") == "ASYMMETRIC_VALIDATION"
             and coordination.get("validation_passed") is True
             and coordination.get("gate_released") is True
             and coordination.get("superposition_integrity") is True
-            and coordination.get("no_bung") is True
-            and coordination.get("continuity_flow") is True
             and not coordination.get("frozen_modules", ())
         )
 
