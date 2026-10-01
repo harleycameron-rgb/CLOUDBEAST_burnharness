@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////
+// QOB‑10 OUTER LATTICE — PRIVATE REPO
+////////////////////////////////////////////////////////////
+
+STAGE: QOB10_OUTER_LATTICE
+DESCRIPTION: "Constructs outer lattice layer from QOB‑9 framework shell anchor."
+
+INPUTS {
+    QOB9_ANCHOR = load("QOB9.sha512");
+}
+
+LATTICE_SETUP {
+    // 1. Base lattice seed
+    lattice_seed = "LATTICE_CORE" + QOB9_ANCHOR;
+
+    // 2. Outer lattice pattern (deterministic boundary weave)
+    lattice_pattern = lattice_seed + lattice_seed[40:104];
+
+    // 3. Generate outer lattice anchor
+    QOB10_ANCHOR = SHA512(lattice_pattern);
+}
+
+CHECKS {
+    // Anchor exists
+    if QOB10_ANCHOR != null:
+        status_exists = "OK";
+    else:
+        status_exists = "FAIL";
+
+    // Correct SHA‑512 length
+    if len(QOB10_ANCHOR) == 128:
+        status_length = "OK";
+    else:
+        status_length = "FAIL";
+}
+
+STABILITY {
+    if status_exists == "OK"
+    and status_length == "OK":
+        verification = "QOB‑10 VERIFIED";
+    else:
+        verification = "QOB‑10 INVALID";
+}
+
+OUTPUT_PATHS {
+    burnharness/ignition_layer/QOB10.sha512;
+    unified_field/manifest/QOB10.sha512;
+    sentinel_dot/metadata/QOB10.sha512;
+    github_repo_root/QOB10.sha512;
+}
+
+OUTPUT {
+    QOB10_ANCHOR;
+    verification;
+}
+
+NOTES:
+- QOB‑10 forms the outer boundary lattice above QOB‑9.
+- Keep private until ignition event.
+////////////////////////////////////////////////////////////
