@@ -1,5 +1,6 @@
 import hashlib
 import json
+import threading
 import unittest
 
 from burnharness.ignition_layer.legs.sentinel_dot.ignition_stub import (
@@ -17,8 +18,45 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
             instance_id: SentinelDotIgnitionStub()
             for instance_id in self.coordinator.instance_ids
         }
-        for instance_id, sentinel in self.sentinels.items():
-            sentinel.bind(self.coordinator, instance_id)
+        threads = [
+            threading.Thread(
+                target=self.sentinels[instance_id].bind,
+                args=(self.coordinator, instance_id),
+            )
+            for instance_id in self.coordinator.instance_ids
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(2)
+            self.assertFalse(thread.is_alive())
+
+    def test_genesis_gate_distributes_same_anchor_before_divergence(self):
+        first, second = (
+            self.sentinels[instance_id]
+            for instance_id in self.coordinator.instance_ids
+        )
+        self.assertTrue(self.coordinator.state["genesis_anchor_locked"])
+        self.assertEqual(first.genesis_anchor_id, second.genesis_anchor_id)
+        self.assertEqual(
+            first.state["invariant_projection_anchor"],
+            second.state["initial_symbol_state"],
+        )
+        genesis_id = first.genesis_anchor_id
+        self.assertEqual(len(genesis_id), 128)
+
+        first.publish_invariant_projection(
+            ParabolaProjection(a=1, b=0, c=0)
+        )
+        second.publish_accumulated_symbol({"x": 3, "y": 9})
+        self.assertNotEqual(
+            first.state["invariant_projection_anchor"],
+            second.state["accumulated_symbol"],
+        )
+        self.assertEqual(self.coordinator.release.genesis_block_id, genesis_id)
+        self.assertEqual(
+            first.fire_record["block_id"], second.fire_record["block_id"]
+        )
 
     def test_valid_projection_releases_gate_and_fires_both_instances(self):
         projection = ParabolaProjection(a=1, b=0, c=0, tolerance=0.01)
@@ -47,6 +85,10 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
         self.assertEqual(records[0]["block_id"], records[1]["block_id"])
         self.assertEqual(records[0]["block_id"], release.block_id)
         self.assertEqual(len(release.block_id), 128)
+        self.assertEqual(
+            release.genesis_block_id,
+            self.coordinator.state["genesis_block_id"],
+        )
 
     def test_symbol_need_not_equal_projection_representation(self):
         projection = {"members": [{"state": "invariant-member"}]}

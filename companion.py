@@ -11,6 +11,7 @@ class Companion:
         self.imports = self.manifest["imports"]
         self.load_order = self.manifest["load_order"]
         self.coordination_state = {
+            "genesis_anchor_locked": False,
             "sync_mechanism_active": True,
             "sync_mode": "ASYMMETRIC_VALIDATION",
             "validation_passed": False,
@@ -81,6 +82,7 @@ class Companion:
             state.get("paths_valid", False)
             and state.get("imports_valid", False)
             and state.get("load_order_locked", False)
+            and coordination.get("genesis_anchor_locked") is True
             and coordination.get("sync_mechanism_active") is True
             and coordination.get("sync_mode") == "ASYMMETRIC_VALIDATION"
             and coordination.get("validation_passed") is True

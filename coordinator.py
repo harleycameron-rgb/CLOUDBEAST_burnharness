@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import os
+import threading
 from dataclasses import dataclass
 
 
@@ -35,7 +36,13 @@ class ValidationRelease:
     projection_revision: int
     symbol_revision: int
     block_id: str
+    genesis_block_id: str
     gate_released: bool = True
+
+
+@dataclass(frozen=True)
+class GenesisAnchor:
+    block_id: str
 
 
 class SentinelDotCoordinator:
@@ -48,6 +55,11 @@ class SentinelDotCoordinator:
             raise ValueError("exactly two distinct Sentinel Dot instance IDs are required")
         self.invariant_source_id, self.symbol_source_id = tuple(instance_ids)
         self.instance_ids = tuple(instance_ids)
+        self._genesis_barrier = threading.Barrier(len(self.instance_ids))
+        self._genesis_lock = threading.Lock()
+        self._genesis_ready = set()
+        self._genesis_distributed = set()
+        self._genesis_anchor = None
         self._projection = None
         self._symbol = None
         self._has_projection = False
@@ -66,6 +78,14 @@ class SentinelDotCoordinator:
     def state(self):
         passed = self._release is not None
         return {
+            "genesis_anchor_locked": (
+                self._genesis_anchor is not None
+                and self._genesis_distributed == set(self.instance_ids)
+            ),
+            "genesis_block_id": (
+                None if self._genesis_anchor is None
+                else self._genesis_anchor.block_id
+            ),
             "sync_mechanism_active": True,
             "sync_mode": "ASYMMETRIC_VALIDATION",
             "validation_passed": passed,
@@ -86,6 +106,32 @@ class SentinelDotCoordinator:
     def release(self):
         return self._release
 
+    def report_genesis_ready(self, instance_id, timeout=None):
+        if instance_id not in self.instance_ids:
+            raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
+        with self._genesis_lock:
+            if self._genesis_anchor is not None:
+                self._genesis_distributed.add(instance_id)
+                return self._genesis_anchor
+            if instance_id in self._genesis_ready:
+                raise RuntimeError(
+                    f"Sentinel Dot instance {instance_id!r} already reported genesis readiness"
+                )
+            self._genesis_ready.add(instance_id)
+
+        try:
+            self._genesis_barrier.wait(timeout)
+        except threading.BrokenBarrierError:
+            raise TimeoutError("both Sentinel Dot instances must reach genesis") from None
+
+        with self._genesis_lock:
+            if self._genesis_anchor is None:
+                self._genesis_anchor = GenesisAnchor(
+                    hashlib.sha512(os.urandom(64)).hexdigest()
+                )
+            self._genesis_distributed.add(instance_id)
+            return self._genesis_anchor
+
     def subscribe(self, instance_id, callback):
         if instance_id not in self.instance_ids:
             raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
@@ -96,6 +142,7 @@ class SentinelDotCoordinator:
         self._dispatch(deliveries)
 
     def publish_invariant_projection(self, projection):
+        self._require_genesis_anchor()
         normalized = self._normalize_projection(projection)
         if not self._has_projection or normalized != self._projection:
             self._projection_revision += 1
@@ -110,6 +157,7 @@ class SentinelDotCoordinator:
         return release
 
     def publish_accumulated_symbol(self, symbol):
+        self._require_genesis_anchor()
         normalized = self._copy_json_value(symbol)
         if not self._has_symbol or normalized != self._symbol:
             self._symbol_revision += 1
@@ -122,6 +170,13 @@ class SentinelDotCoordinator:
         deliveries = self._pending_deliveries()
         self._dispatch(deliveries)
         return release
+
+    def _require_genesis_anchor(self):
+        if (self._genesis_anchor is None
+                or self._genesis_distributed != set(self.instance_ids)):
+            raise RuntimeError(
+                "both Sentinel Dot instances must receive the Genesis anchor first"
+            )
 
     def _normalize_projection(self, projection):
         if isinstance(projection, ParabolaProjection):
@@ -189,6 +244,14 @@ class SentinelDotCoordinator:
         return digest in projection["symbol_hashes"]
 
     def _evaluate(self):
+        if (self._genesis_anchor is None
+                or self._genesis_distributed != set(self.instance_ids)):
+            self._release = None
+            self._last_validation = {
+                "passed": False,
+                "reason": "awaiting locked Genesis anchor",
+            }
+            return
         if not self._has_projection or not self._has_symbol:
             self._release = None
             self._last_validation = {
@@ -223,6 +286,7 @@ class SentinelDotCoordinator:
             projection_revision=self._projection_revision,
             symbol_revision=self._symbol_revision,
             block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
+            genesis_block_id=self._genesis_anchor.block_id,
         )
         self._delivered.clear()
         self._last_validation = {

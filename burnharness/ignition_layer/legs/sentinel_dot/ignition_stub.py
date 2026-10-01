@@ -4,6 +4,7 @@ class SentinelDotIgnitionStub:
         self._fire_record = None
         self._coordinator = None
         self._instance_id = None
+        self.genesis_anchor_id = None
         self.state = {
     "ignition_constant": 3.14159,
     "collapse_boundary": {
@@ -27,6 +28,14 @@ class SentinelDotIgnitionStub:
             raise ValueError(f"unknown Sentinel Dot instance: {instance_id!r}")
         self._coordinator = coordinator
         self._instance_id = instance_id
+        anchor = coordinator.report_genesis_ready(instance_id)
+        self.genesis_anchor_id = anchor.block_id
+        self.state["genesis_anchor_id"] = anchor.block_id
+        if instance_id == coordinator.invariant_source_id:
+            self.state["invariant_projection_anchor"] = anchor.block_id
+        else:
+            self.state["initial_symbol_state"] = anchor.block_id
+            self.state["accumulated_symbol"] = anchor.block_id
         coordinator.subscribe(instance_id, self._on_gate_release)
 
     def publish_invariant_projection(self, projection):
@@ -35,11 +44,16 @@ class SentinelDotIgnitionStub:
 
     def publish_accumulated_symbol(self, symbol):
         self._require_source(self._coordinator.symbol_source_id)
-        return self._coordinator.publish_accumulated_symbol(symbol)
+        release = self._coordinator.publish_accumulated_symbol(symbol)
+        self.state["accumulated_symbol"] = symbol
+        return release
 
     def _require_source(self, expected_id):
-        if self._coordinator is None or self._instance_id != expected_id:
-            raise RuntimeError("Sentinel Dot instance is not bound to this source role")
+        if (self._coordinator is None or self._instance_id != expected_id
+                or not self._coordinator.state["genesis_anchor_locked"]):
+            raise RuntimeError(
+                "Sentinel Dot source role requires the locked Genesis anchor"
+            )
 
     def _on_gate_release(self, release):
         self.fire(self._coordinator, release, self._instance_id)
