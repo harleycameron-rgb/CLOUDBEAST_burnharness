@@ -1,5 +1,9 @@
 ////////////////////////////////////////////////////////////
-// QBLOCK — SYMBOLIC QUANTUM ORIGIN NODE
+// 
+# @copilot-designation: quantum_origin_block
+
+
+QBLOCK — SYMBOLIC QUANTUM ORIGIN NODE
 // Safe, mythopoetic, non-functional construct
 ////////////////////////////////////////////////////////////
 
