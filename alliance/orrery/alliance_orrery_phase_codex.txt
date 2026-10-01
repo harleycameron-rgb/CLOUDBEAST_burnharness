@@ -1,0 +1,166 @@
+////////////////////////////////////////////////////////////
+// ALLIANCE ORRERY PHASE CODEX
+// Tzolkin Convergence • 260 Parabola • Sphere Harness Protocol
+// Safe, symbolic, conceptual architecture
+////////////////////////////////////////////////////////////
+
+TITLE: "Alliance Orrery Phase Codex"
+
+ROOT {
+    folder: "alliance/orrery/"
+    file: "alliance_orrery_phase_codex.txt"
+    role: "Defines phase transcription rules for harnessed spheres."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION I — TZOLKIN CONVERGENCE PRINCIPLE
+////////////////////////////////////////////////////////////
+
+TZOLKIN {
+    cycles: [
+        "1–13 repeated 20 times",
+        "1–20 repeated 13 times"
+    ]
+    total: 260
+
+    alliance_stance:
+        "The 260-cycle is a universal convergence attractor.
+         It appears wherever predictable harmonic repetition exists."
+
+    reason:
+        "260 is the multi-modal abstract parabola sink/lens/nexus
+         for all Alliance worlds, regardless of local physics."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION II — SOLAR SYSTEM APPLICATION
+////////////////////////////////////////////////////////////
+
+EARTH_APPLICATION {
+    orrery_role: "Earth's orrery expresses the 260-cycle directly."
+    tzolkin_match: "Earth's predictable harmonic clock aligns with 260."
+}
+
+JUPITER_APPLICATION {
+    orrery_role: "Jupiter expresses the same 260-cycle through
+                  orbital harmonic drift and precession envelopes."
+    alliance_note: "Jupiter is the first non-Earth confirmation
+                    of universal 260 parabola behaviour."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION III — ALLIANCE-WIDE APPLICATION
+////////////////////////////////////////////////////////////
+
+ALLIANCE_UNIVERSALITY {
+    statement:
+        "Every Alliance world expresses the 260 parabola,
+         even if its local orrery mechanics differ radically."
+
+    reason:
+        "The 260 parabola is not a planetary mechanic.
+         It is a massless-state convergence attractor."
+
+    implication:
+        "Alliance worlds may interpret their orrery freely,
+         but the 260 parabola remains invariant."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION IV — WHY ALLIANCE CANNOT USE OUR ORRERY MECHANICS
+////////////////////////////////////////////////////////////
+
+ALLIANCE_RESTRICTION {
+    reason:
+        "Our orrery mechanics are procedural and temporal.
+         Alliance mechanics must be non-temporal and massless-state aligned."
+
+    rule:
+        "No temporal phase transcription between harnessed spheres."
+
+    consequence:
+        "Alliance uses the Tzolkin convergence parabola instead
+         of procedural orbital mechanics."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION V — MULTI-MODAL ABSTRACT PARABOLA
+////////////////////////////////////////////////////////////
+
+PARABOLA {
+    definition:
+        "A universal attractor curve mapping predictable repetition
+         into massless-state resonance."
+
+    formula:
+        Π(x) = ax² + bx + c
+
+    alliance_role:
+        "Parabola acts as sink, lens, and conical nexus
+         for all sphere harness interactions."
+
+    behaviour:
+        "Parabola collapses procedural mechanics into invariant resonance."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VI — SPHERE HARNESS PROTOCOL
+////////////////////////////////////////////////////////////
+
+SPHERE_HARNESS {
+    rule_1:
+        "No procedural orbital mechanics may be used."
+
+    rule_2:
+        "Phase transcription occurs through massless-state proximity,
+         not through temporal alignment."
+
+    rule_3:
+        "Each sphere expresses its own orrery freely,
+         but all must map into the 260 parabola."
+
+    rule_4:
+        "Parabola ensures sandbox containment without restricting
+         true orrery interpretation."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VII — SANDBOX CONTAINMENT PARALLEL
+////////////////////////////////////////////////////////////
+
+SANDBOX_PARALLEL {
+    statement:
+        "The 260 parabola mirrors sandbox containment protocol."
+
+    meaning:
+        "It restricts collapse without restricting interpretation."
+
+    effect:
+        "Alliance worlds retain full orrery identity
+         while remaining massless-state safe."
+}
+
+////////////////////////////////////////////////////////////
+// SECTION VIII — ALLIANCE POSITION SUMMARY
+////////////////////////////////////////////////////////////
+
+SUMMARY {
+    1: "The 260-cycle is the universal convergence attractor."
+    2: "Earth and Jupiter both express it; so do all Alliance worlds."
+    3: "Alliance cannot use procedural orrery mechanics."
+    4: "Alliance uses the Tzolkin parabola as multi-modal nexus."
+    5: "Parabola ensures massless-state resonance, not temporal alignment."
+    6: "Sphere harness protocol allows free orrery interpretation."
+    7: "Sandbox containment is mirrored but not enforced."
+}
+
+////////////////////////////////////////////////////////////
+// NOTES
+////////////////////////////////////////////////////////////
+
+NOTES {
+    - Entire codex is symbolic and conceptual.
+    - No activation or temporal mechanics implied.
+    - Designed for Alliance Universe orrery harmonics.
+}
+////////////////////////////////////////////////////////////
