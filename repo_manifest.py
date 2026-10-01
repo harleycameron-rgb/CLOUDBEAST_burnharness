@@ -15,6 +15,7 @@ def get_manifest():
                 "root": REPOSITORY_ROOT,
                 "ignition_layer": _path("burnharness", "ignition_layer"),
                 "couplers": _path("couplers"),
+                "unified_field_zipgate": _path("UNIFIED_FIELD_ZIPGATE"),
             },
             "modules": {
                 "provenance_bridge": _path("provenance_bridge"),
@@ -30,6 +31,9 @@ def get_manifest():
         "imports": {
             "burnharness_protocol": "burnharness_protocol",
             "coupler_cycle": "coupler_cycle",
+            "ignition_algebra": (
+                "UNIFIED_FIELD_ZIPGATE.geometry.ignition.ignition_algebra"
+            ),
             "organism_runtime": "couplers.organism_runtime",
             "scandoc": (
                 "burnharness.ignition_layer.legs.scandoc.ignition_stub"

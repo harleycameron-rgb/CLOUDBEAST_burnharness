@@ -79,6 +79,14 @@ any configured drift risk is detected. The organism runtime applies friction
 above the oath threshold, then halts and routes to the stub if numeric drift
 exceeds that threshold.
 
+The sphere-surface ignition algebra is registered under
+`geometry_system.ignition_algebra` and implemented in
+`UNIFIED_FIELD_ZIPGATE/geometry/ignition/ignition_algebra.py`. It provides
+harmonic-field and pairwise ignition-time calculations, strict flow alignment,
+destiny alignment, and a fail-closed alliance recurrence bit. Destiny domains
+are supplied by the caller as membership containers, two-endpoint intervals,
+or predicates.
+
 Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surface
 state, sphere trajectory geometry, and read-only stabiliser packet. The existing
 `run_cycle()` resonance-field return format remains unchanged.
