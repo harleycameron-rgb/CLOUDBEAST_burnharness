@@ -89,10 +89,13 @@ def protocol_upgrade_met(protocol=PROTOCOL):
 def admit_leg(leg_name, protocol=PROTOCOL):
     """Return an admission decision, using the generic stub when policy fails."""
     upgraded = protocol_upgrade_met(protocol)
+    admitted = upgraded and isinstance(leg_name, str) and bool(leg_name)
     return {
-        "admitted": upgraded and isinstance(leg_name, str) and bool(leg_name),
+        "admitted": admitted,
         "leg": leg_name,
-        "fallback_stub": None if upgraded else PROTOCOL["leg_admission"]["fallback_stub"],
+        "fallback_stub": (
+            None if admitted else PROTOCOL["leg_admission"]["fallback_stub"]
+        ),
     }
 
 
@@ -103,7 +106,8 @@ def create_stabiliser_packet():
 
 def propagate_stabiliser_packet(packet):
     """Pass an immutable packet through unchanged; reject mutable packet data."""
-    if not isinstance(packet, MappingProxyType):
+    if (not isinstance(packet, MappingProxyType)
+            or dict(packet) != dict(PROTOCOL["stabiliser_packet"])):
         raise TypeError("stabiliser packet must be created by create_stabiliser_packet")
     return packet
 

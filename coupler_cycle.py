@@ -6,6 +6,11 @@
 
 import importlib
 
+from burnharness_protocol import (
+    create_stabiliser_packet,
+    geometry_header,
+)
+
 LEG_PATH = "burnharness.ignition_layer.legs"
 COUPLER_PATH = "couplers"
 
@@ -28,7 +33,7 @@ def load_coupler(name):
     class_name = "".join([p.capitalize() for p in name.split("_")]) + "Coupler"
     return getattr(module, class_name)
 
-def run_cycle():
+def run_cycle(stabiliser_packet=None):
     resonance = {
         "stability": 0.0,
         "curvature": 0.0,
@@ -40,7 +45,7 @@ def run_cycle():
         legB = load_leg(legB_name)
 
         CouplerClass = load_coupler(coupler_name)
-        coupler = CouplerClass(legA, legB)
+        coupler = CouplerClass(legA, legB, stabiliser_packet)
 
         output = coupler.couple()
 
@@ -54,6 +59,25 @@ def run_cycle():
     resonance["provenance"] /= len(COUPLER_SEQUENCE)
 
     return resonance
+
+
+def run_protocol_cycle():
+    """Run the cycle with an unchanged packet and emit dual state plus geometry."""
+    packet = create_stabiliser_packet()
+    resonance = run_cycle(packet)
+    orrery_state = load_leg("orrery").ignite()
+    return {
+        "dual_state": {
+            "root": load_leg("sentinel_dot").ignite(),
+            "surface": resonance,
+        },
+        "geometry": {
+            "header": geometry_header(),
+            "trajectory": orrery_state.get("trajectory_seed", {}).get("vector"),
+        },
+        "stabiliser_packet": packet,
+    }
+
 
 if __name__ == "__main__":
     field = run_cycle()

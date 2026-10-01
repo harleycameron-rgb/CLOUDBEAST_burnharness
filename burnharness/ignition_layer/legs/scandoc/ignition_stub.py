@@ -1,4 +1,7 @@
 
+from burnharness_protocol import propagate_stabiliser_packet
+
+
 class ScandocIgnitionStub:
     def __init__(self):
         self.state = {
@@ -15,6 +18,10 @@ class ScandocIgnitionStub:
 
     def ignite(self):
         return self.state
+
+    def ingest_stabiliser_packet(self, packet):
+        self.stabiliser_packet = propagate_stabiliser_packet(packet)
+        return self.stabiliser_packet
 
     def diagnostic(self):
         return "Scandoc: ignition stable"
