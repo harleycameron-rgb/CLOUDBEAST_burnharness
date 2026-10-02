@@ -71,6 +71,11 @@ class ReconcileTests(unittest.TestCase):
             reconcile("genesis-anchor", self.head_a, self.head_a,
                       self.log_a, self.log_b)
 
+    def test_single_sentinel_rejected(self):
+        with self.assertRaisesRegex(ValueError, "single sentinel"):
+            reconcile("genesis-anchor", self.head_a, self.head_a,
+                      self.log_a, self.log_a)
+
     def test_projection_is_independent_of_arrival_order(self):
         self.assertEqual(
             canonical_projection(self.log_a),

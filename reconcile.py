@@ -99,7 +99,10 @@ def reconcile(anchor, head_a, head_b, log_a, log_b):
         raise ValueError("anchor must be a non-empty string")
     hash_a, hash_b = _head_hash(head_a), _head_hash(head_b)
     if hash_a == hash_b:
-        raise ValueError("the two sessions must have distinct head hashes")
+        raise ValueError(
+            "a single sentinel cannot produce an invariant; "
+            "the two sessions must have distinct head hashes"
+        )
     if not verify(head_a, log_a) or not verify(head_b, log_b):
         raise ValueError("a session head does not verify against its log")
 
