@@ -71,10 +71,20 @@ class ReconcileTests(unittest.TestCase):
             reconcile("genesis-anchor", self.head_a, self.head_a,
                       self.log_a, self.log_b)
 
-    def test_projection_is_independent_of_arrival_order(self):
+    def test_projection_is_order_independent(self):
+        log_a = {"outcomes": [
+            {"key": "alpha", "value": {"passed": True}},
+            {"key": "beta", "value": 7},
+            {"key": "gamma", "value": ["stable", 3]},
+        ]}
+        log_b = {"outcomes": [
+            {"key": "gamma", "value": ["stable", 3]},
+            {"key": "alpha", "value": {"passed": True}},
+            {"key": "beta", "value": 7},
+        ]}
         self.assertEqual(
-            canonical_projection(self.log_a),
-            canonical_projection(self.log_b),
+            canonical_projection(log_a),
+            canonical_projection(log_b),
         )
 
     def test_head_must_verify_against_its_own_log(self):
