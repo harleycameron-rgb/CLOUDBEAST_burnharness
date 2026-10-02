@@ -1,6 +1,7 @@
 import hashlib
 import json
 import unittest
+from dataclasses import replace
 
 from reconcile import Divergence, canonical_projection, reconcile
 from verify_reconciled import verify_reconciled
@@ -40,6 +41,20 @@ class ReconcileTests(unittest.TestCase):
         self.assertTrue(verify_reconciled(
             "genesis-anchor", self.head_a, self.head_b, block
         ))
+
+    def test_verifier_is_idempotent(self):
+        block = reconcile("genesis-anchor", self.head_a, self.head_b,
+                          self.log_a, self.log_b)
+        for _ in range(2):
+            self.assertTrue(verify_reconciled(
+                "genesis-anchor", self.head_a, self.head_b, block
+            ))
+
+        corrupted_block = replace(block, reconciled_hash="invalid")
+        for _ in range(2):
+            self.assertFalse(verify_reconciled(
+                "genesis-anchor", self.head_a, self.head_b, corrupted_block
+            ))
 
     def test_divergent_sessions_return_both_projection_values(self):
         changed = {**self.log_b, "outcomes": [
