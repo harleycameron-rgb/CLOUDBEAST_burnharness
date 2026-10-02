@@ -16,7 +16,7 @@ DRIFT_LIMIT = 0.05
 TOLERANCE = 1e-9
 
 
-def check_environment():
+def check_environment(coordinator=None):
     """Check local modules, paths, and leg/coupler configuration."""
     if not protocol_upgrade_met():
         return False
@@ -36,7 +36,9 @@ def check_environment():
                     config = json.load(stream)
                 if (not isinstance(config, dict) or config.get("leg") != leg
                         or not isinstance(config.get("ignition_state"), dict)
-                        or config["ignition_state"] != load_leg(leg).ignite()):
+                        or config["ignition_state"] != load_leg(
+                            leg, coordinator=coordinator
+                        ).ignite()):
                     return False
             path = root / "couplers" / coupler / "coupler_manifest.json"
             with path.open(encoding="utf-8") as stream:
@@ -103,14 +105,14 @@ def check_integrity(data):
             and digest != changed), digest
 
 
-def validate_system(input_data=None):
+def validate_system(input_data=None, coordinator=None):
     """Return a fail-closed readiness report for the local cycle.
 
     If input_data is omitted, use the first cycle output as the input field.
     Subsequent cycles must remain within the strict drift threshold.
     """
     report = {
-        "environment_ready": check_environment(),
+        "environment_ready": check_environment(coordinator=coordinator),
         "boundary_valid": False,
         "stable": False,
         "consistent": False,
@@ -126,9 +128,12 @@ def validate_system(input_data=None):
         return report
     try:
         initial_config = _configuration_snapshot()
-        samples = [run_cycle() for _ in range(3)]
+        samples = [
+            run_cycle(coordinator=coordinator) for _ in range(3)
+        ]
         report["environment_ready"] = (
-            check_environment() and _configuration_snapshot() == initial_config
+            check_environment(coordinator=coordinator)
+            and _configuration_snapshot() == initial_config
         )
         if not report["environment_ready"]:
             return report
@@ -159,14 +164,53 @@ def validate_system(input_data=None):
     return report
 
 
-def system_heartbeat():
-    """Return whether every system readiness check passes."""
-    report = validate_system()
+def system_heartbeat(coordinator):
+    """Return anchored readiness without sampling before Genesis."""
+    try:
+        coordinator._require_genesis()
+    except (AttributeError, RuntimeError):
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    genesis = coordinator.genesis
+    if genesis is None or not coordinator.genesis_anchor_locked:
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    try:
+        sentinel = load_leg("sentinel_dot", coordinator=coordinator)
+    except (RuntimeError, ValueError):
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    if sentinel.genesis_block_id is None or (
+        sentinel.genesis_block_id != genesis.block_id
+    ):
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    report = validate_system(coordinator=coordinator)
     checks = (
         "environment_ready", "boundary_valid", "stable", "consistent",
         "integrity_verified"
     )
-    return all(report.get(check) is True for check in checks)
+    return {
+        "anchored": True,
+        "genesis_block_id": genesis.block_id,
+        "readiness": all(report.get(check) is True for check in checks),
+    }
 
 
 if __name__ == "__main__":

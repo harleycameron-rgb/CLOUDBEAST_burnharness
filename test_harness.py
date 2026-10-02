@@ -3,12 +3,21 @@ import math
 from unittest.mock import patch
 
 import system_validation as validation
+from burnharness.ignition_layer.legs.sentinel_dot.ignition_stub import (
+    SentinelDotIgnitionStub,
+)
+from coordinator import SentinelDotCoordinator, bootstrap_genesis
 
 
 FIELD = {"stability": 0.5, "curvature": 0.2, "provenance": 0.1}
 
 
 class ValidationHarness(unittest.TestCase):
+    def setUp(self):
+        self.coordinator = SentinelDotCoordinator()
+        for instance_id in self.coordinator.instance_ids:
+            SentinelDotIgnitionStub().bind(self.coordinator, instance_id)
+        bootstrap_genesis(self.coordinator)
 
     # ------------------------------------------------------------
     # HEARTBEAT / READINESS
@@ -21,14 +30,18 @@ class ValidationHarness(unittest.TestCase):
             )
         }
         with patch.object(validation, "validate_system", return_value=passing):
-            self.assertTrue(validation.system_heartbeat())
+            self.assertTrue(
+                validation.system_heartbeat(self.coordinator)["readiness"]
+            )
 
         for failed in passing:
             with self.subTest(failed=failed):
                 failing = {**passing, failed: False}
                 with patch.object(validation, "validate_system",
                                   return_value=failing):
-                    self.assertFalse(validation.system_heartbeat())
+                    self.assertFalse(
+                        validation.system_heartbeat(self.coordinator)["readiness"]
+                    )
 
     # ------------------------------------------------------------
     # BASELINE SYSTEM READINESS
