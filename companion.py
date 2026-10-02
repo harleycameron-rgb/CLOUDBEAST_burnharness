@@ -1,7 +1,15 @@
 import importlib
 import os
+from types import MappingProxyType
 
 from repo_manifest import get_manifest
+
+
+BIG_PROMPT_INVARIANTS = MappingProxyType({
+    "genesis_anchor_locked": True,
+    "no_bung": True,
+    "continuity_flow": True,
+})
 
 
 class Companion:
@@ -10,6 +18,18 @@ class Companion:
         self.paths = self.manifest["paths"]
         self.imports = self.manifest["imports"]
         self.load_order = self.manifest["load_order"]
+        self.coordination_state = {
+            "sync_mechanism_active": True,
+            "sync_mode": "ASYMMETRIC_VALIDATION",
+            "validation_passed": False,
+            "gate_released": False,
+            "superposition_integrity": False,
+            "no_bung": True,
+            "continuity_flow": True,
+            "genesis_anchor_locked": False,
+            "frozen_modules": (),
+        }
+        self.big_prompt_invariants = BIG_PROMPT_INVARIANTS
 
     def enforce_absolute_paths(self):
         missing = []
@@ -62,11 +82,25 @@ class Companion:
             and not module_state.get("bung", False)
         )
 
-    def superposition_integrity(self, state):
+    def superposition_integrity(self, state, coordination_state=None):
+        coordination = (
+            self.coordination_state
+            if coordination_state is None else coordination_state
+        )
         return (
             state.get("paths_valid", False)
             and state.get("imports_valid", False)
-            and state.get("load_order_locked", True)
+            and state.get("load_order_locked", False)
+            and coordination.get("sync_mechanism_active") is True
+            and coordination.get("sync_mode") == "ASYMMETRIC_VALIDATION"
+            and coordination.get("validation_passed") is True
+            and coordination.get("gate_released") is True
+            and coordination.get("superposition_integrity") is True
+            and all(
+                coordination.get(key) is value
+                for key, value in BIG_PROMPT_INVARIANTS.items()
+            )
+            and not coordination.get("frozen_modules", ())
         )
 
     def enforce(self):
