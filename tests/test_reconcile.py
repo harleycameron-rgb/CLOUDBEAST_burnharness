@@ -1,7 +1,13 @@
 import hashlib
 import json
 import unittest
+from dataclasses import replace
 
+from burnharness.ignition_layer.legs.sentinel_dot.ignition_stub import (
+    SentinelDotIgnitionStub,
+)
+from coordinator import SentinelDotCoordinator, bootstrap_genesis
+from coupler_cycle import run_cycle
 from reconcile import Divergence, canonical_projection, reconcile
 from verify_reconciled import verify_reconciled
 
@@ -40,6 +46,20 @@ class ReconcileTests(unittest.TestCase):
         self.assertTrue(verify_reconciled(
             "genesis-anchor", self.head_a, self.head_b, block
         ))
+
+    def test_verifier_is_idempotent(self):
+        block = reconcile("genesis-anchor", self.head_a, self.head_b,
+                          self.log_a, self.log_b)
+        for _ in range(2):
+            self.assertTrue(verify_reconciled(
+                "genesis-anchor", self.head_a, self.head_b, block
+            ))
+
+        corrupted_block = replace(block, reconciled_hash="invalid")
+        for _ in range(2):
+            self.assertFalse(verify_reconciled(
+                "genesis-anchor", self.head_a, self.head_b, corrupted_block
+            ))
 
     def test_divergent_sessions_return_both_projection_values(self):
         changed = {**self.log_b, "outcomes": [
@@ -136,6 +156,46 @@ class ReconcileTests(unittest.TestCase):
                 ),
                 Divergence,
             )
+
+    def test_anchor_is_immutable_across_full_cycle(self):
+        coordinator = SentinelDotCoordinator()
+        sentinels = {}
+        for instance_id in coordinator.instance_ids:
+            sentinel = SentinelDotIgnitionStub()
+            sentinel.bind(coordinator, instance_id)
+            sentinels[instance_id] = sentinel
+
+        genesis = bootstrap_genesis(coordinator)
+        anchor_bytes = genesis.block_id.encode("utf-8")
+
+        invariant_source = sentinels[coordinator.invariant_source_id]
+        symbol_source = sentinels[coordinator.symbol_source_id]
+        invariant_source.publish_invariant_projection({"members": ["complete"]})
+        release = symbol_source.publish_accumulated_symbol("complete")
+        self.assertIsNotNone(release)
+
+        cycle = run_cycle(coordinator=coordinator)
+        outcomes = [
+            {"key": "gate_released", "value": coordinator.state["gate_released"]},
+            {"key": "genesis_block_id", "value": genesis.block_id},
+            {"key": "session_completed", "value": True},
+        ]
+        log_a = {
+            "session_id": "session-a",
+            "cycle": cycle,
+            "outcomes": outcomes,
+        }
+        log_b = {
+            "session_id": "session-b",
+            "cycle": cycle,
+            "outcomes": outcomes,
+        }
+        head_a = make_head(log_a)
+        head_b = make_head(log_b)
+        block = reconcile(genesis.block_id, head_a, head_b, log_a, log_b)
+
+        self.assertTrue(verify_reconciled(genesis.block_id, head_a, head_b, block))
+        self.assertEqual(anchor_bytes, coordinator.genesis.block_id.encode("utf-8"))
 
 
 if __name__ == "__main__":
