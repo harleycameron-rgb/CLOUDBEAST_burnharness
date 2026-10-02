@@ -52,6 +52,17 @@ class ReconcileTests(unittest.TestCase):
         self.assertEqual(block.pa, canonical_projection(self.log_a))
         self.assertEqual(block.pb, canonical_projection(changed))
 
+    def test_divergence_reports_where(self):
+        changed = {**self.log_b, "outcomes": [
+            {"key": "beta", "value": 8},
+            {"key": "alpha", "value": {"passed": True}},
+        ]}
+        block = reconcile("genesis-anchor", self.head_a, make_head(changed, "b"),
+                          self.log_a, changed)
+        self.assertIsInstance(block, Divergence)
+        self.assertEqual(block.key, "beta")
+        self.assertIn("beta", block.reason)
+
     def test_tampered_head_does_not_verify(self):
         block = reconcile("genesis-anchor", self.head_a, self.head_b,
                           self.log_a, self.log_b)
