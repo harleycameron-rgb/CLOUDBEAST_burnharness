@@ -104,6 +104,34 @@ class SystemValidationTests(unittest.TestCase):
         with patch.object(validation, "run_cycle", return_value={"stability": 0.1}):
             self.assertFalse(validation.validate_system()["system_ready"])
 
+    def test_adversarial_cycle_fields_fail_closed(self):
+        malformed_samples = (
+            {**FIELD, "stability": float("nan")},
+            {**FIELD, "curvature": True},
+            {**FIELD, "unexpected": 0},
+        )
+        for malformed in malformed_samples:
+            with self.subTest(malformed=malformed):
+                with patch.object(validation, "run_cycle", return_value=malformed):
+                    report = validation.validate_system()
+
+                self.assertFalse(report["boundary_valid"])
+                self.assertFalse(report["system_ready"])
+                self.assertIsNone(report["canonical_model"])
+                self.assertIsNone(report["sha512"])
+
+    def test_configuration_change_during_cycle_fails_closed(self):
+        with patch.object(
+            validation, "_configuration_snapshot",
+            side_effect=[("before",), ("after",)],
+        ), patch.object(validation, "run_cycle", return_value=FIELD):
+            report = validation.validate_system()
+
+        self.assertFalse(report["environment_ready"])
+        self.assertFalse(report["system_ready"])
+        self.assertIsNone(report["canonical_model"])
+        self.assertIsNone(report["sha512"])
+
     def test_environment_rejects_missing_modules_and_bad_config(self):
         with patch.object(validation.importlib, "import_module",
                           side_effect=ModuleNotFoundError):
