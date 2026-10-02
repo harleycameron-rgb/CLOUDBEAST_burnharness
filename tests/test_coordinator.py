@@ -14,6 +14,7 @@ from coordinator import (
     bootstrap_genesis,
 )
 from couplers.orrery_sentinel_dot.coupler import OrrerySentinelDotCoupler
+from system_validation import system_heartbeat
 
 
 class SentinelDotCoordinatorTests(unittest.TestCase):
@@ -246,6 +247,60 @@ class GenesisBootstrapTests(unittest.TestCase):
         self.assertEqual(report["iterations"], 50)
         self.assertLess(report["median_ms"], 50.0)
         self.assertLess(report["max_ms"], 1000.0)
+
+    def test_monitor_reports_unanchored_before_genesis(self):
+        result = system_heartbeat(self.coordinator)
+
+        self.assertFalse(result["anchored"])
+        self.assertIsNone(result["genesis_block_id"])
+        self.assertIsNone(result["readiness"])
+        self.assertTrue(all(
+            sentinel.genesis_record is None for sentinel in self.sentinels.values()
+        ))
+        self.assertFalse(self.coordinator.genesis_anchor_locked)
+
+    def test_monitor_reports_anchored_after_genesis(self):
+        bootstrap_genesis(self.coordinator)
+
+        result = system_heartbeat(self.coordinator)
+
+        self.assertTrue(result["anchored"])
+        self.assertEqual(
+            result["genesis_block_id"], self.coordinator.genesis.block_id
+        )
+
+    def test_partial_distribution_rolls_back(self):
+        sentinel = self.sentinels[self.coordinator.symbol_source_id]
+        original_callback = sentinel._on_genesis
+        attempts = 0
+
+        def fail_once(instance, genesis):
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                raise RuntimeError("injected Genesis callback failure")
+            return original_callback(genesis)
+
+        sentinel._on_genesis = fail_once.__get__(sentinel, type(sentinel))
+        self.coordinator._genesis_listeners[
+            self.coordinator.symbol_source_id
+        ] = sentinel._on_genesis
+
+        with self.assertRaises(RuntimeError):
+            bootstrap_genesis(self.coordinator)
+
+        self.assertIsNone(self.coordinator.genesis)
+        self.assertFalse(self.coordinator.genesis_anchor_locked)
+        self.assertTrue(all(
+            stub.genesis_record is None for stub in self.sentinels.values()
+        ))
+
+        genesis = bootstrap_genesis(self.coordinator)
+        self.assertEqual(
+            self.sentinels[self.coordinator.invariant_source_id].genesis_block_id,
+            genesis.block_id,
+        )
+        self.assertEqual(sentinel.genesis_block_id, genesis.block_id)
 
 
 if __name__ == "__main__":

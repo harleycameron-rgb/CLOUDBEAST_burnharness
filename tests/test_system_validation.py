@@ -3,12 +3,22 @@ import unittest
 from unittest.mock import patch
 
 import system_validation as validation
+from burnharness.ignition_layer.legs.sentinel_dot.ignition_stub import (
+    SentinelDotIgnitionStub,
+)
+from coordinator import SentinelDotCoordinator, bootstrap_genesis
 
 
 FIELD = {"stability": 0.5, "curvature": 0.2, "provenance": 0.1}
 
 
 class SystemValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.coordinator = SentinelDotCoordinator()
+        for instance_id in self.coordinator.instance_ids:
+            SentinelDotIgnitionStub().bind(self.coordinator, instance_id)
+        bootstrap_genesis(self.coordinator)
+
     def test_system_heartbeat_requires_every_readiness_check(self):
         passing_report = {
             check: True for check in (
@@ -17,14 +27,18 @@ class SystemValidationTests(unittest.TestCase):
             )
         }
         with patch.object(validation, "validate_system", return_value=passing_report):
-            self.assertTrue(validation.system_heartbeat())
+            self.assertTrue(
+                validation.system_heartbeat(self.coordinator)["readiness"]
+            )
 
         for failed_check in passing_report:
             with self.subTest(failed_check=failed_check):
                 failing_report = {**passing_report, failed_check: False}
                 with patch.object(validation, "validate_system",
                                   return_value=failing_report):
-                    self.assertFalse(validation.system_heartbeat())
+                    self.assertFalse(
+                        validation.system_heartbeat(self.coordinator)["readiness"]
+                    )
 
     def test_local_system_is_ready(self):
         report = validation.validate_system()
