@@ -170,6 +170,36 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
             release, self.coordinator.instance_ids[0]
         ))
 
+    def test_release_is_bound_to_identity_instance_and_genesis(self):
+        self.coordinator.publish_invariant_projection({"members": ["valid"]})
+        release = self.coordinator.publish_accumulated_symbol("valid")
+        other_coordinator = SentinelDotCoordinator()
+
+        self.assertFalse(self.coordinator.accepts_release(
+            type(release)(**release.__dict__), self.coordinator.instance_ids[0]
+        ))
+        self.assertFalse(self.coordinator.accepts_release(
+            release, "unregistered-sentinel"
+        ))
+        self.assertFalse(other_coordinator.accepts_release(
+            release, other_coordinator.instance_ids[0]
+        ))
+
+    def test_invalid_projection_fails_closed_without_exception(self):
+        for projection in (
+            {"members": "not-a-sequence"},
+            {"symbol_hashes": ["not-a-sha512-digest"]},
+            {"a": float("nan"), "b": 0, "c": 0},
+        ):
+            with self.subTest(projection=projection):
+                self.assertIsNone(
+                    self.coordinator.publish_invariant_projection(projection)
+                )
+                self.assertIsNone(
+                    self.coordinator.publish_accumulated_symbol("anything")
+                )
+                self.assertFalse(self.coordinator.state["gate_released"])
+
     def test_coupler_publishes_asymmetric_state_without_equality_checks(self):
         class Leg:
             def __init__(self, state):
