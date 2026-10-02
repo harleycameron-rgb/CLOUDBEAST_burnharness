@@ -1,17 +1,16 @@
 import hashlib
 import json
 import unittest
-from dataclasses import replace
 
 from reconcile import Divergence, canonical_projection, reconcile
 from verify_reconciled import verify_reconciled
 
 
-def make_head(log, salt):
+def make_head(log, salt=None):
     payload = json.dumps(
         log, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
     ).encode("utf-8")
-    return hashlib.sha256(payload + salt.encode("utf-8")).hexdigest()
+    return hashlib.sha256(payload).hexdigest()
 
 
 class ReconcileTests(unittest.TestCase):
