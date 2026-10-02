@@ -56,6 +56,20 @@ class GenesisBootstrapError(RuntimeError):
     """Raised when the one-time Genesis rendezvous cannot complete."""
 
 
+def assert_genesis_uniform(coordinator, stubs):
+    stubs = tuple(stubs)
+    records = [stub.genesis_record for stub in stubs]
+    if any(record is not None for record in records) and any(
+        record is None for record in records
+    ):
+        raise AssertionError("Sentinel Dot instances have partially seeded Genesis")
+    genesis = coordinator.genesis
+    if genesis is not None and any(
+        stub.genesis_block_id != genesis.block_id for stub in stubs
+    ):
+        raise AssertionError("Sentinel Dot instances do not share the Genesis anchor")
+
+
 class SentinelDotCoordinator:
     """Non-blocking validation gate for an invariant source and a symbol stream."""
 
@@ -83,21 +97,23 @@ class SentinelDotCoordinator:
         self._genesis_listeners = {}
         self._genesis_ready = set()
         self._genesis_distributed = frozenset()
-        self._genesis_lock = threading.Lock()
+        self._genesis_lock = threading.RLock()
         self._genesis_barrier = threading.Barrier(
             len(self.instance_ids), action=self._mint_and_distribute_genesis
         )
 
     @property
     def genesis(self):
-        return self._genesis
+        with self._genesis_lock:
+            return self._genesis
 
     @property
     def genesis_anchor_locked(self):
-        return (
-            self._genesis is not None
-            and self._genesis_distributed == frozenset(self.instance_ids)
-        )
+        with self._genesis_lock:
+            return (
+                self._genesis is not None
+                and self._genesis_distributed == frozenset(self.instance_ids)
+            )
 
     def subscribe_genesis(self, instance_id, callback):
         if instance_id not in self.instance_ids:
@@ -134,30 +150,50 @@ class SentinelDotCoordinator:
 
     def _mint_and_distribute_genesis(self):
         with self._genesis_lock:
-            if self._genesis_ready != set(self.instance_ids):
-                raise GenesisBootstrapError("both Sentinel Dot instances must be Ready")
-            missing = [
-                instance_id for instance_id in self.instance_ids
-                if instance_id not in self._genesis_listeners
-            ]
-            if missing:
-                raise GenesisBootstrapError(
-                    f"Sentinel Dot instances not bound for Genesis: {missing!r}"
+            try:
+                if self._genesis_ready != set(self.instance_ids):
+                    raise GenesisBootstrapError(
+                        "both Sentinel Dot instances must be Ready"
+                    )
+                missing = [
+                    instance_id for instance_id in self.instance_ids
+                    if instance_id not in self._genesis_listeners
+                ]
+                if missing:
+                    raise GenesisBootstrapError(
+                        f"Sentinel Dot instances not bound for Genesis: {missing!r}"
+                    )
+                genesis = GenesisBlock(
+                    block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
+                    invariant_source_id=self.invariant_source_id,
+                    symbol_source_id=self.symbol_source_id,
                 )
-            genesis = GenesisBlock(
-                block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
-                invariant_source_id=self.invariant_source_id,
-                symbol_source_id=self.symbol_source_id,
-            )
-            listeners = [
-                self._genesis_listeners[instance_id]
-                for instance_id in self.instance_ids
-            ]
-        for callback in listeners:
-            callback(genesis)
-        with self._genesis_lock:
-            self._genesis = genesis
-            self._genesis_distributed = frozenset(self.instance_ids)
+                listeners = [
+                    self._genesis_listeners[instance_id]
+                    for instance_id in self.instance_ids
+                ]
+                self._genesis = genesis
+                self._genesis_distributed = frozenset(self.instance_ids)
+                for callback in listeners:
+                    callback(genesis)
+                assert_genesis_uniform(
+                    self,
+                    (
+                        getattr(callback, "__self__", None)
+                        for callback in listeners
+                        if getattr(callback, "__self__", None) is not None
+                    ),
+                )
+            except Exception:
+                self._genesis = None
+                self._genesis_distributed = frozenset()
+                for callback in self._genesis_listeners.values():
+                    stub = getattr(callback, "__self__", None)
+                    if stub is not None and hasattr(stub, "_genesis_record"):
+                        stub._genesis_record = None
+                self._genesis_ready.clear()
+                self._genesis_barrier.reset()
+                raise
 
     def _require_genesis(self):
         if not self.genesis_anchor_locked:
