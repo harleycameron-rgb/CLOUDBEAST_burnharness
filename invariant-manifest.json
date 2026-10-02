@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "origin": "invarianttap-origin-v1",
+  "root": "sentinel_dot",
+  "updated_at": "2026-10-02T00:00:00Z",
+  "legs": {
+    "sentinel_dot":      { "repo": "harleycameron-rgb/sentinel_dot",           "role": "root",    "stage": "pre-super-block" },
+    "orrery":            { "repo": "harleycameron-rgb/orrery",                 "role": "leg",     "stage": "pre-super-block" },
+    "invarianttap":      { "repo": "harleycameron-rgb/invarianttap.app",       "role": "leg",     "stage": "pre-super-block" },
+    "topology_engine":   { "repo": "harleycameron-rgb/Topology-engine",        "role": "leg",     "stage": "pre-super-block" },
+    "invariant_surface": { "repo": "harleycameron-rgb/invariant-surface-",     "role": "leg",     "stage": "pre-super-block" },
+    "invariant_scale":   { "repo": "harleycameron-rgb/invariant-scale-",       "role": "leg",     "stage": "pre-super-block" },
+    "invariant_engine":  { "repo": "harleycameron-rgb/invariant-engine-",      "role": "leg",     "stage": "pre-super-block" },
+    "cloudbeast":        { "repo": "harleycameron-rgb/CLOUDBEAST_burnharness", "role": "harness", "stage": "pre-super-block" }
+  },
+  "couplers": [
+    { "name": "orrery_sentinel_dot",       "from": "orrery",       "to": "sentinel_dot" },
+    { "name": "sentinel_dot_scandoc",      "from": "sentinel_dot", "to": "scandoc" },
+    { "name": "invarianttap_sentinel_dot", "from": "invarianttap", "to": "sentinel_dot" }
+  ]
+}
