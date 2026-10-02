@@ -93,13 +93,24 @@ state, sphere trajectory geometry, and read-only stabiliser packet. The existing
 
 `SentinelDotCoordinator` in `coordinator.py` uses an event-driven asymmetric
 Genesis bootstrap first synchronizes both instances once and distributes the
-same immutable SHA-512 anchor. Sentinel A then publishes its invariant
-projection while Sentinel B publishes its accumulated symbol; the event-driven
-gate releases only when the symbol belongs to the projection (including
-parabola and declared member/hash projections). Both registered Sentinel Dot
-instances receive the release event and seal it with the same SHA-512 block ID.
-Companion integrity requires `genesis_anchor_locked` and successful validation;
-`no_bung` and `continuity_flow` remain true.
+same immutable SHA-512 anchor. Startup order is: create one coordinator; bind
+Sentinel A and B concurrently; have both report ready; generate one anchor;
+install it as A's projection anchor and B's initial symbol; have both confirm
+distribution; then permit asymmetric runtime publications. The coordinator owns
+the readiness/distribution barriers and its reentrant state lock; callers must
+not mutate or reset them.
+
+If either bootstrap barrier times out or breaks, neither runtime publisher can
+pass the Genesis checks. Treat that coordinator and both participating instances
+as failed: discard them and start a fresh coordinator with two fresh instances.
+Do not retry a participant against a broken barrier or reuse a partially
+distributed anchor. After successful distribution, Sentinel A publishes its
+invariant projection while Sentinel B publishes its accumulated symbol; the
+event-driven gate releases only when the symbol belongs to the projection
+(including parabola and declared member/hash projections). Both registered
+Sentinel Dot instances receive the release event and seal it with the same
+SHA-512 block ID. Companion integrity requires `genesis_anchor_locked` and
+successful validation; `no_bung` and `continuity_flow` remain true.
 
 Run `python runtime_monitor.py` from the repository root to print live
 readiness every 30 seconds until interrupted. The printed SHA-512 prefix is

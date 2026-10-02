@@ -22,6 +22,14 @@ releases only when the symbol satisfies the projection. Both receive one
 validation release and seal it with the same SHA-512 block ID. `no_bung` and
 `continuity_flow` remain true.
 
+Bootstrap order: create one coordinator; bind both Sentinel Dot instances;
+wait for both readiness reports; generate and assign one shared genesis anchor;
+wait for both distribution confirmations; then allow runtime publications.
+The coordinator owns both bootstrap barriers and its reentrant state lock.
+If either barrier times out or breaks, bootstrap fails closed: do not publish,
+retry on that coordinator, or reuse the partial anchor. Discard the coordinator
+and both instances and restart with fresh participants.
+
 Correct generational order:
 Sentinel_dot -> Burnharness -> Super_Block -> Engines -> Sphere_Model
 

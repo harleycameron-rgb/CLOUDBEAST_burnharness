@@ -188,6 +188,79 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             coordinator.publish_accumulated_symbol("seed")
 
+    def test_required_invariants_each_block_runtime_publication(self):
+        projection_publisher = self.sentinels[
+            self.coordinator.invariant_source_id
+        ].publish_invariant_projection
+        symbol_publisher = self.sentinels[
+            self.coordinator.symbol_source_id
+        ].publish_accumulated_symbol
+        for invariant in ("no_bung", "continuity_flow"):
+            with self.subTest(invariant=invariant):
+                setattr(self.coordinator, invariant, False)
+                with self.assertRaisesRegex(RuntimeError, invariant):
+                    projection_publisher({"members": ["blocked"]})
+                with self.assertRaisesRegex(RuntimeError, invariant):
+                    symbol_publisher("blocked")
+                setattr(self.coordinator, invariant, True)
+
+    def test_genesis_readiness_timeout_fails_closed(self):
+        coordinator = SentinelDotCoordinator()
+        with self.assertRaises(TimeoutError):
+            coordinator.report_genesis_ready(
+                coordinator.invariant_source_id, timeout=0.001
+            )
+        with self.assertRaises(TimeoutError):
+            coordinator.report_genesis_ready(
+                coordinator.symbol_source_id, timeout=0
+            )
+        self.assertIsNone(coordinator.state["genesis_block_id"])
+        self.assertFalse(coordinator.state["genesis_anchor_locked"])
+        with self.assertRaises(RuntimeError):
+            coordinator.publish_invariant_projection({"members": ["seed"]})
+
+    def test_genesis_distribution_timeout_blocks_publication(self):
+        coordinator = SentinelDotCoordinator()
+        ready = {}
+        threads = [
+            threading.Thread(
+                target=lambda instance_id=instance_id: ready.setdefault(
+                    instance_id,
+                    coordinator.report_genesis_ready(instance_id, timeout=1),
+                )
+            )
+            for instance_id in coordinator.instance_ids
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(2)
+            self.assertFalse(thread.is_alive())
+        anchor = ready[coordinator.invariant_source_id]
+        with self.assertRaises(TimeoutError):
+            coordinator.confirm_genesis_distributed(
+                coordinator.invariant_source_id, anchor, timeout=0.001
+            )
+        with self.assertRaises(TimeoutError):
+            coordinator.confirm_genesis_distributed(
+                coordinator.symbol_source_id, anchor, timeout=0
+            )
+        self.assertFalse(coordinator.state["genesis_anchor_locked"])
+        with self.assertRaises(RuntimeError):
+            coordinator.publish_accumulated_symbol("seed")
+
+    def test_genesis_anchor_is_immutable_and_reentrant_ready_is_safe(self):
+        anchor = self.coordinator._genesis_anchor
+        self.assertIs(
+            self.coordinator.report_genesis_ready(
+                self.coordinator.invariant_source_id
+            ),
+            anchor,
+        )
+        with self.assertRaises((AttributeError, TypeError)):
+            anchor.block_id = "0" * 128
+        self.assertIs(self.coordinator._genesis_anchor, anchor)
+
 
 if __name__ == "__main__":
     unittest.main()
