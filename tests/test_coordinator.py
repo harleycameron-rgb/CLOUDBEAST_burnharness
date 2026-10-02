@@ -104,6 +104,72 @@ class SentinelDotCoordinatorTests(unittest.TestCase):
             first_release, self.coordinator.instance_ids[0]
         ))
 
+    def test_published_symbol_is_defensively_copied(self):
+        symbol = {"values": [1]}
+        self.assertIsNone(self.coordinator.publish_accumulated_symbol(symbol))
+        symbol["values"].append(2)
+
+        self.coordinator.publish_invariant_projection(
+            {"members": [{"values": [1]}]}
+        )
+        self.assertTrue(self.coordinator.state["gate_released"])
+
+    def test_equivalent_publications_preserve_release_and_revisions(self):
+        projection = {"members": [{"state": "valid"}]}
+        symbol = {"state": "valid"}
+        self.coordinator.publish_invariant_projection(projection)
+        release = self.coordinator.publish_accumulated_symbol(symbol)
+        revisions = (
+            self.coordinator.state["projection_revision"],
+            self.coordinator.state["symbol_revision"],
+        )
+
+        self.assertIs(
+            self.coordinator.publish_invariant_projection(projection), release
+        )
+        self.assertIs(
+            self.coordinator.publish_accumulated_symbol(symbol), release
+        )
+        self.assertEqual(
+            (
+                self.coordinator.state["projection_revision"],
+                self.coordinator.state["symbol_revision"],
+            ),
+            revisions,
+        )
+
+    def test_changed_projection_revokes_release_until_symbol_is_revalidated(self):
+        self.coordinator.publish_invariant_projection({"members": ["valid"]})
+        first_release = self.coordinator.publish_accumulated_symbol("valid")
+        self.assertIsNotNone(first_release)
+
+        self.assertIsNone(
+            self.coordinator.publish_invariant_projection({"members": ["new"]})
+        )
+        self.assertFalse(self.coordinator.state["gate_released"])
+        self.assertFalse(self.coordinator.accepts_release(
+            first_release, self.coordinator.instance_ids[0]
+        ))
+
+        second_release = self.coordinator.publish_accumulated_symbol("new")
+        self.assertIsNotNone(second_release)
+        self.assertNotEqual(second_release.block_id, first_release.block_id)
+        self.assertGreater(
+            second_release.projection_revision, first_release.projection_revision
+        )
+
+    def test_non_finite_symbol_is_rejected_without_revoking_release(self):
+        self.coordinator.publish_invariant_projection({"members": ["valid"]})
+        release = self.coordinator.publish_accumulated_symbol("valid")
+
+        with self.assertRaises(ValueError):
+            self.coordinator.publish_accumulated_symbol({"value": float("nan")})
+
+        self.assertIs(self.coordinator.release, release)
+        self.assertTrue(self.coordinator.accepts_release(
+            release, self.coordinator.instance_ids[0]
+        ))
+
     def test_coupler_publishes_asymmetric_state_without_equality_checks(self):
         class Leg:
             def __init__(self, state):
