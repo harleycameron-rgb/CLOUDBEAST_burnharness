@@ -1,6 +1,9 @@
 import hashlib
 import json
+import pickle
+import tempfile
 import unittest
+from pathlib import Path
 
 from reconcile import Divergence, canonical_projection, reconcile
 from verify_reconciled import verify_reconciled
@@ -39,6 +42,31 @@ class ReconcileTests(unittest.TestCase):
                           self.log_a, self.log_b)
         self.assertTrue(verify_reconciled(
             "genesis-anchor", self.head_a, self.head_b, block
+        ))
+
+    def test_verifier_does_not_need_logs(self):
+        anchor_id = "genesis-anchor"
+        block = reconcile(anchor_id, self.head_a, self.head_b,
+                          self.log_a, self.log_b)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            directory = Path(temporary_directory)
+            block_path = directory / "block.pickle"
+            head_a_path = directory / "head-a"
+            head_b_path = directory / "head-b"
+
+            with block_path.open("wb") as block_file:
+                pickle.dump(block, block_file)
+            head_a_path.write_text(self.head_a, encoding="utf-8")
+            head_b_path.write_text(self.head_b, encoding="utf-8")
+
+            with block_path.open("rb") as block_file:
+                persisted_block = pickle.load(block_file)
+            head_a = head_a_path.read_text(encoding="utf-8")
+            head_b = head_b_path.read_text(encoding="utf-8")
+
+        self.assertTrue(verify_reconciled(
+            anchor_id, head_a, head_b, persisted_block
         ))
 
     def test_divergent_sessions_return_both_projection_values(self):
