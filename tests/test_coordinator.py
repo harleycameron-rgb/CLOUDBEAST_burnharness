@@ -282,6 +282,9 @@ class GenesisBootstrapTests(unittest.TestCase):
             return original_callback(genesis)
 
         sentinel._on_genesis = fail_once.__get__(sentinel, type(sentinel))
+        self.coordinator._genesis_listeners[
+            self.coordinator.symbol_source_id
+        ] = sentinel._on_genesis
 
         with self.assertRaises(RuntimeError):
             bootstrap_genesis(self.coordinator)

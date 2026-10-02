@@ -192,7 +192,6 @@ class SentinelDotCoordinator:
                     if stub is not None and hasattr(stub, "_genesis_record"):
                         stub._genesis_record = None
                 self._genesis_ready.clear()
-                self._genesis_barrier.reset()
                 raise
 
     def _require_genesis(self):
@@ -422,6 +421,8 @@ def bootstrap_genesis(coordinator, timeout=GENESIS_TIMEOUT_SECONDS):
     for thread in threads:
         thread.join(timeout + 1.0)
     if errors:
+        if coordinator.genesis is None:
+            coordinator._genesis_barrier.reset()
         raise errors[0]
     if any(thread.is_alive() for thread in threads):
         raise GenesisBootstrapError("Genesis rendezvous did not complete")

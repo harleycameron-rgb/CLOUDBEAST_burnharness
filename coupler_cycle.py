@@ -29,6 +29,7 @@ def load_leg(name, coordinator=None):
     leg = getattr(module, class_name)()
     if name == "sentinel_dot" and coordinator is not None:
         coordinator._require_genesis()
+        leg._instance_id = coordinator.invariant_source_id
         leg._on_genesis(coordinator.genesis)
         if (leg.genesis_block_id is None
                 or leg.genesis_block_id != coordinator.genesis.block_id):
