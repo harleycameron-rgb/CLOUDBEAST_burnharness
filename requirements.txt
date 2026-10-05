@@ -1,0 +1,4 @@
+numpy
+pytest
+# private repo: needs GitHub access (gh auth / token) to install
+sentinel_dot @ git+https://github.com/harleycameron-rgb/sentinel_dot.git

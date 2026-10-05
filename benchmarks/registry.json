@@ -1,0 +1,400 @@
+{
+  "benchmarks": [
+    {
+      "id": "genesis_bootstrap",
+      "source": "coordinator.benchmark_genesis_bootstrap",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.6735729998581519,
+        "mean_ms": 0.1534592050086303,
+        "median_ms": 0.14619950002270343,
+        "p95_ms": 0.18509500000618573
+      }
+    },
+    {
+      "id": "coupler_cycle",
+      "source": "coupler_cycle.run_cycle",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.10225899995930376,
+        "mean_ms": 0.03713779999657163,
+        "median_ms": 0.035430000025371555,
+        "p95_ms": 0.04405000004226167
+      }
+    },
+    {
+      "id": "coupler.scandoc_invariant_surface",
+      "source": "couplers/scandoc_invariant_surface/coupler.py",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.011165999922013725,
+        "mean_ms": 0.004096944993534635,
+        "median_ms": 0.003958999968745047,
+        "p95_ms": 0.004612999873643275
+      }
+    },
+    {
+      "id": "coupler.invariant_surface_topology_engine",
+      "source": "couplers/invariant_surface_topology_engine/coupler.py",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.007694000032643089,
+        "mean_ms": 0.004625034995342503,
+        "median_ms": 0.004385500005810172,
+        "p95_ms": 0.006795999979658518
+      }
+    },
+    {
+      "id": "coupler.topology_engine_waxtablet_engine",
+      "source": "couplers/topology_engine_waxtablet_engine/coupler.py",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.007224999990285141,
+        "mean_ms": 0.0045062399965445366,
+        "median_ms": 0.004458000034901488,
+        "p95_ms": 0.0046919999476813246
+      }
+    },
+    {
+      "id": "coupler.waxtablet_engine_orrery",
+      "source": "couplers/waxtablet_engine_orrery/coupler.py",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.006139000106486492,
+        "mean_ms": 0.004059119996782101,
+        "median_ms": 0.004021999984615832,
+        "p95_ms": 0.004295000053389231
+      }
+    },
+    {
+      "id": "coupler.orrery_sentinel_dot",
+      "source": "couplers/orrery_sentinel_dot/coupler.py",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.01557800010232313,
+        "mean_ms": 0.0042891649911780405,
+        "median_ms": 0.0041595000084271305,
+        "p95_ms": 0.004470000021683518
+      }
+    },
+    {
+      "id": "coupler.sentinel_dot_scandoc",
+      "source": "couplers/sentinel_dot_scandoc/coupler.py",
+      "timing": {
+        "iterations": 200,
+        "max_ms": 0.005655999984810478,
+        "mean_ms": 0.004078520004213715,
+        "median_ms": 0.004041500005769194,
+        "p95_ms": 0.0043289999211992836
+      }
+    },
+    {
+      "id": "causal_lkzm.burn",
+      "source": "causal_lkzm/harness.py:burn",
+      "timing": {
+        "iterations": 1,
+        "per_trial_ms": 57.89085164062513,
+        "total_ms": 3705.0145050000083,
+        "trials": 64
+      }
+    }
+  ],
+  "connectors": [
+    {
+      "connector": "scandoc_invariant_surface",
+      "diagnostic": "ScandocInvariantSurface: coupling stable",
+      "kind": "coupler",
+      "legs": [
+        "scandoc",
+        "invariant_surface"
+      ],
+      "output": {
+        "curvature": 0.015,
+        "provenance": 5e-05,
+        "stability": 0.9995
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "invariant_surface_topology_engine",
+      "diagnostic": "InvariantSurfaceTopologyEngine: coupling stable",
+      "kind": "coupler",
+      "legs": [
+        "invariant_surface",
+        "topology_engine"
+      ],
+      "output": {
+        "curvature": 0.0,
+        "provenance": 0.0,
+        "stability": 0.0
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "topology_engine_waxtablet_engine",
+      "diagnostic": "TopologyEngineWaxtabletEngine: coupling stable",
+      "kind": "coupler",
+      "legs": [
+        "topology_engine",
+        "waxtablet_engine"
+      ],
+      "output": {
+        "curvature": 0.0,
+        "provenance": 0.0,
+        "stability": 0.0
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "waxtablet_engine_orrery",
+      "diagnostic": "WaxtabletEngineOrrery: coupling stable",
+      "kind": "coupler",
+      "legs": [
+        "waxtablet_engine",
+        "orrery"
+      ],
+      "output": {
+        "curvature": 0.0,
+        "provenance": 0.0,
+        "stability": 0.0
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "orrery_sentinel_dot",
+      "diagnostic": "OrrerySentinelDot: coupling stable",
+      "kind": "coupler",
+      "legs": [
+        "orrery",
+        "sentinel_dot"
+      ],
+      "output": {
+        "curvature": 0.0,
+        "provenance": 0.0,
+        "stability": 0.0
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "sentinel_dot_scandoc",
+      "diagnostic": "SentinelDotScandoc: coupling stable",
+      "kind": "coupler",
+      "legs": [
+        "sentinel_dot",
+        "scandoc"
+      ],
+      "output": {
+        "curvature": 0.0,
+        "provenance": 0.0,
+        "stability": 0.0
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "engine_alignment",
+      "detail": null,
+      "kind": "adapter",
+      "result": {
+        "drift": 0.22912878474779202,
+        "mean_residue": [
+          0.1,
+          0.2,
+          0.050000000000000044
+        ],
+        "phase": 1.1071487177940904,
+        "samples": 2,
+        "stability": 1.0
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "provenance_bridge",
+      "detail": null,
+      "kind": "adapter",
+      "result": {
+        "bytes": 102,
+        "sha256": "1d025931c8cfe0371ea6e1a5e5ea6266490fcfebb214d3d7f48759c525d6978e"
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "sentinel_link",
+      "detail": null,
+      "kind": "adapter",
+      "result": {
+        "ledger_entries": 12,
+        "zero_state": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "status": "fired"
+    },
+    {
+      "connector": "temporal_anchor",
+      "detail": null,
+      "kind": "adapter",
+      "result": {
+        "anchored": true,
+        "residues": [
+          [
+            0.1,
+            0.2,
+            0.050000000000000044
+          ],
+          [
+            0.1,
+            0.2,
+            0.050000000000000044
+          ]
+        ]
+      },
+      "status": "fired"
+    }
+  ],
+  "cross_repo_suites": [
+    {
+      "commit": "ecb42940391cd48ba2a610e6949c5bff6b5839e0",
+      "counts": {
+        "passed": 77
+      },
+      "exit_code": 0,
+      "repo": "CLOUDBEAST_burnharness",
+      "runner": "pytest",
+      "wall_s": 2.72
+    },
+    {
+      "commit": "7c66043ab5b6502ee71d83d6bf4e37dedfccfe99",
+      "counts": {
+        "passed": 11
+      },
+      "exit_code": 0,
+      "repo": "Convergence-defence",
+      "runner": "pytest",
+      "wall_s": 2.354
+    },
+    {
+      "commit": "77c6fe78a89da320da59cd4d47d742e70a13e065",
+      "counts": {
+        "passed": 40
+      },
+      "exit_code": 0,
+      "repo": "blueprint-invariant-overlay",
+      "runner": "pytest",
+      "wall_s": 10.83
+    },
+    {
+      "commit": "c439a4e6bfe5d2e3355b0c6a5be4ad7c9d70f1bf",
+      "counts": {
+        "passed": 21
+      },
+      "exit_code": 0,
+      "repo": "bounded-mdl-residue-test",
+      "runner": "pytest",
+      "wall_s": 1.961
+    },
+    {
+      "commit": "6a165e8273747fbb52ee6085d915d49a14540a2a",
+      "counts": {
+        "passed": 31
+      },
+      "exit_code": 0,
+      "repo": "convergence-sim",
+      "runner": "pytest",
+      "wall_s": 13.759
+    },
+    {
+      "commit": "1e3e98f8c2ab404160b0450159940ed3f6f78d90",
+      "counts": {
+        "passed": 5
+      },
+      "exit_code": 0,
+      "repo": "invariantdriftinstrument-",
+      "runner": "pytest",
+      "wall_s": 2.24
+    },
+    {
+      "commit": "290275cb7982791a282857fb390c0e699e1cec91",
+      "counts": {
+        "passed": 110
+      },
+      "exit_code": 0,
+      "repo": "invariantgatewriter",
+      "runner": "pytest",
+      "wall_s": 10.707
+    },
+    {
+      "commit": "290275cb7982791a282857fb390c0e699e1cec91",
+      "counts": {
+        "failed": 0,
+        "passed": 23
+      },
+      "exit_code": 0,
+      "repo": "invariantgatewriter",
+      "runner": "node",
+      "wall_s": 0.291
+    },
+    {
+      "commit": "a4afc35a2a2201e1914c458a11db9d742eae7eaf",
+      "counts": {
+        "passed": 13
+      },
+      "exit_code": 0,
+      "repo": "invarianttap.app",
+      "runner": "pytest",
+      "wall_s": 2.303
+    },
+    {
+      "commit": "31ebe6cc1d4cf6397c8b14fb62246001ef1a33c4",
+      "counts": {
+        "passed": 63
+      },
+      "exit_code": 0,
+      "repo": "orrery",
+      "runner": "pytest",
+      "wall_s": 2.196
+    },
+    {
+      "commit": "7f5719af85f91e6546a5558b388aa8b91647a1a9",
+      "counts": {
+        "passed": 62
+      },
+      "exit_code": 0,
+      "repo": "scandoc-provenance",
+      "runner": "pytest",
+      "wall_s": 4.666
+    },
+    {
+      "commit": "99923c406b5ee71630e93dde4a6be3293647f8a4",
+      "counts": {
+        "deselected": 2,
+        "passed": 157
+      },
+      "exit_code": 0,
+      "repo": "sentinel_dot",
+      "runner": "pytest",
+      "wall_s": 4.893
+    },
+    {
+      "commit": "40bd207fa3db66288b49886c7908658df84c4fad",
+      "counts": {
+        "failed": 0,
+        "passed": 7
+      },
+      "exit_code": 0,
+      "repo": "repo-orchestratorv2",
+      "runner": "npm",
+      "wall_s": 0.713
+    }
+  ],
+  "deterministic_sha512": "8a5a9fa9b97934c45b14863d520ed661c9ad0d9705686aac466ca83db530203aab1cf369a99457bda79f0fc9cc948079e304480c5766be6ef05fb96817de1438",
+  "python": "3.14.3",
+  "resonance_field": {
+    "curvature": 0.0025,
+    "provenance": 8.333333333333334e-06,
+    "stability": 0.16658333333333333
+  },
+  "schema": "burnharness.benchmark_registry/1",
+  "summary": {
+    "adapters_fired": 4,
+    "adapters_unimplemented": 0,
+    "couplers_fired": 6
+  }
+}
