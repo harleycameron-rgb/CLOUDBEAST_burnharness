@@ -52,6 +52,7 @@ def build_body(parent_hash=GENESIS_PARENT, height=0, registry=None):
         "connectors": [
             {k: c[k] for k in ("connector", "kind", "status") if k in c}
             | ({"output": c["output"]} if "output" in c else {})
+            | ({"result": c["result"]} if "result" in c else {})
             for c in registry["connectors"]
         ],
         "resonance_field": registry["resonance_field"],

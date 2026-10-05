@@ -142,8 +142,10 @@ The order is:
 
 ## Fire, benchmark, superblock, causal Lk/Z_m burn
 
-`python fire_all.py --write` fires all six couplers, probes the four Sentinel_dot
-adapters (currently `NotImplementedError` stubs, reported as `unimplemented`),
+`python fire_all.py --write` fires all six couplers, fires the four Sentinel_dot
+connectors end-to-end on one ledger (sentinel_link, temporal_anchor,
+provenance_bridge, engine_alignment — see their READMEs; requires
+`pip install -r requirements.txt`),
 registers timing benchmarks in `benchmarks/registry.json` (with the cross-repo
 suite results from `benchmarks/cross_repo_results.json`), seals
 `superblock/superblock_0000.json`, and runs the causal Lk/Z_m invariant burn

@@ -75,19 +75,75 @@ def fire_couplers(packet=None):
     return fired
 
 
-def probe_adapters():
-    probed = []
-    for name in ADAPTERS:
-        module = importlib.import_module(f"{name}.adapter")
+# Test vector from burnharness/integration_patch.txt (PATCH 1).
+ORRERY_TEST_VECTOR = {"t0": [0, 0, 1], "t1": [0.1, 0.2, 1.05], "t2": [0.2, 0.4, 1.1]}
+
+
+def probe_adapters(link_kwargs=None):
+    """Fire all four Sentinel_dot connectors end-to-end on one shared ledger.
+
+    sentinel_link opens the ledger and ingests the Waxtablet substrate;
+    temporal_anchor ingests the Orrery test vector; provenance_bridge records
+    the ScanDoc root scan; engine_alignment derives invariant_core from the
+    recorded residue. A connector is ``fired`` only if its step succeeds and
+    the ledger verifies afterwards. Outputs exclude key-dependent hashes so
+    they stay deterministic.
+    """
+    results = {}
+
+    def attempt(name, fn):
         try:
-            module.connect()
-            status, detail = "fired", None
+            out = fn()
+            results[name] = {"connector": name, "kind": "adapter", "status": "fired",
+                             "detail": None, "result": out}
         except NotImplementedError as exc:
-            status, detail = "unimplemented", str(exc)
-        except Exception as exc:  # pragma: no cover - surfaced, not hidden
-            status, detail = "error", f"{type(exc).__name__}: {exc}"
-        probed.append({"connector": name, "kind": "adapter", "status": status, "detail": detail})
-    return probed
+            results[name] = {"connector": name, "kind": "adapter", "status": "unimplemented",
+                             "detail": str(exc)}
+        except Exception as exc:  # surfaced, not hidden
+            results[name] = {"connector": name, "kind": "adapter", "status": "error",
+                             "detail": f"{type(exc).__name__}: {exc}"}
+
+    mods = {n: importlib.import_module(f"{n}.adapter") for n in ADAPTERS}
+    state = {}
+
+    def fire_link():
+        state["link"] = mods["sentinel_link"].connect(**(link_kwargs or {}))
+        substrate = load_leg("waxtablet_engine").ignite()
+        state["link"].ingest_substrate(dict(substrate))
+        return {"zero_state": state["link"].open_entry["parameters"]["zero_state"]}
+
+    def fire_temporal():
+        out = mods["temporal_anchor"].connect(state["link"]).ingest_trajectory(ORRERY_TEST_VECTOR)
+        return {"residues": out["residues"], "anchored": out["anchor_record"] is not None}
+
+    def fire_provenance():
+        scan = dict(load_leg("scandoc").ignite())
+        bridge = mods["provenance_bridge"].connect(state["link"])
+        fx = bridge.ingest_root_scan(scan, "scandoc:root_scan")
+        if not bridge.verify_scan(scan, "scandoc:root_scan"):
+            raise RuntimeError("recorded fixity does not match scan")
+        return {"bytes": fx["bytes"], "sha256": fx["sha256"]}
+
+    def fire_alignment():
+        core = mods["engine_alignment"].connect(state["link"]).align()
+        return {k: core[k] for k in ("stability", "phase", "drift", "mean_residue", "samples")}
+
+    attempt("sentinel_link", fire_link)
+    for name, fn in (("temporal_anchor", fire_temporal), ("provenance_bridge", fire_provenance),
+                     ("engine_alignment", fire_alignment)):
+        if "link" in state:
+            attempt(name, fn)
+        else:
+            results[name] = {"connector": name, "kind": "adapter", "status": "error",
+                             "detail": "sentinel_link did not open"}
+    if "link" in state:
+        ok, issues = state["link"].verify()
+        if not ok:
+            for r in results.values():
+                if r["status"] == "fired":
+                    r["status"], r["detail"] = "error", f"ledger failed verification: {issues[:2]}"
+        results["sentinel_link"].setdefault("result", {})["ledger_entries"] = state["link"].head()[0]
+    return [results[n] for n in ADAPTERS]
 
 
 def load_cross_repo():

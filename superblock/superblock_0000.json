@@ -1,5 +1,5 @@
 {
-  "block_hash": "c8037f192c7763afe07b8b0ea4446356c8852653ee5346897a3fd8a46ad4490a74e3478187b77a9ba80ca0b148b943bce1002003b0223d76ce43fd98834a1de0",
+  "block_hash": "5fa6301b89fe2ff4a9752f6ac382ff3aeb8eacf2220c93bc7f4f53c883019625c3ce311f5fe86322af1343b399e5653db93b4088d4193d2ebac74a2d196e4339",
   "body": {
     "connectors": [
       {
@@ -65,22 +65,56 @@
       {
         "connector": "engine_alignment",
         "kind": "adapter",
-        "status": "unimplemented"
+        "result": {
+          "drift": 0.22912878474779202,
+          "mean_residue": [
+            0.1,
+            0.2,
+            0.050000000000000044
+          ],
+          "phase": 1.1071487177940904,
+          "samples": 2,
+          "stability": 1.0
+        },
+        "status": "fired"
       },
       {
         "connector": "provenance_bridge",
         "kind": "adapter",
-        "status": "unimplemented"
+        "result": {
+          "bytes": 102,
+          "sha256": "1d025931c8cfe0371ea6e1a5e5ea6266490fcfebb214d3d7f48759c525d6978e"
+        },
+        "status": "fired"
       },
       {
         "connector": "sentinel_link",
         "kind": "adapter",
-        "status": "unimplemented"
+        "result": {
+          "ledger_entries": 12,
+          "zero_state": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "status": "fired"
       },
       {
         "connector": "temporal_anchor",
         "kind": "adapter",
-        "status": "unimplemented"
+        "result": {
+          "anchored": true,
+          "residues": [
+            [
+              0.1,
+              0.2,
+              0.050000000000000044
+            ],
+            [
+              0.1,
+              0.2,
+              0.050000000000000044
+            ]
+          ]
+        },
+        "status": "fired"
       }
     ],
     "cross_repo_suites": [
@@ -215,7 +249,7 @@
       "waxtablet_engine": "96b2c4a674878d6a265f2155b7a18a16fd8926b58ee5e64f64317e3d4793ee953a5c194ec391a3ea4d39a3ad4e0e8fd6e39851cbd9c04f0e09487c767d5e0019"
     },
     "parent_hash": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-    "registry_deterministic_sha512": "f22aad556f5764265bc6712d0f2b5a27847e3ed6dbe1d2145b3a0d27f315c3136754c7c44eb7fa5b3036518379ed27187806ca64d4927d7e87856e1a46fb3acc",
+    "registry_deterministic_sha512": "8a5a9fa9b97934c45b14863d520ed661c9ad0d9705686aac466ca83db530203aab1cf369a99457bda79f0fc9cc948079e304480c5766be6ef05fb96817de1438",
     "resonance_field": {
       "curvature": 0.0025,
       "provenance": 8.333333333333334e-06,

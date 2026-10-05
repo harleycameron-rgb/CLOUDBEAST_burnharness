@@ -5,10 +5,10 @@
       "source": "coordinator.benchmark_genesis_bootstrap",
       "timing": {
         "iterations": 200,
-        "max_ms": 1.043879000008019,
-        "mean_ms": 0.14813331000254948,
-        "median_ms": 0.1387699999781944,
-        "p95_ms": 0.16374600011204166
+        "max_ms": 0.6735729998581519,
+        "mean_ms": 0.1534592050086303,
+        "median_ms": 0.14619950002270343,
+        "p95_ms": 0.18509500000618573
       }
     },
     {
@@ -16,10 +16,10 @@
       "source": "coupler_cycle.run_cycle",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.12903000003916532,
-        "mean_ms": 0.03713567500199133,
-        "median_ms": 0.03559350005843953,
-        "p95_ms": 0.04488399997626402
+        "max_ms": 0.10225899995930376,
+        "mean_ms": 0.03713779999657163,
+        "median_ms": 0.035430000025371555,
+        "p95_ms": 0.04405000004226167
       }
     },
     {
@@ -27,10 +27,10 @@
       "source": "couplers/scandoc_invariant_surface/coupler.py",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.00832099999570346,
-        "mean_ms": 0.004172149997998531,
-        "median_ms": 0.0040539999872635235,
-        "p95_ms": 0.004670999942391063
+        "max_ms": 0.011165999922013725,
+        "mean_ms": 0.004096944993534635,
+        "median_ms": 0.003958999968745047,
+        "p95_ms": 0.004612999873643275
       }
     },
     {
@@ -38,10 +38,10 @@
       "source": "couplers/invariant_surface_topology_engine/coupler.py",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.007761000006212271,
-        "mean_ms": 0.004653124995002145,
-        "median_ms": 0.004384000021673273,
-        "p95_ms": 0.006934999987606716
+        "max_ms": 0.007694000032643089,
+        "mean_ms": 0.004625034995342503,
+        "median_ms": 0.004385500005810172,
+        "p95_ms": 0.006795999979658518
       }
     },
     {
@@ -49,10 +49,10 @@
       "source": "couplers/topology_engine_waxtablet_engine/coupler.py",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.03449199994065566,
-        "mean_ms": 0.004504999999426218,
-        "median_ms": 0.0043259999529254856,
-        "p95_ms": 0.004555000032269163
+        "max_ms": 0.007224999990285141,
+        "mean_ms": 0.0045062399965445366,
+        "median_ms": 0.004458000034901488,
+        "p95_ms": 0.0046919999476813246
       }
     },
     {
@@ -60,10 +60,10 @@
       "source": "couplers/waxtablet_engine_orrery/coupler.py",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.006994000045779103,
-        "mean_ms": 0.004107174997329821,
-        "median_ms": 0.004027000045425666,
-        "p95_ms": 0.004343999989941949
+        "max_ms": 0.006139000106486492,
+        "mean_ms": 0.004059119996782101,
+        "median_ms": 0.004021999984615832,
+        "p95_ms": 0.004295000053389231
       }
     },
     {
@@ -71,10 +71,10 @@
       "source": "couplers/orrery_sentinel_dot/coupler.py",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.08937799998420815,
-        "mean_ms": 0.004607805002478926,
-        "median_ms": 0.004126500016354839,
-        "p95_ms": 0.004569999987324991
+        "max_ms": 0.01557800010232313,
+        "mean_ms": 0.0042891649911780405,
+        "median_ms": 0.0041595000084271305,
+        "p95_ms": 0.004470000021683518
       }
     },
     {
@@ -82,10 +82,10 @@
       "source": "couplers/sentinel_dot_scandoc/coupler.py",
       "timing": {
         "iterations": 200,
-        "max_ms": 0.006117999987509393,
-        "mean_ms": 0.004039659997374656,
-        "median_ms": 0.003996500026914873,
-        "p95_ms": 0.004305999937059823
+        "max_ms": 0.005655999984810478,
+        "mean_ms": 0.004078520004213715,
+        "median_ms": 0.004041500005769194,
+        "p95_ms": 0.0043289999211992836
       }
     },
     {
@@ -93,8 +93,8 @@
       "source": "causal_lkzm/harness.py:burn",
       "timing": {
         "iterations": 1,
-        "per_trial_ms": 57.24628331249981,
-        "total_ms": 3663.762131999988,
+        "per_trial_ms": 57.89085164062513,
+        "total_ms": 3705.0145050000083,
         "trials": 64
       }
     }
@@ -192,27 +192,61 @@
     },
     {
       "connector": "engine_alignment",
-      "detail": "engine_alignment adapter not yet implemented",
+      "detail": null,
       "kind": "adapter",
-      "status": "unimplemented"
+      "result": {
+        "drift": 0.22912878474779202,
+        "mean_residue": [
+          0.1,
+          0.2,
+          0.050000000000000044
+        ],
+        "phase": 1.1071487177940904,
+        "samples": 2,
+        "stability": 1.0
+      },
+      "status": "fired"
     },
     {
       "connector": "provenance_bridge",
-      "detail": "provenance_bridge adapter not yet implemented",
+      "detail": null,
       "kind": "adapter",
-      "status": "unimplemented"
+      "result": {
+        "bytes": 102,
+        "sha256": "1d025931c8cfe0371ea6e1a5e5ea6266490fcfebb214d3d7f48759c525d6978e"
+      },
+      "status": "fired"
     },
     {
       "connector": "sentinel_link",
-      "detail": "sentinel_link adapter not yet implemented",
+      "detail": null,
       "kind": "adapter",
-      "status": "unimplemented"
+      "result": {
+        "ledger_entries": 12,
+        "zero_state": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "status": "fired"
     },
     {
       "connector": "temporal_anchor",
-      "detail": "temporal_anchor adapter not yet implemented",
+      "detail": null,
       "kind": "adapter",
-      "status": "unimplemented"
+      "result": {
+        "anchored": true,
+        "residues": [
+          [
+            0.1,
+            0.2,
+            0.050000000000000044
+          ],
+          [
+            0.1,
+            0.2,
+            0.050000000000000044
+          ]
+        ]
+      },
+      "status": "fired"
     }
   ],
   "cross_repo_suites": [
@@ -350,7 +384,7 @@
       "wall_s": 0.713
     }
   ],
-  "deterministic_sha512": "f22aad556f5764265bc6712d0f2b5a27847e3ed6dbe1d2145b3a0d27f315c3136754c7c44eb7fa5b3036518379ed27187806ca64d4927d7e87856e1a46fb3acc",
+  "deterministic_sha512": "8a5a9fa9b97934c45b14863d520ed661c9ad0d9705686aac466ca83db530203aab1cf369a99457bda79f0fc9cc948079e304480c5766be6ef05fb96817de1438",
   "python": "3.14.3",
   "resonance_field": {
     "curvature": 0.0025,
@@ -359,8 +393,8 @@
   },
   "schema": "burnharness.benchmark_registry/1",
   "summary": {
-    "adapters_fired": 0,
-    "adapters_unimplemented": 4,
+    "adapters_fired": 4,
+    "adapters_unimplemented": 0,
     "couplers_fired": 6
   }
 }
