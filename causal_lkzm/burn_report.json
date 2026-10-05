@@ -1,0 +1,40 @@
+{
+  "admissible": {
+    "preserved": 64,
+    "violations": []
+  },
+  "adversarial": {
+    "causal_reorder": {
+      "at": 3,
+      "detected": true
+    },
+    "dropped_event": {
+      "detected": true
+    },
+    "payload_edit": {
+      "at": 10,
+      "detected": true
+    },
+    "single_reversal": {
+      "detected": true,
+      "expected_detectable": true,
+      "residue": 5
+    },
+    "strand_pass": {
+      "detected": true,
+      "residue": 3
+    }
+  },
+  "anchor_hash": "c8037f192c7763afe07b8b0ea4446356c8852653ee5346897a3fd8a46ad4490a74e3478187b77a9ba80ca0b148b943bce1002003b0223d76ce43fd98834a1de0",
+  "base_gap": 0.39664571004584176,
+  "base_lk": 2,
+  "declared_residue": 2,
+  "declared_winding": 2,
+  "event_log_head": "a4a97f3a61ae7560de06eeb269b29097bf4519bbb567b6913bf213a5ee4fcca2aa2dfcb3a6cd1905a7db47a1d0a3fbcc4400f8d96297d35943723d19edc6b229",
+  "m": 7,
+  "passed": true,
+  "report_sha512": "85181ca79fddda15ab809347f6580fbef4a11629d3a2f3e0b6960bc2caca68df2aa84906bbb810856108b32c0c4b940f5f1aef1874d114b5ab7da497f6a1a3a4",
+  "schema": "burnharness.causal_lkzm/1",
+  "seed": 0,
+  "trials": 64
+}

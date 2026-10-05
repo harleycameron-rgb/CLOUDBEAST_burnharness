@@ -1,0 +1,230 @@
+{
+  "block_hash": "c8037f192c7763afe07b8b0ea4446356c8852653ee5346897a3fd8a46ad4490a74e3478187b77a9ba80ca0b148b943bce1002003b0223d76ce43fd98834a1de0",
+  "body": {
+    "connectors": [
+      {
+        "connector": "scandoc_invariant_surface",
+        "kind": "coupler",
+        "output": {
+          "curvature": 0.015,
+          "provenance": 5e-05,
+          "stability": 0.9995
+        },
+        "status": "fired"
+      },
+      {
+        "connector": "invariant_surface_topology_engine",
+        "kind": "coupler",
+        "output": {
+          "curvature": 0.0,
+          "provenance": 0.0,
+          "stability": 0.0
+        },
+        "status": "fired"
+      },
+      {
+        "connector": "topology_engine_waxtablet_engine",
+        "kind": "coupler",
+        "output": {
+          "curvature": 0.0,
+          "provenance": 0.0,
+          "stability": 0.0
+        },
+        "status": "fired"
+      },
+      {
+        "connector": "waxtablet_engine_orrery",
+        "kind": "coupler",
+        "output": {
+          "curvature": 0.0,
+          "provenance": 0.0,
+          "stability": 0.0
+        },
+        "status": "fired"
+      },
+      {
+        "connector": "orrery_sentinel_dot",
+        "kind": "coupler",
+        "output": {
+          "curvature": 0.0,
+          "provenance": 0.0,
+          "stability": 0.0
+        },
+        "status": "fired"
+      },
+      {
+        "connector": "sentinel_dot_scandoc",
+        "kind": "coupler",
+        "output": {
+          "curvature": 0.0,
+          "provenance": 0.0,
+          "stability": 0.0
+        },
+        "status": "fired"
+      },
+      {
+        "connector": "engine_alignment",
+        "kind": "adapter",
+        "status": "unimplemented"
+      },
+      {
+        "connector": "provenance_bridge",
+        "kind": "adapter",
+        "status": "unimplemented"
+      },
+      {
+        "connector": "sentinel_link",
+        "kind": "adapter",
+        "status": "unimplemented"
+      },
+      {
+        "connector": "temporal_anchor",
+        "kind": "adapter",
+        "status": "unimplemented"
+      }
+    ],
+    "cross_repo_suites": [
+      {
+        "commit": "ecb42940391cd48ba2a610e6949c5bff6b5839e0",
+        "counts": {
+          "passed": 77
+        },
+        "exit_code": 0,
+        "repo": "CLOUDBEAST_burnharness",
+        "runner": "pytest"
+      },
+      {
+        "commit": "7c66043ab5b6502ee71d83d6bf4e37dedfccfe99",
+        "counts": {
+          "passed": 11
+        },
+        "exit_code": 0,
+        "repo": "Convergence-defence",
+        "runner": "pytest"
+      },
+      {
+        "commit": "77c6fe78a89da320da59cd4d47d742e70a13e065",
+        "counts": {
+          "passed": 40
+        },
+        "exit_code": 0,
+        "repo": "blueprint-invariant-overlay",
+        "runner": "pytest"
+      },
+      {
+        "commit": "c439a4e6bfe5d2e3355b0c6a5be4ad7c9d70f1bf",
+        "counts": {
+          "passed": 21
+        },
+        "exit_code": 0,
+        "repo": "bounded-mdl-residue-test",
+        "runner": "pytest"
+      },
+      {
+        "commit": "6a165e8273747fbb52ee6085d915d49a14540a2a",
+        "counts": {
+          "passed": 31
+        },
+        "exit_code": 0,
+        "repo": "convergence-sim",
+        "runner": "pytest"
+      },
+      {
+        "commit": "1e3e98f8c2ab404160b0450159940ed3f6f78d90",
+        "counts": {
+          "passed": 5
+        },
+        "exit_code": 0,
+        "repo": "invariantdriftinstrument-",
+        "runner": "pytest"
+      },
+      {
+        "commit": "290275cb7982791a282857fb390c0e699e1cec91",
+        "counts": {
+          "passed": 110
+        },
+        "exit_code": 0,
+        "repo": "invariantgatewriter",
+        "runner": "pytest"
+      },
+      {
+        "commit": "290275cb7982791a282857fb390c0e699e1cec91",
+        "counts": {
+          "failed": 0,
+          "passed": 23
+        },
+        "exit_code": 0,
+        "repo": "invariantgatewriter",
+        "runner": "node"
+      },
+      {
+        "commit": "a4afc35a2a2201e1914c458a11db9d742eae7eaf",
+        "counts": {
+          "passed": 13
+        },
+        "exit_code": 0,
+        "repo": "invarianttap.app",
+        "runner": "pytest"
+      },
+      {
+        "commit": "31ebe6cc1d4cf6397c8b14fb62246001ef1a33c4",
+        "counts": {
+          "passed": 63
+        },
+        "exit_code": 0,
+        "repo": "orrery",
+        "runner": "pytest"
+      },
+      {
+        "commit": "7f5719af85f91e6546a5558b388aa8b91647a1a9",
+        "counts": {
+          "passed": 62
+        },
+        "exit_code": 0,
+        "repo": "scandoc-provenance",
+        "runner": "pytest"
+      },
+      {
+        "commit": "99923c406b5ee71630e93dde4a6be3293647f8a4",
+        "counts": {
+          "deselected": 2,
+          "passed": 157
+        },
+        "exit_code": 0,
+        "repo": "sentinel_dot",
+        "runner": "pytest"
+      },
+      {
+        "commit": "40bd207fa3db66288b49886c7908658df84c4fad",
+        "counts": {
+          "failed": 0,
+          "passed": 7
+        },
+        "exit_code": 0,
+        "repo": "repo-orchestratorv2",
+        "runner": "npm"
+      }
+    ],
+    "height": 0,
+    "legs": {
+      "invariant_surface": "7f00de03ffcee2bea1c877845761d9fb36f96ecad49aa1cb51cafe7820927cb0ea0dec313f9b0de5e22958ab2fa164ff7fa212c3f1b0b5850cd046f45e4f88fb",
+      "orrery": "4f46445e9c86545b32f343c09f68719a01c04f133ca4a5540cf60e58bcd53c309b7182f7eaced4dcf0d720b844155661d9854e567e5e773f5bead75dd80c74cc",
+      "scandoc": "e2e6dfb6a4fcb8eb27a859f96705d21342e59b3e044fb3653adc7d7b01a9f87a7f08432724fa3372ff53ea8a964e25b5c1c43f9f4d67ba9ba48594af342ab46a",
+      "sentinel_dot": "f255de4f26c64148b9f3444a414ea52721e7479323732a79f7e0b707638fa3e618d40283ac72f603d7756158487bc9b8abc2f0b05011696c4d36c3d48c775585",
+      "topology_engine": "f94de6e581225c0fb5a065e2299e6298e780c53e9fb1a388452df54bf9ae32d780adf8309fd8a36849b72dec182b35c1e943a14abdf76d8f23385e416afca4ee",
+      "waxtablet_engine": "96b2c4a674878d6a265f2155b7a18a16fd8926b58ee5e64f64317e3d4793ee953a5c194ec391a3ea4d39a3ad4e0e8fd6e39851cbd9c04f0e09487c767d5e0019"
+    },
+    "parent_hash": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "registry_deterministic_sha512": "f22aad556f5764265bc6712d0f2b5a27847e3ed6dbe1d2145b3a0d27f315c3136754c7c44eb7fa5b3036518379ed27187806ca64d4927d7e87856e1a46fb3acc",
+    "resonance_field": {
+      "curvature": 0.0025,
+      "provenance": 8.333333333333334e-06,
+      "stability": 0.16658333333333333
+    },
+    "schema": "burnharness.superblock/1",
+    "system_validation": {
+      "sha512": "67cf3d250da19facae29c01243995d65ae4dfccd1d2b912dbd240e214f4665100710dd7cd28e73941d5b0a9738602899dbced2b54335dcfbaf96f71089e41f24",
+      "system_ready": true
+    }
+  }
+}

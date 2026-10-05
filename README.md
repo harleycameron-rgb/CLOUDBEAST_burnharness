@@ -139,3 +139,13 @@ Sentinel_dot is the zero‑state or spark.
 The Burnharness grows from that spark.
 
 The order is:
+
+## Fire, benchmark, superblock, causal Lk/Z_m burn
+
+`python fire_all.py --write` fires all six couplers, probes the four Sentinel_dot
+adapters (currently `NotImplementedError` stubs, reported as `unimplemented`),
+registers timing benchmarks in `benchmarks/registry.json` (with the cross-repo
+suite results from `benchmarks/cross_repo_results.json`), seals
+`superblock/superblock_0000.json`, and runs the causal Lk/Z_m invariant burn
+anchored on that block's hash (`causal_lkzm/burn_report.json`). See
+`superblock/README.md` and `causal_lkzm/README.md`.
