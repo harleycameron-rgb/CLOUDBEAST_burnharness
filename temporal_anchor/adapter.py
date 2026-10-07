@@ -9,9 +9,8 @@ residue defined in ``burnharness/integration_patch.txt``:
 
     R(t) = p(t) - p(t - 1)        (no residue for the first sample)
 
-After an intake the ledger head is written to an offline Sentinel_dot anchor
-record (``<ledger>.anchors/anchor-<seq>.json``), which can later be stamped into
-Bitcoin with ``sentinel_dot anchor create``/``ots stamp``. No network is used here.
+After an intake the ledger head is returned as an ephemeral in-memory anchor
+value. No file or external timestamp is created.
 """
 
 import math

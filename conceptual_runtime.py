@@ -1,18 +1,15 @@
 """Read-only status report for the conceptual Burnharness–Alliance sequence."""
 
 import json
-from pathlib import Path
-
-from repo_manifest import REPOSITORY_ROOT
 
 
 ARTIFACTS = {
-    "frame": Path("burnharness/integration/burnharness_alliance_invariant_checksum.txt"),
-    "exclusion": Path("burnharness/integration/on_checksum_stub.txt"),
-    "qob_algebra": Path("burnharness/glyphs/qob_glyph_algebra.txt"),
-    "hemisphere_engine": Path("alliance/archetype/quantum_hemisphere_engine.txt"),
-    "validator": Path("burnharness/integration/on_checksum_validator_engine.txt"),
-    "glyph_prompt": Path("burnharness/glyphs/qob_glyph_prompt.txt"),
+    "frame": "burnharness/integration/burnharness_alliance_invariant_checksum.txt",
+    "exclusion": "burnharness/integration/on_checksum_stub.txt",
+    "qob_algebra": "burnharness/glyphs/qob_glyph_algebra.txt",
+    "hemisphere_engine": "alliance/archetype/quantum_hemisphere_engine.txt",
+    "validator": "burnharness/integration/on_checksum_validator_engine.txt",
+    "glyph_prompt": "burnharness/glyphs/qob_glyph_prompt.txt",
 }
 
 SEQUENCE = (
@@ -28,18 +25,13 @@ SEQUENCE = (
 )
 
 
-def initialize_conceptual_runtime(root=REPOSITORY_ROOT):
-    """Report available reference files without executing the described runtime."""
-    root = Path(root)
-    artifacts = {}
-    for name, relative_path in ARTIFACTS.items():
-        path = root / relative_path
-        try:
-            path.read_text(encoding="utf-8")
-            loaded = True
-        except (OSError, UnicodeError):
-            loaded = False
-        artifacts[name] = {"path": str(relative_path), "loaded": loaded}
+def initialize_conceptual_runtime(root=None):
+    """Report symbolic references without reading or loading persistent files."""
+    del root
+    artifacts = {
+        name: {"path": relative_path, "loaded": False}
+        for name, relative_path in ARTIFACTS.items()
+    }
 
     return {
         "sequence": [
@@ -66,6 +58,7 @@ def initialize_conceptual_runtime(root=REPOSITORY_ROOT):
         "activation_performed": False,
         "runtime_initialized": True,
         "safe_symbolic_start": True,
+        "data_source": "in_memory_only",
     }
 
 

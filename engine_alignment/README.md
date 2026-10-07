@@ -1,7 +1,8 @@
 # engine_alignment
 
 Invariant-Surface reads residue through here. Residues are read only from the
-verified ledger (entries written by `temporal_anchor`) and reduced to `invariant_core`:
+verified process-local Sentinel Link ledger (entries recorded by
+`temporal_anchor`) and reduced to `invariant_core`:
 
 | field | definition |
 |---|---|
@@ -11,4 +12,5 @@ verified ledger (entries written by `temporal_anchor`) and reduced to `invariant
 | `mean_residue`, `samples` | as named |
 
 `integration_patch.txt` left `f(R(t))` undefined; this is the explicit choice made here.
-The core is recorded back to the ledger. A tampered ledger raises instead of producing a core.
+The core is recorded in the in-memory ledger. A tampered ledger raises instead
+of producing a core.

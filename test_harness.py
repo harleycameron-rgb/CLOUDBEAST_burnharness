@@ -106,7 +106,7 @@ class ValidationHarness(unittest.TestCase):
             self.assertFalse(validation.check_environment())
             self.assertFalse(validation.validate_system()["system_ready"])
 
-        with patch.object(validation.json, "load", return_value={"leg": "scandoc"}):
+        with patch.object(validation, "load_coupler", side_effect=ValueError):
             self.assertFalse(validation.check_environment())
 
     # ------------------------------------------------------------

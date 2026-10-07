@@ -4,11 +4,10 @@ import hashlib
 import importlib
 import json
 import math
-from pathlib import Path
 
-from coupler_cycle import COUPLER_SEQUENCE, load_leg, run_cycle
+from coupler_cycle import COUPLER_SEQUENCE, load_coupler, load_leg, run_cycle
 from burnharness_protocol import protocol_upgrade_met
-from repo_manifest import REPOSITORY_ROOT, get_manifest
+from repo_manifest import get_manifest
 
 FIELD_NAMES = ("stability", "curvature", "provenance")
 MAX_INPUT_BYTES = 4096
@@ -17,34 +16,19 @@ TOLERANCE = 1e-9
 
 
 def check_environment(coordinator=None):
-    """Check local modules, paths, and leg/coupler configuration."""
+    """Check imported modules and in-memory leg/coupler configuration."""
     if not protocol_upgrade_met():
         return False
     manifest = get_manifest()
     try:
-        for section in manifest["paths"].values():
-            for path in section.values():
-                if not Path(path).exists():
-                    return False
         for module in manifest["imports"].values():
             importlib.import_module(module)
-        root = Path(REPOSITORY_ROOT)
         for first, second, coupler in COUPLER_SEQUENCE:
             for leg in (first, second):
-                path = root / "burnharness" / "ignition_layer" / "legs" / leg / "leg_manifest.json"
-                with path.open(encoding="utf-8") as stream:
-                    config = json.load(stream)
-                if (not isinstance(config, dict) or config.get("leg") != leg
-                        or not isinstance(config.get("ignition_state"), dict)
-                        or config["ignition_state"] != load_leg(
-                            leg, coordinator=coordinator
-                        ).ignite()):
+                if not isinstance(load_leg(leg, coordinator=coordinator).ignite(), dict):
                     return False
-            path = root / "couplers" / coupler / "coupler_manifest.json"
-            with path.open(encoding="utf-8") as stream:
-                config = json.load(stream)
-            if (not isinstance(config, dict) or config.get("coupler") != coupler
-                    or list(config.get("legs", [])) != [first, second]):
+            coupling_class = load_coupler(coupler)
+            if not callable(getattr(coupling_class, "couple", None)):
                 return False
     except Exception:
         return False
@@ -57,17 +41,13 @@ def canonical_model(data):
 
 
 def _configuration_snapshot():
-    root = Path(REPOSITORY_ROOT)
     legs = {leg for first, second, _ in COUPLER_SEQUENCE for leg in (first, second)}
-    paths = [
-        root / "burnharness" / "ignition_layer" / "legs" / leg / "leg_manifest.json"
-        for leg in sorted(legs)
-    ]
-    paths.extend(
-        root / "couplers" / coupler / "coupler_manifest.json"
-        for _, _, coupler in COUPLER_SEQUENCE
+    return (
+        json.dumps(get_manifest(), sort_keys=True, separators=(",", ":")),
+        tuple((leg, canonical_model(load_leg(leg).ignite())) for leg in sorted(legs)),
+        tuple((coupler, load_coupler(coupler).__module__)
+              for _, _, coupler in COUPLER_SEQUENCE),
     )
-    return get_manifest(), tuple(path.read_bytes() for path in paths)
 
 
 def check_boundary(data):
