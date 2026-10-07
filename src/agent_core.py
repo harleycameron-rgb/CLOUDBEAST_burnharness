@@ -39,11 +39,11 @@ class CloudburnerAgent:
         )
         self.supervisor.add_step(
             "residue",
-            action=lambda: {"residue": [6.0, "mapping-definition-6"]},
+            action=lambda: (6.0, "mapping-definition-6"),
             verify=lambda output: (
-                isinstance(output, dict)
-                and isinstance(output.get("residue"), list)
-                and type(output["residue"][0]) in (int, float)
+                isinstance(output, (tuple, list))
+                and bool(output)
+                and type(output[0]) in (int, float)
             ),
         )
         self._initialised = True

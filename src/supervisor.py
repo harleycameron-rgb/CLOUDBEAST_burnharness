@@ -26,6 +26,8 @@ class Supervisor:
             definition = self.steps[step]
         except KeyError as exc:
             raise KeyError(f"unknown supervised step: {step!r}") from exc
+        if step == next(iter(self.steps)) and tuple(self._results) == tuple(self.steps):
+            self._results.clear()
         result = definition["action"]()
         try:
             encoded = json.dumps(
