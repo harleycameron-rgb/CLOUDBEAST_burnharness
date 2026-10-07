@@ -82,6 +82,8 @@ class Slipstream:
                        for value in point)
                 or not isinstance(matrix, (list, tuple)) or len(matrix) != 2
                 or any(not isinstance(row, (list, tuple)) or len(row) != 2
+                       or any(type(value) not in (int, float)
+                              or not math.isfinite(value) for value in row)
                        for row in matrix)):
             raise ValueError("trajectory and rotation must produce finite 2D values")
         scale = math.exp(self.lam * time)

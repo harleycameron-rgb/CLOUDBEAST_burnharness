@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 
 from burnharness.ignition_layer.generate_leg_ignition_layer import (
@@ -50,6 +52,46 @@ class ZeroDataTests(unittest.TestCase):
             with forbid_file_io():
                 from pathlib import Path
                 Path("not-read.txt").read_text()
+        filesystem_lookups = (
+            lambda: os.lstat("."),
+            lambda: os.access(".", os.F_OK),
+            lambda: os.readlink("/proc/self/exe"),
+        )
+        for lookup in filesystem_lookups:
+            with self.subTest(lookup=lookup):
+                with self.assertRaises(FileIOViolation):
+                    with forbid_file_io():
+                        lookup()
+
+    def test_guard_rejects_preopened_file_handles(self):
+        with tempfile.TemporaryFile(mode="w+b") as file:
+            file.write(b"unchanged")
+            file.flush()
+            file.seek(0)
+            with self.assertRaises(FileIOViolation):
+                with forbid_file_io():
+                    file.write(b"blocked")
+            file.seek(0)
+            self.assertEqual(file.read(), b"unchanged")
+
+        with tempfile.TemporaryFile(mode="w+b") as file:
+            cached_write = os.write
+            with self.assertRaises(FileIOViolation):
+                with forbid_file_io():
+                    cached_write(file.fileno(), b"blocked")
+            file.seek(0)
+            self.assertEqual(file.read(), b"")
+
+    def test_overlapping_guards_restore_patches_after_last_exit(self):
+        original_stat = os.stat
+        first = forbid_file_io()
+        second = forbid_file_io()
+        first.__enter__()
+        second.__enter__()
+        first.__exit__(None, None, None)
+        self.assertIsNot(os.stat, original_stat)
+        second.__exit__(None, None, None)
+        self.assertIs(os.stat, original_stat)
 
     def test_coupler_generator_returns_in_memory_content(self):
         with forbid_file_io():
