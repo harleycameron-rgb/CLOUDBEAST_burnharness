@@ -1,10 +1,7 @@
 # ---------------------------------------------------------
 # Generate all six cross‑leg couplers in one operation
 # ---------------------------------------------------------
-import os
 import json
-
-BASE = "couplers"
 
 COUPLER_MAP = {
     "scandoc_invariant_surface": ("scandoc", "invariant_surface"),
@@ -48,28 +45,20 @@ class {ClassName}Coupler:
         return "{ClassName}: coupling stable"
 """
 
-def ensure_base():
-    if not os.path.exists(BASE):
-        os.makedirs(BASE)
-
 def generate_coupler(name, legs):
-    folder = os.path.join(BASE, name)
-    os.makedirs(folder, exist_ok=True)
-
     class_name = "".join([p.capitalize() for p in name.split("_")])
     stub_code = COUPLER_TEMPLATE.format(ClassName=class_name)
-
-    with open(os.path.join(folder, "coupler.py"), "w") as f:
-        f.write(stub_code)
-
     manifest = {"coupler": name, "legs": legs}
-    with open(os.path.join(folder, "coupler_manifest.json"), "w") as f:
-        json.dump(manifest, f, indent=4)
+    return {
+        "coupler.py": stub_code,
+        "coupler_manifest.json": json.dumps(manifest, indent=4),
+    }
 
 def main():
-    ensure_base()
-    for name, legs in COUPLER_MAP.items():
-        generate_coupler(name, legs)
+    return {
+        name: generate_coupler(name, legs)
+        for name, legs in COUPLER_MAP.items()
+    }
 
 if __name__ == "__main__":
     main()

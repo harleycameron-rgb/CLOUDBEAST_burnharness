@@ -10,9 +10,10 @@ this adapter fixes it explicitly so the result is reproducible:
     phase     = atan2(mean_y, mean_x)                  radians in (-pi, pi]
     drift     = |mean|                                 mean step length per sample
 
-Residues are read only from a verified Sentinel_dot ledger (entries written by
-temporal_anchor), never from caller memory, so a tampered ledger yields an error
-instead of a core. The computed core is itself recorded back to the ledger.
+Residues are read only from a verified in-memory Sentinel Link ledger (entries
+recorded by temporal_anchor), never from caller memory, so a tampered ledger
+yields an error instead of a core. The computed core is recorded in that
+process-local ledger.
 """
 
 import math

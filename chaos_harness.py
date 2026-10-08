@@ -43,18 +43,20 @@ class ChaosInjector:
         return [0.5 + math.sin(seed + i) for i in range(steps)]
 
     @staticmethod
-    def brownian(seed, steps=64):
+    def brownian(seed, steps=64, random_seed=0):
+        rng = random.Random(random_seed)
         x = seed
         out = []
         for _ in range(steps):
-            x += random.uniform(-0.1, 0.1)
+            x += rng.uniform(-0.1, 0.1)
             out.append(x)
         return out
 
     @staticmethod
-    def permutation(values):
+    def permutation(values, random_seed=0):
+        rng = random.Random(random_seed)
         out = values[:]
-        random.shuffle(out)
+        rng.shuffle(out)
         return out
 
 
@@ -66,23 +68,27 @@ class MutationFuzzer:
     """Mutates fields in controlled ways."""
 
     @staticmethod
-    def mutate_field(value):
+    def mutate_field(value, random_seed=0):
+        rng = random.Random(random_seed)
         mutations = [
-            lambda v: v + random.uniform(-0.2, 0.2),
+            lambda v: v + rng.uniform(-0.2, 0.2),
             lambda v: float("nan"),
             lambda v: float("inf"),
             lambda v: -abs(v),
-            lambda v: v * random.uniform(0.5, 2.0),
+            lambda v: v * rng.uniform(0.5, 2.0),
             lambda v: None,
             lambda v: [],
         ]
-        return random.choice(mutations)(value)
+        return rng.choice(mutations)(value)
 
     @staticmethod
-    def mutate_dict(d):
+    def mutate_dict(d, random_seed=0):
+        rng = random.Random(random_seed)
         mutated = dict(d)
-        key = random.choice(list(mutated.keys()))
-        mutated[key] = MutationFuzzer.mutate_field(mutated[key])
+        key = rng.choice(list(mutated.keys()))
+        mutated[key] = MutationFuzzer.mutate_field(
+            mutated[key], random_seed=random_seed
+        )
         return mutated
 
 
