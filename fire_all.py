@@ -1,28 +1,16 @@
 """One-shot pipeline: fire connectors -> register benchmarks -> seal superblock
 -> run the causal Lk/Z_m burn anchored on the superblock hash.
 
-    python fire_all.py            # print summary only
-    python fire_all.py --write    # also write the three artefacts below
-
-Artefacts:
-    benchmarks/registry.json         connector results, timings, cross-repo suites
-    superblock/superblock_0000.json  hash-sealed residue (height 0, genesis parent)
-    causal_lkzm/burn_report.json     invariant burn report anchored on the block
+    python fire_all.py            # print an in-memory summary
 """
 
 import json
-import os
 import sys
 import time
 
-from benchmarks.fire import REGISTRY_PATH, build_registry
+from benchmarks.fire import build_registry
 from causal_lkzm.harness import burn
 from superblock.superblock import build_superblock, verify_chain
-
-ROOT = os.path.dirname(os.path.abspath(__file__))
-SUPERBLOCK_PATH = os.path.join(ROOT, "superblock", "superblock_0000.json")
-BURN_PATH = os.path.join(ROOT, "causal_lkzm", "burn_report.json")
-
 
 def run(m=7, trials=64, seed=0):
     registry = build_registry()
@@ -43,11 +31,9 @@ def run(m=7, trials=64, seed=0):
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
-    registry, block, report = run()
     if "--write" in argv:
-        for path, obj in ((REGISTRY_PATH, registry), (SUPERBLOCK_PATH, block), (BURN_PATH, report)):
-            with open(path, "w", encoding="utf-8") as fh:
-                fh.write(json.dumps(obj, indent=2, sort_keys=True) + "\n")
+        raise ValueError("persistent pipeline artifacts are disabled")
+    registry, block, report = run()
     summary = {
         "connectors": registry["summary"],
         "superblock_hash": block["block_hash"],

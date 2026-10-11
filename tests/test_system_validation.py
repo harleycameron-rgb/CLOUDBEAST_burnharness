@@ -1,5 +1,6 @@
 import math
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import system_validation as validation
@@ -123,7 +124,21 @@ class SystemValidationTests(unittest.TestCase):
                           side_effect=ModuleNotFoundError):
             self.assertFalse(validation.check_environment())
             self.assertFalse(validation.validate_system()["system_ready"])
-        with patch.object(validation.json, "load", return_value={"leg": "scandoc"}):
+        with patch.object(validation, "load_coupler", side_effect=ValueError):
+            self.assertFalse(validation.check_environment())
+
+    def test_environment_rejects_empty_or_wrong_schema_leg_states(self):
+        for state in ({}, {"root_scan_state": 1.0}):
+            with self.subTest(state=state):
+                leg = SimpleNamespace(ignite=lambda: state)
+                with patch.object(validation, "load_leg", return_value=leg):
+                    self.assertFalse(validation.check_environment())
+
+    def test_environment_rejects_mismatched_declared_coupler_pair(self):
+        with patch.dict(
+            validation.COUPLER_MAP,
+            {"scandoc_invariant_surface": ("scandoc", "orrery")},
+        ):
             self.assertFalse(validation.check_environment())
 
     def test_changed_configuration_fails_readiness(self):

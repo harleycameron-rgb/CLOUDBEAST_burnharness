@@ -40,3 +40,19 @@ class SlipstreamClearanceTests(unittest.TestCase):
         )
         ss = Slipstream([A, E], lam=lam)
         self.assertIs(ss.clearance_ok(0, 1, times), False)
+
+    def test_clearance_rejects_non_finite_rotation_matrix(self):
+        module = Module(
+            "A", u=(0, 0), d0=1.0,
+            gamma=lambda t: (t, 0),
+            R=lambda t: ((float("nan"), 0), (0, 1)),
+            interface=Interface({}),
+        )
+        other = Module(
+            "B", u=(0, 0), d0=1.0,
+            gamma=lambda t: (t, 1),
+            R=lambda t: rot(0),
+            interface=Interface({}),
+        )
+        with self.assertRaises(ValueError):
+            Slipstream([module, other], lam=1).clearance_ok(0, 1, [0])

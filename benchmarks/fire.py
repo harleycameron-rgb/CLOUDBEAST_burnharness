@@ -9,16 +9,15 @@ reported as fired.
 Run from the repository root::
 
     python -m benchmarks.fire            # prints the registry JSON
-    python -m benchmarks.fire --write    # also writes benchmarks/registry.json
 
-The registry is deterministic except for the ``timing`` blocks, which are
-wall-clock measurements on the machine that ran them.
+The registry is returned in memory. Timing fields are measurements and are
+excluded from its deterministic digest.
+
 """
 
 import hashlib
 import importlib
 import json
-import os
 import statistics
 import sys
 import time
@@ -29,11 +28,6 @@ from coupler_cycle import COUPLER_SEQUENCE, load_coupler, load_leg, run_cycle
 
 ADAPTERS = ("engine_alignment", "provenance_bridge", "sentinel_link", "temporal_anchor")
 FIELDS = ("stability", "curvature", "provenance")
-HERE = os.path.dirname(os.path.abspath(__file__))
-REGISTRY_PATH = os.path.join(HERE, "registry.json")
-CROSS_REPO_PATH = os.path.join(HERE, "cross_repo_results.json")
-
-
 def canonical(obj):
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
@@ -147,10 +141,8 @@ def probe_adapters(link_kwargs=None):
 
 
 def load_cross_repo():
-    if not os.path.exists(CROSS_REPO_PATH):
-        return []
-    with open(CROSS_REPO_PATH, encoding="utf-8") as fh:
-        return json.load(fh)
+    """Cross-repository results are not loaded from persistent artifacts."""
+    return []
 
 
 def build_registry(iterations=200):
@@ -190,11 +182,10 @@ def build_registry(iterations=200):
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
+    if "--write" in argv:
+        raise ValueError("persistent benchmark artifacts are disabled")
     registry = build_registry()
     text = json.dumps(registry, indent=2, sort_keys=True)
-    if "--write" in argv:
-        with open(REGISTRY_PATH, "w", encoding="utf-8") as fh:
-            fh.write(text + "\n")
     print(text)
     return registry
 

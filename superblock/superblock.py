@@ -2,39 +2,38 @@
 
 A superblock collects, in canonical JSON, everything a cycle leaves behind:
 
-* the six leg manifests (each content-hashed),
+* the canonical in-memory ignition state for each leg (content-hashed),
 * the fired coupler outputs and the normalised resonance field,
 * the ``system_validation`` report digest,
 * the deterministic digest of the benchmark registry (timings excluded),
-* the commit SHA and pass/fail counts of every cross-repo test suite.
+* pass/fail counts for supplied cross-repository suite data.
 
 ``block_hash`` = SHA-512 over the canonical body, which includes
 ``parent_hash``. Chaining blocks therefore preserves history: altering any
 earlier block breaks every later ``parent_hash`` link (see ``verify_chain``).
-Nothing is signed -- this is integrity (tamper evidence), not authenticity.
+Blocks are returned in memory and are never persisted. Nothing is signed --
+this is integrity (tamper evidence), not authenticity.
 """
 
 import hashlib
 import json
-import os
 
 from benchmarks.fire import build_registry, canonical, sha512
+from coupler_cycle import COUPLER_SEQUENCE, load_leg
 from system_validation import validate_system
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LEGS_DIR = os.path.join(ROOT, "burnharness", "ignition_layer", "legs")
 GENESIS_PARENT = "0" * 128
 SCHEMA = "burnharness.superblock/1"
 
 
 def leg_manifest_digests():
-    out = {}
-    for leg in sorted(os.listdir(LEGS_DIR)):
-        path = os.path.join(LEGS_DIR, leg, "leg_manifest.json")
-        if os.path.isfile(path):
-            with open(path, "rb") as fh:
-                out[leg] = hashlib.sha512(fh.read()).hexdigest()
-    return out
+    """Hash canonical ignition states instead of reading persisted manifests."""
+    legs = {leg for first, second, _ in COUPLER_SEQUENCE
+            for leg in (first, second)}
+    return {
+        leg: hashlib.sha512(canonical(load_leg(leg).ignite()).encode("utf-8")).hexdigest()
+        for leg in sorted(legs)
+    }
 
 
 def build_body(parent_hash=GENESIS_PARENT, height=0, registry=None):

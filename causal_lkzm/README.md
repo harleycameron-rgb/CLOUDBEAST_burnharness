@@ -14,4 +14,5 @@ Scope: the winding is chosen from the hash and the curve is built to realise it.
 The harness proves exact recovery, preservation under admissible deformation, and
 tamper detection; it makes no physical claim about the Burnharness field.
 
-Run: `python fire_all.py --write` → `causal_lkzm/burn_report.json`.
+The burn report is returned in memory by the supervised pipeline; no report
+file is written.

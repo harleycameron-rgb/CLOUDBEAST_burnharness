@@ -1,14 +1,21 @@
 # sentinel_link
 
-Opens the shared Burnharness ledger: a [Sentinel_dot](https://github.com/harleycameron-rgb/sentinel_dot)
-append-only JSONL log, HMAC-SHA256 chained. The other three connectors write through it.
+`SentinelLink` provides a process-local append-only ledger. Each entry is
+SHA-256 chained and HMAC-SHA256 sealed; `entries()`, `verify()`, and `head()`
+operate only on in-memory state. The ledger is discarded when the link object
+is released.
 
-- Records the zero-state (Sentinel_dot genesis hash) and, if a `SentinelDotCoordinator` is passed, its Genesis `block_id`.
-- `ingest_substrate(dict)` — Waxtablet_Engine `ignition_substrate -> sentinel_link`.
-- `entries()` only reads from a ledger that verifies; `verify()`, `head()`, `anchor_record()` (offline anchor, no network).
-- Key: `key=` (≥ 32 bytes) or `SENTINEL_DOT_KEY` (base64). Otherwise an ephemeral key is used (`key_mode = hmac-ephemeral`) and the ledger can only be verified while the object lives.
+- Records the zero-state and, when supplied, the coordinator's Genesis anchor.
+- `ingest_substrate(dict)` accepts Waxtablet Engine substrate values.
+- Keys may be supplied with `key=` (at least 32 bytes) or through
+  `SENTINEL_DOT_KEY`; otherwise an ephemeral in-memory key is used.
+- Persistent `log_path` values are rejected. `anchor_record()` returns an
+  in-memory value and never creates a file.
 
 ```python
 from sentinel_link.adapter import connect
-link = connect("burnharness.jsonl")          # key from SENTINEL_DOT_KEY
+
+link = connect()
+link.ingest_substrate({"density": 0.8})
+assert link.verify()[0]
 ```

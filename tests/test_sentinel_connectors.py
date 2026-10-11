@@ -2,7 +2,6 @@ import base64
 import json
 import math
 import os
-import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -21,18 +20,10 @@ KEY = b"k" * 32
 
 class Base(unittest.TestCase):
     def setUp(self):
-        self.dir = tempfile.mkdtemp()
-        self.path = os.path.join(self.dir, "ledger.jsonl")
-        self.link = connect_link(self.path, key=KEY)
+        self.link = connect_link(key=KEY)
 
     def tamper(self, line_no, field, value):
-        with open(self.path) as fh:
-            lines = fh.read().splitlines()
-        entry = json.loads(lines[line_no])
-        entry["parameters"][field] = value
-        lines[line_no] = json.dumps(entry, sort_keys=True, separators=(",", ":"))
-        with open(self.path, "w") as fh:
-            fh.write("\n".join(lines) + "\n")
+        self.link.log._entries[line_no]["parameters"][field] = value
 
 
 class SentinelLinkTests(Base):
@@ -42,14 +33,15 @@ class SentinelLinkTests(Base):
         self.assertEqual(params["key_mode"], "hmac-supplied")
         self.assertEqual(self.link.verify(), (True, []))
 
-    def test_reopen_existing_ledger_appends(self):
+    def test_each_link_has_isolated_in_memory_state(self):
         self.link.ingest_substrate({"density": 0.8})
-        again = connect_link(self.path, key=KEY)
-        self.assertEqual(again.open_entry["seq"], 2)
+        again = connect_link(key=KEY)
+        self.assertEqual(again.open_entry["seq"], 0)
+        self.assertEqual(len(again.log.read_all()), 1)
 
-    def test_reopen_with_wrong_key_refused(self):
-        with self.assertRaises(Exception):
-            connect_link(self.path, key=b"x" * 32)
+    def test_persistent_ledger_path_is_rejected(self):
+        with self.assertRaises(ValueError):
+            connect_link("ledger.jsonl", key=KEY)
 
     def test_env_key_and_ephemeral_key(self):
         with patch.dict(os.environ, {"SENTINEL_DOT_KEY": base64.b64encode(KEY).decode()}):
@@ -79,9 +71,7 @@ class SentinelLinkTests(Base):
             encode({"x": math.nan})
 
     def test_anchor_record_matches_head(self):
-        path = self.link.anchor_record(now="2026-10-05T00:00:00Z")
-        with open(path) as fh:
-            record = json.load(fh)
+        record = self.link.anchor_record(now="2026-10-05T00:00:00Z")
         self.assertEqual((record["next_seq"], record["hash"]), self.link.head())
 
 
@@ -92,7 +82,10 @@ class TemporalAnchorTests(Base):
         for r in out["residues"]:
             for got, want in zip(r, (0.1, 0.2, 0.05)):
                 self.assertAlmostEqual(got, want, places=12)
-        self.assertTrue(os.path.exists(out["anchor_record"]))
+        self.assertEqual(
+            (out["anchor_record"]["next_seq"], out["anchor_record"]["hash"]),
+            self.link.head(),
+        )
 
     def test_list_input_and_topology_source(self):
         out = connect_temporal(self.link).ingest_trajectory([[0, 0, 0], [1, 1, 1]], source="topology_engine")
@@ -127,8 +120,9 @@ class ProvenanceBridgeTests(Base):
 
     def test_scan_content_not_in_ledger(self):
         connect_provenance(self.link).ingest_root_scan(b"SECRET-PAGE-TEXT", "s")
-        with open(self.path) as fh:
-            self.assertNotIn("SECRET-PAGE-TEXT", fh.read())
+        self.assertNotIn(
+            "SECRET-PAGE-TEXT", json.dumps(self.link.log.read_all())
+        )
 
     def test_tampered_ledger_blocks_verification(self):
         bridge = connect_provenance(self.link)

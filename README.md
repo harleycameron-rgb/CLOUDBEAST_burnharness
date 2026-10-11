@@ -1,153 +1,54 @@
-# burnharness
-# Burnharness
+# CLOUDBURNER17
 
-The Burnharness is the “glue universe” that connects all the other parts of the system.
-If each repo is a bubble, the Burnharness is the thick soap fluid between them.
+CLOUDBURNER17 is a zero-persistence supervised engine for the CLOUDBEAST
+Burnharness. It runs the local couplers, validates the resonance field, seals an
+in-memory superblock, and exercises the causal Lk/Z_m burn. The harmony
+stabiliser checks ordered step outputs across two independent runs and returns a
+reproducible SHA-512 sentinel.
 
-It keeps everything stable, stops the system drifting apart, and creates the first
-super‑block (the big combined engine layer).
+## Zero-data behavior
 
-The Burnharness is built on top of **Sentinel_dot**, which acts like the spark or
-zero‑point that starts everything.
+Runtime ledgers, benchmark results, superblocks, burn reports, and anchors exist
+only as process-local Python values. The pipeline does not create or update
+artifact files, and it blocks common Python filesystem APIs while supervised
+steps execute. The in-memory Sentinel Link uses an append-only HMAC-sealed ledger
+that is discarded with its object. No network service is required.
 
----
+Python must load the program and its dependencies before runtime guards can be
+enabled. The guard covers the supervised execution itself; it is not a claim
+that the operating system or CI runner performs no filesystem operations.
 
-## What the Burnharness Does
+## Run
 
-### 1. Connects all repos
-It links:
-- ScanDoc
-- Invariant‑Surface
-- Topology‑Engine
-- Waxtablet‑Engine
-- Orrery
+From the repository root:
 
-All of these become “bubbles” inside the Burnharness world.
+```sh
+python -B src/run_supervised_build.py
+python -B -m unittest discover -s tests -v
+```
 
-### 2. Shares invariant state
-The Burnharness holds the shared memory and stable information that all bubbles use.
+The supervised command prints a JSON result to standard output and returns the
+same data in memory. It runs the benchmark, superblock, causal burn, and
+verification steps twice, failing if outputs drift. `sentinel_hash` seals the
+ordered step digests. Use `-B` (or `PYTHONDONTWRITEBYTECODE=1`) to prevent
+Python bytecode cache files during local runs.
 
-### 3. Stops drift
-It keeps the whole system moving in the same direction so nothing goes weird or off‑track.
+`python -B fire_all.py` remains an in-memory one-shot summary. The former
+`--write` option is rejected. `python -B system_validation.py` prints a local
+readiness report without reading manifest files. The conceptual runtime reports
+symbolic references only and does not load referenced artifacts.
 
-### 4. Builds the first super‑block
-As the system moves forward, the Burnharness collects the “residue” left behind and
-turns it into the first big structure the engines can attach to.
+## Components
 
-### 5. Follows the sphere‑model
-The Burnharness moves forward along the same path as the sphere‑model, which acts like
-the “trajectory” for the whole system.
+- `src/run_supervised_build.py` runs and verifies the supervised pipeline.
+- `stabiliser.py` validates step names and order, hashes canonical outputs, and
+  detects missing or drifting steps.
+- `zero_data.py` provides the runtime filesystem-access guard.
+- `sentinel_link/`, `temporal_anchor/`, `provenance_bridge/`, and
+  `engine_alignment/` keep connector state in memory.
+- `superblock/` and `causal_lkzm/` construct verifiable outputs in memory.
+- `.github/workflows/ci.yml` runs the pipeline and tests with bytecode writing
+  disabled; `infra/github-actions.yml` records the corresponding CI commands.
 
----
-
-## System validation
-
-Run `python system_validation.py` from the repository root to obtain a JSON
-readiness report, or call `validate_system(input_data=None)` from
-`system_validation`. Readiness requires all five checks to pass:
-`environment_ready`, `boundary_valid`, `stable`, `consistent`, and
-`integrity_verified`. The validator uses local modules and configuration only;
-it makes no network calls.
-Call `system_heartbeat()` from `system_validation` for a boolean indicating
-whether all five readiness checks pass.
-
-The optional input is a dictionary with exactly `stability`, `curvature`, and
-`provenance` keys, each a finite number in `[0, 1]`. Its canonical JSON encoding
-must fit within 4096 UTF-8 bytes. A supplied input must also match the first
-local coupler cycle output within `1e-9` for every field; without an input, that
-output is used directly. Three cycles are compared; the maximum field deviation
-from the first must be strictly below `0.05`. The SHA-512 digest of the sorted-key
-canonical JSON is included in the report. A failed check yields
-`system_ready: false`.
-
-Run tests with `python -m unittest discover -s tests -v`.
-
-## Unified field oath protocol
-
-`burnharness_protocol.py` defines the protocol policy, admission gate, immutable
-stabiliser packet, and mobile sphere-surface geometry header. New generated legs
-are admitted only when the complete protocol upgrade is active; otherwise the
-generic invariant-flow fallback is selected. Every coupler passes a supplied
-packet through by identity without modifying it.
-
-`evaluate_ai_entry(system, qualifications)` accepts only a listed AI system and
-requires affirmative oath, geometry, surface-model,
-packet-integrity, and drift-targeting qualifications. An incomplete or
-unqualified entry is halted and routed to the generic invariant-flow stub.
-`evaluate_drift()` likewise fails closed for incomplete reports and halts when
-any configured drift risk is detected. The organism runtime applies friction
-above the oath threshold, then halts and routes to the stub if numeric drift
-exceeds that threshold.
-
-The sphere-surface ignition algebra is registered under
-`geometry_system.ignition_algebra` and implemented in
-`UNIFIED_FIELD_ZIPGATE/geometry/ignition/ignition_algebra.py`. It provides
-harmonic-field and pairwise ignition-time calculations, strict flow alignment,
-destiny alignment, and a fail-closed alliance recurrence bit. Destiny domains
-are supplied by the caller as membership containers, two-endpoint intervals,
-or predicates.
-
-Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surface
-state, sphere trajectory geometry, and read-only stabiliser packet. The existing
-`run_cycle()` resonance-field return format remains unchanged.
-
-`SentinelDotCoordinator` in `coordinator.py` starts with a one-time Genesis
-bootstrap: both bound Sentinel Dot instances call `enter_genesis()` (or use
-`bootstrap_genesis(coordinator)`), and once both are Ready the coordinator mints
-one SHA-512 Genesis block ID from `os.urandom(64)`, distributes it to Sentinel A
-(read-only parabola anchor) and Sentinel B (initial accumulated symbol), then
-releases the barrier. The rendezvous times out instead of deadlocking, and
-runtime publications are rejected until `genesis_anchor_locked` is true. Run
-`python coordinator.py` to benchmark Genesis bootstrap overhead.
-
-After Genesis, `SentinelDotCoordinator` uses an event-driven asymmetric
-validation gate. Sentinel A publishes its invariant projection while Sentinel B
-publishes its accumulated symbol; the gate releases only when the symbol belongs
-to the projection (including parabola and declared member/hash projections).
-Both registered Sentinel Dot instances receive the release event and seal it
-with the same SHA-512 block ID. Companion integrity reflects successful
-validation, and every release carries the Genesis block ID it is anchored to.
-Companion integrity enforces the Big Prompt invariants
-`genesis_anchor_locked`, `no_bung` and `continuity_flow`.
-
-Run `python runtime_monitor.py` from the repository root to print live
-readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
-the hash of the fixed `"sphere_interior"` marker, not a hash of live system state.
-
-## Conceptual Alliance sequence
-
-Run `python conceptual_runtime.py` to report which reference artifacts for the
-Burnharness–Alliance sequence are present. This is a read-only symbolic status
-report: it does not run the coherence check or checksum validator, request an
-agent trigger, generate a glyph, or activate the runtime. Missing artifacts are
-reported without being synthesized.
-
-## Symbolic transduction demo
-
-Run `./transduction_runtime.sh` to display the inert transduction sequence.
-The coherence, checksum, and feedback values are symbolic constants; no
-validator, ignition, or manifestation operation is performed. Continuing past
-the dormant state requires typing `ignite`, and the continuation remains
-symbolic.
-
----
-
-## How It Connects to Sentinel_dot
-
-Sentinel_dot is the zero‑state or spark.
-
-The Burnharness grows from that spark.
-
-The order is:
-
-## Fire, benchmark, superblock, causal Lk/Z_m burn
-
-`python fire_all.py --write` fires all six couplers, fires the four Sentinel_dot
-connectors end-to-end on one ledger (sentinel_link, temporal_anchor,
-provenance_bridge, engine_alignment — see their READMEs; requires
-`pip install -r requirements.txt`),
-registers timing benchmarks in `benchmarks/registry.json` (with the cross-repo
-suite results from `benchmarks/cross_repo_results.json`), seals
-`superblock/superblock_0000.json`, and runs the causal Lk/Z_m invariant burn
-anchored on that block's hash (`causal_lkzm/burn_report.json`). See
-`superblock/README.md` and `causal_lkzm/README.md`.
+The in-memory guarantee applies to application data and generated artifacts.
+Static source, manifests, and dependency files remain part of the repository.
