@@ -12,7 +12,7 @@ from burnharness_protocol import (
     create_stabiliser_packet,
     propagate_stabiliser_packet,
 )
-from zero_data import forbid_file_io
+from zero_data import FileIOViolation, forbid_file_io
 
 
 LEGS = (
@@ -201,16 +201,21 @@ def attempt_leg(leg, declarations, binding=None, *, allow_clone_retention=False,
                 return gates
             propagate_stabiliser_packet(packet)
             gates["packet_invariants_preserved"] = Gate("passed", "identity and content preserved")
-            gates["declared_tests_passed"] = (
-                Gate("passed", "declared test callback executed")
-                if binding.declared_tests(output) is True
-                else Gate(reason="declared upstream tests unavailable or unsuccessful")
+            checks = (
+                ("declared_tests_passed", binding.declared_tests, (output,)),
+                ("containment_requirements_tested", binding.containment_tests, ()),
             )
-            gates["containment_requirements_tested"] = (
-                Gate("passed", "binding containment tests executed")
-                if binding.containment_tests() is True
-                else Gate(reason="containment requirements not demonstrated")
-            )
+            for name, check, arguments in checks:
+                try:
+                    gates[name] = (
+                        Gate("passed", "binding test callback executed")
+                        if check(*arguments) is True
+                        else Gate(reason="binding tests unavailable or unsuccessful")
+                    )
+                except FileIOViolation:
+                    raise
+                except Exception as exc:
+                    gates[name] = Gate("failed", type(exc).__name__)
             if (output.get("stabiliser_packet") is not packet
                     or dict(packet) != snapshot):
                 gates["packet_invariants_preserved"] = Gate(
