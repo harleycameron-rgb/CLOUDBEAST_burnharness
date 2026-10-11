@@ -161,6 +161,21 @@ class OriginIntegrationTests(unittest.TestCase):
         self.assertEqual(gates["declared_tests_passed"].status, "blocked")
         self.assertEqual(gates["containment_requirements_tested"].status, "blocked")
 
+    def test_test_exceptions_are_recorded_on_independent_gates(self):
+        self.binding.declared_tests.side_effect = RuntimeError("private test trace")
+        gates = self.attempt()
+        self.assertEqual(gates["adapter_invoked"].status, "passed")
+        self.assertEqual(gates["declared_tests_passed"], Gate("failed", "RuntimeError"))
+        self.assertEqual(gates["containment_requirements_tested"].status, "passed")
+        self.binding.containment_tests.assert_called_once()
+        self.binding.declared_tests.side_effect = None
+        self.binding.containment_tests.side_effect = RuntimeError("private containment trace")
+        gates = self.attempt()
+        self.assertEqual(gates["adapter_invoked"].status, "passed")
+        self.assertEqual(gates["declared_tests_passed"].status, "passed")
+        self.assertEqual(gates["containment_requirements_tested"],
+                         Gate("failed", "RuntimeError"))
+
     def test_closed_cube_has_shared_edges_vertices_and_symmetric_adjacency(self):
         geometry = cube_geometry()
         self.assertTrue(geometry["closed"])
