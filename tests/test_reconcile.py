@@ -117,6 +117,46 @@ class ReconcileTests(unittest.TestCase):
             canonical_projection({**self.log_a, "timestamp": "elsewhere"}),
         )
 
+    def test_empty_and_partial_sessions(self):
+        empty_a = {"session_id": "empty-a", "outcomes": []}
+        empty_b = {"session_id": "empty-b", "outcomes": []}
+        empty_block = reconcile(
+            "genesis-anchor", make_head(empty_a), make_head(empty_b),
+            empty_a, empty_b,
+        )
+        self.assertNotIsInstance(empty_block, Divergence)
+        self.assertEqual(
+            canonical_projection(empty_a), canonical_projection(empty_b),
+        )
+
+        non_empty = {
+            "session_id": "non-empty",
+            "outcomes": [{"key": "alpha", "value": 1}],
+        }
+        partial_block = reconcile(
+            "genesis-anchor", make_head(empty_a), make_head(non_empty),
+            empty_a, non_empty,
+        )
+        self.assertIsInstance(partial_block, Divergence)
+
+        duplicate_outcome = {"key": "alpha", "value": 1}
+        repeated = {
+            "session_id": "repeated",
+            "outcomes": [duplicate_outcome, duplicate_outcome],
+        }
+        single = {
+            "session_id": "single",
+            "outcomes": [duplicate_outcome],
+        }
+        with self.subTest("duplicate outcomes use multiset semantics"):
+            self.assertIsInstance(
+                reconcile(
+                    "genesis-anchor", make_head(repeated), make_head(single),
+                    repeated, single,
+                ),
+                Divergence,
+            )
+
     def test_anchor_is_immutable_across_full_cycle(self):
         coordinator = SentinelDotCoordinator()
         sentinels = {}
@@ -156,6 +196,43 @@ class ReconcileTests(unittest.TestCase):
 
         self.assertTrue(verify_reconciled(genesis.block_id, head_a, head_b, block))
         self.assertEqual(anchor_bytes, coordinator.genesis.block_id.encode("utf-8"))
+
+    def test_metadata_does_not_affect_projection(self):
+        log_a = {
+            "timestamp": "2026-01-01T00:00:00Z",
+            "session_id": "session-a",
+            "hostname": "host-a",
+            "transport": {"protocol": "tcp", "port": 8000},
+            "outcomes": [
+                {
+                    "key": "alpha",
+                    "value": {"passed": True},
+                    "timestamp": "2026-01-01T00:00:01Z",
+                    "session_id": "session-a",
+                    "hostname": "host-a",
+                    "transport": {"sequence": 1, "latency": 0.1},
+                },
+                {"key": "beta", "value": 7},
+            ],
+        }
+        log_b = {
+            "timestamp": "2026-05-01T12:00:00Z",
+            "session_id": "session-b",
+            "hostname": "host-b",
+            "transport": {"protocol": "udp", "port": 9000},
+            "outcomes": [
+                {
+                    "key": "alpha",
+                    "value": {"passed": True},
+                    "timestamp": "2026-05-01T12:00:02Z",
+                    "session_id": "session-b",
+                    "hostname": "host-b",
+                    "transport": {"sequence": 42, "latency": 0.2},
+                },
+                {"key": "beta", "value": 7},
+            ],
+        }
+        self.assertEqual(canonical_projection(log_a), canonical_projection(log_b))
 
 
 if __name__ == "__main__":
