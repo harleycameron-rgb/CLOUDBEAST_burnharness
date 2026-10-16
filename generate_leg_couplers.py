@@ -3,6 +3,8 @@
 # ---------------------------------------------------------
 import json
 
+from couplers._resolver import resolve_all_couplers
+
 COUPLER_MAP = {
     "scandoc_invariant_surface": ("scandoc", "invariant_surface"),
     "invariant_surface_topology_engine": ("invariant_surface", "topology_engine"),
@@ -45,6 +47,7 @@ class {ClassName}Coupler:
         return "{ClassName}: coupling stable"
 """
 
+
 def generate_coupler(name, legs):
     class_name = "".join([p.capitalize() for p in name.split("_")])
     stub_code = COUPLER_TEMPLATE.format(ClassName=class_name)
@@ -54,11 +57,18 @@ def generate_coupler(name, legs):
         "coupler_manifest.json": json.dumps(manifest, indent=4),
     }
 
+
 def main():
     return {
         name: generate_coupler(name, legs)
         for name, legs in COUPLER_MAP.items()
     }
 
+
+def generate_leg_couplers():
+    return resolve_all_couplers()
+
+
 if __name__ == "__main__":
-    main()
+    for c in generate_leg_couplers():
+        print(c)
