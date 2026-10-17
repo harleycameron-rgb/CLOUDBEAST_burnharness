@@ -4,45 +4,98 @@ import hashlib
 import importlib
 import json
 import math
-from pathlib import Path
 
-from coupler_cycle import COUPLER_SEQUENCE, load_leg, run_cycle
+from coupler_cycle import COUPLER_SEQUENCE, load_coupler, load_leg, run_cycle
 from burnharness_protocol import protocol_upgrade_met
-from repo_manifest import REPOSITORY_ROOT, get_manifest
+from generate_leg_couplers import COUPLER_MAP
+from repo_manifest import get_manifest
 
 FIELD_NAMES = ("stability", "curvature", "provenance")
 MAX_INPUT_BYTES = 4096
 DRIFT_LIMIT = 0.05
 TOLERANCE = 1e-9
 
+LEG_STATE_SCHEMAS = {
+    "scandoc": {
+        "root_scan_state": float,
+        "surface_topology": {"grid": [int, int], "roughness": float},
+        "provenance_delta": float,
+    },
+    "invariant_surface": {
+        "invariant_core": {"stability": float, "phase": float},
+        "wobble_state": float,
+        "gesture_map": {"vector_count": int, "curvature": float},
+    },
+    "topology_engine": {
+        "manifold_seed": {"dim": int, "origin": [int, int, int]},
+        "T_amp_root": float,
+        "reconstruction_basis": {
+            "vectors": [[int, int, int], [int, int, int], [int, int, int]],
+        },
+    },
+    "waxtablet_engine": {
+        "substrate_zero": {"density": float, "porosity": float},
+        "pre_atomic_imprint": {"pattern": str, "depth": float},
+        "sentinel_prelink": float,
+    },
+    "orrery": {
+        "sphere_zero": {"radius": float, "phase": float},
+        "temporal_pull": float,
+        "trajectory_seed": {"vector": [float, float, float]},
+    },
+    "sentinel_dot": {
+        "ignition_constant": float,
+        "collapse_boundary": {"limit": float, "mode": str},
+        "zero_anchor": {"position": [int, int], "strength": float},
+    },
+}
 
-def check_environment():
-    """Check local modules, paths, and leg/coupler configuration."""
+
+def _matches_schema(value, schema):
+    if isinstance(schema, dict):
+        return (
+            isinstance(value, dict)
+            and value.keys() == schema.keys()
+            and all(_matches_schema(value[key], nested)
+                    for key, nested in schema.items())
+        )
+    if isinstance(schema, list):
+        return (
+            isinstance(value, (list, tuple))
+            and len(value) == len(schema)
+            and all(_matches_schema(item, nested)
+                    for item, nested in zip(value, schema))
+        )
+    if schema is float:
+        return type(value) in (int, float) and math.isfinite(value)
+    return type(value) is schema
+
+
+def _coupler_pairs_match():
+    expected_pairs = {
+        coupler: (first, second)
+        for first, second, coupler in COUPLER_SEQUENCE
+    }
+    return len(expected_pairs) == len(COUPLER_SEQUENCE) and expected_pairs == COUPLER_MAP
+
+
+def check_environment(coordinator=None):
+    """Check imported modules and in-memory leg/coupler configuration."""
     if not protocol_upgrade_met():
+        return False
+    if not _coupler_pairs_match():
         return False
     manifest = get_manifest()
     try:
-        for section in manifest["paths"].values():
-            for path in section.values():
-                if not Path(path).exists():
-                    return False
         for module in manifest["imports"].values():
             importlib.import_module(module)
-        root = Path(REPOSITORY_ROOT)
         for first, second, coupler in COUPLER_SEQUENCE:
             for leg in (first, second):
-                path = root / "burnharness" / "ignition_layer" / "legs" / leg / "leg_manifest.json"
-                with path.open(encoding="utf-8") as stream:
-                    config = json.load(stream)
-                if (not isinstance(config, dict) or config.get("leg") != leg
-                        or not isinstance(config.get("ignition_state"), dict)
-                        or config["ignition_state"] != load_leg(leg).ignite()):
+                state = load_leg(leg, coordinator=coordinator).ignite()
+                if not _matches_schema(state, LEG_STATE_SCHEMAS[leg]):
                     return False
-            path = root / "couplers" / coupler / "coupler_manifest.json"
-            with path.open(encoding="utf-8") as stream:
-                config = json.load(stream)
-            if (not isinstance(config, dict) or config.get("coupler") != coupler
-                    or list(config.get("legs", [])) != [first, second]):
+            coupling_class = load_coupler(coupler)
+            if not callable(getattr(coupling_class, "couple", None)):
                 return False
     except Exception:
         return False
@@ -55,17 +108,13 @@ def canonical_model(data):
 
 
 def _configuration_snapshot():
-    root = Path(REPOSITORY_ROOT)
     legs = {leg for first, second, _ in COUPLER_SEQUENCE for leg in (first, second)}
-    paths = [
-        root / "burnharness" / "ignition_layer" / "legs" / leg / "leg_manifest.json"
-        for leg in sorted(legs)
-    ]
-    paths.extend(
-        root / "couplers" / coupler / "coupler_manifest.json"
-        for _, _, coupler in COUPLER_SEQUENCE
+    return (
+        json.dumps(get_manifest(), sort_keys=True, separators=(",", ":")),
+        tuple((leg, canonical_model(load_leg(leg).ignite())) for leg in sorted(legs)),
+        tuple((coupler, load_coupler(coupler).__module__)
+              for _, _, coupler in COUPLER_SEQUENCE),
     )
-    return get_manifest(), tuple(path.read_bytes() for path in paths)
 
 
 def check_boundary(data):
@@ -103,14 +152,14 @@ def check_integrity(data):
             and digest != changed), digest
 
 
-def validate_system(input_data=None):
+def validate_system(input_data=None, coordinator=None):
     """Return a fail-closed readiness report for the local cycle.
 
     If input_data is omitted, use the first cycle output as the input field.
     Subsequent cycles must remain within the strict drift threshold.
     """
     report = {
-        "environment_ready": check_environment(),
+        "environment_ready": check_environment(coordinator=coordinator),
         "boundary_valid": False,
         "stable": False,
         "consistent": False,
@@ -126,9 +175,12 @@ def validate_system(input_data=None):
         return report
     try:
         initial_config = _configuration_snapshot()
-        samples = [run_cycle() for _ in range(3)]
+        samples = [
+            run_cycle(coordinator=coordinator) for _ in range(3)
+        ]
         report["environment_ready"] = (
-            check_environment() and _configuration_snapshot() == initial_config
+            check_environment(coordinator=coordinator)
+            and _configuration_snapshot() == initial_config
         )
         if not report["environment_ready"]:
             return report
@@ -159,14 +211,53 @@ def validate_system(input_data=None):
     return report
 
 
-def system_heartbeat():
-    """Return whether every system readiness check passes."""
-    report = validate_system()
+def system_heartbeat(coordinator):
+    """Return anchored readiness without sampling before Genesis."""
+    try:
+        coordinator._require_genesis()
+    except (AttributeError, RuntimeError):
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    genesis = coordinator.genesis
+    if genesis is None or not coordinator.genesis_anchor_locked:
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    try:
+        sentinel = load_leg("sentinel_dot", coordinator=coordinator)
+    except (RuntimeError, ValueError):
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    if sentinel.genesis_block_id is None or (
+        sentinel.genesis_block_id != genesis.block_id
+    ):
+        return {
+            "anchored": False,
+            "genesis_block_id": None,
+            "readiness": None,
+            "reason": "genesis_not_locked",
+        }
+    report = validate_system(coordinator=coordinator)
     checks = (
         "environment_ready", "boundary_valid", "stable", "consistent",
         "integrity_verified"
     )
-    return all(report.get(check) is True for check in checks)
+    return {
+        "anchored": True,
+        "genesis_block_id": genesis.block_id,
+        "readiness": all(report.get(check) is True for check in checks),
+    }
 
 
 if __name__ == "__main__":

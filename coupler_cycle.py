@@ -23,17 +23,25 @@ COUPLER_SEQUENCE = [
     ("sentinel_dot", "scandoc", "sentinel_dot_scandoc")
 ]
 
-def load_leg(name):
+def load_leg(name, coordinator=None):
     module = importlib.import_module(f"{LEG_PATH}.{name}.ignition_stub")
     class_name = "".join([p.capitalize() for p in name.split("_")]) + "IgnitionStub"
-    return getattr(module, class_name)()
+    leg = getattr(module, class_name)()
+    if name == "sentinel_dot" and coordinator is not None:
+        coordinator._require_genesis()
+        leg._instance_id = coordinator.invariant_source_id
+        leg._on_genesis(coordinator.genesis)
+        if (leg.genesis_block_id is None
+                or leg.genesis_block_id != coordinator.genesis.block_id):
+            raise RuntimeError("Sentinel Dot stub does not match the Genesis anchor")
+    return leg
 
 def load_coupler(name):
     module = importlib.import_module(f"{COUPLER_PATH}.{name}.coupler")
     class_name = "".join([p.capitalize() for p in name.split("_")]) + "Coupler"
     return getattr(module, class_name)
 
-def run_cycle(stabiliser_packet=None):
+def run_cycle(stabiliser_packet=None, coordinator=None):
     resonance = {
         "stability": 0.0,
         "curvature": 0.0,
@@ -41,8 +49,8 @@ def run_cycle(stabiliser_packet=None):
     }
 
     for legA_name, legB_name, coupler_name in COUPLER_SEQUENCE:
-        legA = load_leg(legA_name)
-        legB = load_leg(legB_name)
+        legA = load_leg(legA_name, coordinator=coordinator)
+        legB = load_leg(legB_name, coordinator=coordinator)
 
         CouplerClass = load_coupler(coupler_name)
         coupler = CouplerClass(legA, legB, stabiliser_packet)

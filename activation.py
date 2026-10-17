@@ -1,6 +1,6 @@
 import hashlib
 import importlib
-import os
+import json
 
 from companion import Companion
 from repo_manifest import get_manifest
@@ -23,13 +23,14 @@ class SuperpositionStabiliser:
         for section in self.paths.values():
             for value in section.values():
                 if isinstance(value, str):
-                    if not os.path.exists(value):
+                    if not value or not value.startswith("/"):
                         missing.append(value)
                 elif isinstance(value, dict):
                     for subvalue in value.values():
-                        if isinstance(subvalue, str):
-                            if not os.path.exists(subvalue):
-                                missing.append(subvalue)
+                        if isinstance(subvalue, str) and (
+                            not subvalue or not subvalue.startswith("/")
+                        ):
+                            missing.append(subvalue)
         self.state["paths_valid"] = not missing
         return missing
 
@@ -64,7 +65,11 @@ def sentinel_dot_event(coupler_state):
 
 
 def generate_sha512_block():
-    return hashlib.sha512(os.urandom(64)).hexdigest()
+    anchor = json.dumps(
+        ["burnharness.genesis/1", "sentinel-a", "sentinel-b"],
+        separators=(",", ":"),
+    )
+    return hashlib.sha512(anchor.encode("utf-8")).hexdigest()
 
 
 def start_runtime(

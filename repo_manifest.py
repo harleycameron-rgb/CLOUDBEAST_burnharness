@@ -10,6 +10,12 @@ def _path(*parts):
 
 def get_manifest():
     return {
+        "origin_declarations": {
+            leg: () for leg in (
+                "scandoc", "invariant_surface", "topology_engine",
+                "waxtablet_engine", "orrery", "sentinel_dot",
+            )
+        },
         "paths": {
             "harness": {
                 "root": REPOSITORY_ROOT,

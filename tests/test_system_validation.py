@@ -1,14 +1,25 @@
 import math
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import system_validation as validation
+from burnharness.ignition_layer.legs.sentinel_dot.ignition_stub import (
+    SentinelDotIgnitionStub,
+)
+from coordinator import SentinelDotCoordinator, bootstrap_genesis
 
 
 FIELD = {"stability": 0.5, "curvature": 0.2, "provenance": 0.1}
 
 
 class SystemValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.coordinator = SentinelDotCoordinator()
+        for instance_id in self.coordinator.instance_ids:
+            SentinelDotIgnitionStub().bind(self.coordinator, instance_id)
+        bootstrap_genesis(self.coordinator)
+
     def test_system_heartbeat_requires_every_readiness_check(self):
         passing_report = {
             check: True for check in (
@@ -17,14 +28,18 @@ class SystemValidationTests(unittest.TestCase):
             )
         }
         with patch.object(validation, "validate_system", return_value=passing_report):
-            self.assertTrue(validation.system_heartbeat())
+            self.assertTrue(
+                validation.system_heartbeat(self.coordinator)["readiness"]
+            )
 
         for failed_check in passing_report:
             with self.subTest(failed_check=failed_check):
                 failing_report = {**passing_report, failed_check: False}
                 with patch.object(validation, "validate_system",
                                   return_value=failing_report):
-                    self.assertFalse(validation.system_heartbeat())
+                    self.assertFalse(
+                        validation.system_heartbeat(self.coordinator)["readiness"]
+                    )
 
     def test_local_system_is_ready(self):
         report = validation.validate_system()
@@ -109,7 +124,21 @@ class SystemValidationTests(unittest.TestCase):
                           side_effect=ModuleNotFoundError):
             self.assertFalse(validation.check_environment())
             self.assertFalse(validation.validate_system()["system_ready"])
-        with patch.object(validation.json, "load", return_value={"leg": "scandoc"}):
+        with patch.object(validation, "load_coupler", side_effect=ValueError):
+            self.assertFalse(validation.check_environment())
+
+    def test_environment_rejects_empty_or_wrong_schema_leg_states(self):
+        for state in ({}, {"root_scan_state": 1.0}):
+            with self.subTest(state=state):
+                leg = SimpleNamespace(ignite=lambda: state)
+                with patch.object(validation, "load_leg", return_value=leg):
+                    self.assertFalse(validation.check_environment())
+
+    def test_environment_rejects_mismatched_declared_coupler_pair(self):
+        with patch.dict(
+            validation.COUPLER_MAP,
+            {"scandoc_invariant_surface": ("scandoc", "orrery")},
+        ):
             self.assertFalse(validation.check_environment())
 
     def test_changed_configuration_fails_readiness(self):
