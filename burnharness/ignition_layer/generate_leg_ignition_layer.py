@@ -1,12 +1,10 @@
 # ---------------------------------------------------------
 # Generate all six leg ignition stubs in one operation
 # ---------------------------------------------------------
-import os
 import json
 
 from burnharness_protocol import admit_leg
 
-BASE = "legs"
 LEGS = {
     "scandoc": {
         "root_scan_state": 1.0,
@@ -52,30 +50,22 @@ class {ClassName}IgnitionStub:
         return "{ClassName}: ignition stable"
 """
 
-def ensure_base():
-    if not os.path.exists(BASE):
-        os.makedirs(BASE)
-
 def generate_leg(name, state):
     if not admit_leg(name)["admitted"]:
         raise ValueError("leg admission requires the unified protocol upgrade")
-    folder = os.path.join(BASE, name)
-    os.makedirs(folder, exist_ok=True)
-
     class_name = "".join([p.capitalize() for p in name.split("_")])
     stub_code = STUB_TEMPLATE.format(ClassName=class_name, state=json.dumps(state, indent=4))
-
-    with open(os.path.join(folder, "ignition_stub.py"), "w") as f:
-        f.write(stub_code)
-
     manifest = {"leg": name, "ignition_state": state}
-    with open(os.path.join(folder, "leg_manifest.json"), "w") as f:
-        json.dump(manifest, f, indent=4)
+    return {
+        "ignition_stub.py": stub_code,
+        "leg_manifest.json": json.dumps(manifest, indent=4),
+    }
 
 def main():
-    ensure_base()
-    for name, state in LEGS.items():
-        generate_leg(name, state)
+    return {
+        name: generate_leg(name, state)
+        for name, state in LEGS.items()
+    }
 
 if __name__ == "__main__":
     main()

@@ -4,7 +4,6 @@ asymmetric state and emit gate-release events."""
 import hashlib
 import json
 import math
-import os
 import statistics
 import threading
 import time
@@ -164,7 +163,13 @@ class SentinelDotCoordinator:
                         f"Sentinel Dot instances not bound for Genesis: {missing!r}"
                     )
                 genesis = GenesisBlock(
-                    block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
+                    block_id=hashlib.sha512(
+                        json.dumps(
+                            ["burnharness.genesis/1", *self.instance_ids],
+                            separators=(",", ":"),
+                            ensure_ascii=False,
+                        ).encode("utf-8")
+                    ).hexdigest(),
                     invariant_source_id=self.invariant_source_id,
                     symbol_source_id=self.symbol_source_id,
                 )
@@ -366,7 +371,12 @@ class SentinelDotCoordinator:
         self._release = ValidationRelease(
             projection_revision=self._projection_revision,
             symbol_revision=self._symbol_revision,
-            block_id=hashlib.sha512(os.urandom(64)).hexdigest(),
+            block_id=hashlib.sha512(
+                (
+                    f"burnharness.release/1:{self._genesis.block_id}:"
+                    f"{self._projection_revision}:{self._symbol_revision}"
+                ).encode("utf-8")
+            ).hexdigest(),
             genesis_block_id=self._genesis.block_id,
         )
         self._delivered.clear()

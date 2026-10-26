@@ -1,141 +1,188 @@
-# burnharness
-# Burnharness
+# CLOUDBURNER17
 
-The Burnharness is the “glue universe” that connects all the other parts of the system.
-If each repo is a bubble, the Burnharness is the thick soap fluid between them.
+CLOUDBURNER17 is a zero-persistence supervised engine for the CLOUDBEAST
+Burnharness. It runs the local couplers, validates the resonance field, seals an
+in-memory superblock, and exercises the causal Lk/Z_m burn. The harmony
+stabiliser checks ordered step outputs across two independent runs and returns a
+reproducible SHA-512 sentinel.
 
-It keeps everything stable, stops the system drifting apart, and creates the first
-super‑block (the big combined engine layer).
+## Zero-data behavior
 
-The Burnharness is built on top of **Sentinel_dot**, which acts like the spark or
-zero‑point that starts everything.
+Runtime ledgers, benchmark results, superblocks, burn reports, and anchors exist
+only as process-local Python values. The pipeline does not create or update
+artifact files, and it blocks common Python filesystem APIs while supervised
+steps execute. The in-memory Sentinel Link uses an append-only HMAC-sealed ledger
+that is discarded with its object. No network service is required.
 
----
+Python must load the program and its dependencies before runtime guards can be
+enabled. The guard covers the supervised execution itself; it is not a claim
+that the operating system or CI runner performs no filesystem operations.
 
-## What the Burnharness Does
+## Run
 
-### 1. Connects all repos
-It links:
-- ScanDoc
-- Invariant‑Surface
-- Topology‑Engine
-- Waxtablet‑Engine
-- Orrery
+From the repository root:
 
-All of these become “bubbles” inside the Burnharness world.
+```sh
+python -B src/run_supervised_build.py
+python -B -m unittest discover -s tests -v
+```
 
-### 2. Shares invariant state
-The Burnharness holds the shared memory and stable information that all bubbles use.
+The supervised command prints a JSON result to standard output and returns the
+same data in memory. It runs the benchmark, superblock, causal burn, and
+verification steps twice, failing if outputs drift. `sentinel_hash` seals the
+ordered step digests. Use `-B` (or `PYTHONDONTWRITEBYTECODE=1`) to prevent
+Python bytecode cache files during local runs.
 
-### 3. Stops drift
-It keeps the whole system moving in the same direction so nothing goes weird or off‑track.
+`python -B fire_all.py` remains an in-memory one-shot summary. The former
+`--write` option is rejected. `python -B system_validation.py` prints a local
+readiness report without reading manifest files. The conceptual runtime reports
+symbolic references only and does not load referenced artifacts.
 
-### 4. Builds the first super‑block
-As the system moves forward, the Burnharness collects the “residue” left behind and
-turns it into the first big structure the engines can attach to.
+## Components
 
-### 5. Follows the sphere‑model
-The Burnharness moves forward along the same path as the sphere‑model, which acts like
-the “trajectory” for the whole system.
+- `src/run_supervised_build.py` runs and verifies the supervised pipeline.
+- `stabiliser.py` validates step names and order, hashes canonical outputs, and
+  detects missing or drifting steps.
+- `zero_data.py` provides the runtime filesystem-access guard.
+- `sentinel_link/`, `temporal_anchor/`, `provenance_bridge/`, and
+  `engine_alignment/` keep connector state in memory.
+- `superblock/` and `causal_lkzm/` construct verifiable outputs in memory.
+- `.github/workflows/ci.yml` runs the pipeline and tests with bytecode writing
+  disabled; `infra/github-actions.yml` records the corresponding CI commands.
 
----
+The in-memory guarantee applies to application data and generated artifacts.
+Static source, manifests, and dependency files remain part of the repository.
 
-## System validation
+## Six-leg origin integration (development only)
 
-Run `python system_validation.py` from the repository root to obtain a JSON
-readiness report, or call `validate_system(input_data=None)` from
-`system_validation`. Readiness requires all five checks to pass:
-`environment_ready`, `boundary_valid`, `stable`, `consistent`, and
-`integrity_verified`. The validator uses local modules and configuration only;
-it makes no network calls.
-Call `system_heartbeat()` from `system_validation` for a boolean indicating
-whether all five readiness checks pass.
+`origin_integration.py` is an opt-in resolution and adapter contract, not an
+upstream loader or a production launcher. Existing `load_leg()` and coupler
+cycles continue to use local `IgnitionStub` classes; their results are not
+upstream execution evidence.
 
-The optional input is a dictionary with exactly `stability`, `curvature`, and
-`provenance` keys, each a finite number in `[0, 1]`. Its canonical JSON encoding
-must fit within 4096 UTF-8 bytes. A supplied input must also match the first
-local coupler cycle output within `1e-9` for every field; without an input, that
-output is used directly. Three cycles are compared; the maximum field deviation
-from the first must be strictly below `0.05`. The SHA-512 digest of the sorted-key
-canonical JSON is included in the report. A failed check yields
-`system_ready: false`.
+Inspection of `repo_manifest.py`, all six
+`burnharness/ignition_layer/legs/*/leg_manifest.json` files, their stubs,
+`couplers/*/coupler_manifest.json`, coupler implementations, protocol, tests,
+and the zero-data documentation found **no declared origin repositories or
+upstream APIs**. The topology manifest's `origin` is a coordinate, not a URL.
+`get_manifest()["origin_declarations"]` explicitly records empty declarations:
 
-Run tests with `python -m unittest discover -s tests -v`.
+| Leg | Origin / clone outcome | Outstanding requirements |
+| --- | --- | --- |
+| scandoc | blocked / not attempted | declared repository and upstream API |
+| invariant_surface | blocked / not attempted | declared repository and upstream API |
+| topology_engine | blocked / not attempted | declared repository and upstream API |
+| waxtablet_engine | blocked / not attempted | declared repository and upstream API |
+| orrery | blocked / not attempted | declared repository and upstream API |
+| sentinel_dot | blocked / not attempted | declared repository and upstream API |
 
-## Unified field oath protocol
+For every leg, pin verification, dependency availability, upstream adapter
+invocation, declared upstream tests, packet preservation through that adapter,
+and containment tests remain blocked. No upstream commit was resolved. No
+origin URL was inferred, no access was expanded, and no upstream tree was cloned.
+This is a stopped clone attempt at the resolution gate, not six failed network
+clones. The development baseline is main commit
+`232d4ddb2718428626289660e22cee7a3017b4d8`.
 
-`burnharness_protocol.py` defines the protocol policy, admission gate, immutable
-stabiliser packet, and mobile sphere-surface geometry header. New generated legs
-are admitted only when the complete protocol upgrade is active; otherwise the
-generic invariant-flow fallback is selected. Every coupler passes a supplied
-packet through by identity without modifying it.
+### Binding and evidence contract
 
-`evaluate_ai_entry(system, qualifications)` accepts only a listed AI system and
-requires affirmative oath, geometry, surface-model,
-packet-integrity, and drift-targeting qualifications. An incomplete or
-unqualified entry is halted and routed to the generic invariant-flow stub.
-`evaluate_drift()` likewise fails closed for incomplete reports and halts when
-any configured drift risk is detected. The organism runtime applies friction
-above the oath threshold, then halts and routes to the stub if numeric drift
-exceeds that threshold.
+Supply exactly one `Origin(repository, interface, declaration, commit)` per
+leg, citing a reviewed declaration. `commit` may be omitted during initial
+resolution, but the clone callback must return a verified full resolved commit
+ID; an explicit declared pin must match. Multiple declarations are ambiguous,
+even if identical. No fallback guesses are made.
 
-The sphere-surface ignition algebra is registered under
-`geometry_system.ignition_algebra` and implemented in
-`UNIFIED_FIELD_ZIPGATE/geometry/ignition/ignition_algebra.py`. It provides
-harmonic-field and pairwise ignition-time calculations, strict flow alignment,
-destiny alignment, and a fail-closed alliance recurrence bit. Destiny domains
-are supplied by the caller as membership containers, two-endpoint intervals,
-or predicates.
+`Binding` supplies reviewed, authorized development callbacks: isolated clone
+and pin verification, dependency check, a preloaded `OriginAdapter.invoke(packet,
+projection)`, declared tests, and containment tests. These are explicit
+interfaces to implement once upstream APIs are known, not invented upstream
+implementations. The clone callback must preserve source and licensing notices,
+verify the checkout against its reported commit, and keep trees and private
+evidence outside the repository. There is deliberately no automatic network
+client, subprocess launcher, dependency installer, or dynamic upstream import.
+Do not bind a local stub as upstream evidence.
 
-Call `run_protocol_cycle()` from `coupler_cycle` to receive the dual root/surface
-state, sphere trajectory geometry, and read-only stabiliser packet. The existing
-`run_cycle()` resonance-field return format remains unchanged.
+`attempt_leg()` requires explicit `allow_clone_retention=True` before calling
+clone setup. First review the applicable retention policy: development source
+setup is outside the supervised zero-data runtime, but if retaining origins
+conflicts with that policy, leave this flag false and stop. Runtime callbacks
+run under `forbid_file_io()` with process-local state and bytecode writing
+disabled. Filesystem-dependent upstream tests or APIs cannot pass this boundary;
+review their incompatibility rather than bypass the guard.
 
-`SentinelDotCoordinator` in `coordinator.py` starts with a one-time Genesis
-bootstrap: both bound Sentinel Dot instances call `enter_genesis()` (or use
-`bootstrap_genesis(coordinator)`), and once both are Ready the coordinator mints
-one SHA-512 Genesis block ID from `os.urandom(64)`, distributes it to Sentinel A
-(read-only parabola anchor) and Sentinel B (initial accumulated symbol), then
-releases the barrier. The rendezvous times out instead of deadlocking, and
-runtime publications are rejected until `genesis_anchor_locked` is true. Run
-`python coordinator.py` to benchmark Genesis bootstrap overhead.
+Each leg has seven independent gates: `origin_resolved`,
+`pinned_clone_verified`, `dependencies_available`, `adapter_invoked`,
+`declared_tests_passed`, `packet_invariants_preserved`, and
+`containment_requirements_tested`. Only literal successful callback results
+count. Missing prerequisites remain blocked; clone or invocation exceptions
+fail with exception types only, not potentially sensitive messages. The adapter
+must return the original immutable packet in its `stabiliser_packet` field.
+`completion_report()` requires all seven gates for all six legs and valid
+geometry. `production_launch_authorized` is always false.
 
-After Genesis, `SentinelDotCoordinator` uses an event-driven asymmetric
-validation gate. Sentinel A publishes its invariant projection while Sentinel B
-publishes its accumulated symbol; the gate releases only when the symbol belongs
-to the projection (including parabola and declared member/hash projections).
-Both registered Sentinel Dot instances receive the release event and seal it
-with the same SHA-512 block ID. Companion integrity reflects successful
-validation, and every release carries the Genesis block ID it is anchored to.
-Companion integrity enforces the Big Prompt invariants
-`genesis_anchor_locked`, `no_bung` and `continuity_flow`.
+Evidence is in memory and is a **trusted callback attestation**, not an
+independent proof: a dishonest callback or manually forged evidence can lie.
+Keep actual checkout identities, dependency probes, invocation results, and
+test outcomes in private development evidence, never committed inventories,
+credentials, upstream trees, or sensitive traces. Synthetic contract tests
+exercise failure paths but cannot satisfy actual upstream gates.
 
-Run `python runtime_monitor.py` from the repository root to print live
-readiness every 30 seconds until interrupted. The printed SHA-512 prefix is
-the hash of the fixed `"sphere_interior"` marker, not a hash of live system state.
+### Convex sphere / fixed-keg model
 
-## Conceptual Alliance sequence
+Assumption: the sphere is a unit sphere centered at the model origin and the
+cube has coordinates `[-1, 1]^3`. `DEFAULT_FACES` assigns fixed repository kegs
+as scandoc → +x, invariant_surface → +y, topology_engine → -x,
+waxtablet_engine → +z, orrery → -y, sentinel_dot → -z. This is an explicit
+software assumption, not an upstream declaration; callers can supply another
+one-to-one six-leg mapping. This default also makes consecutive legs in the
+existing coupler cycle adjacent. Cube adjacency has twelve edges, not just the
+six edges of that local cycle.
 
-Run `python conceptual_runtime.py` to report which reference artifacts for the
-Burnharness–Alliance sequence are present. This is a read-only symbolic status
-report: it does not run the coherence check or checksum validator, request an
-agent trigger, generate a glyph, or activate the runtime. Missing artifacts are
-reported without being synthesized.
+`cube_geometry()` checks exact face coverage, four symmetric neighbors per
+face, two incident faces per edge, three per vertex, and Euler closure
+`8 - 12 + 6 = 2`. Face centers are interface projections.
+`project_sphere(d)` maps any finite nonzero direction to `d / max(abs(d))`,
+the cube-surface radial projection; normalization gives the corresponding unit
+sphere direction. This derives model coordinates only and cannot reconstruct
+unread origin source.
 
-## Symbolic transduction demo
+### Proposed containment boundary and limits
 
-Run `./transduction_runtime.sh` to display the inert transduction sequence.
-The coherence, checksum, and feedback values are symbolic constants; no
-validator, ignition, or manifestation operation is performed. Continuing past
-the dormant state requires typing `ignite`, and the continuation remains
-symbolic.
+The proposed runtime boundary is preloaded, reviewed Python adapters and their
+in-memory outputs within the existing supervised filesystem guard. Development
+clone/dependency setup lies outside it and requires separate authorization and
+isolated private workspaces. The Python guard rejects common filesystem access;
+it is **not** source containment, an OS sandbox, network/process isolation, or
+protection against native code or hostile callbacks. This PR does not execute
+untrusted upstream code. Before any such execution, define and test an external
+boundary denying network, subprocesses, host mounts, secrets, and persistent
+writes, with resource limits and cleanup appropriate to each declared API.
+No such external boundary is implemented or tested here.
 
----
+Geometric closure proves none of source containment, security isolation,
+physical behavior, or AGI capability. Passing local or synthetic tests does not
+complete origin integration. No publication, release, merge, deployment,
+blockchain/timestamp submission, upstream modification, or live infrastructure
+change is part of this development attempt.
 
-## How It Connects to Sentinel_dot
+### Executed validation
 
-Sentinel_dot is the zero‑state or spark.
+Commands run from the repository root:
 
-The Burnharness grows from that spark.
+- `python -B -m unittest discover -s tests -p test_origin_integration.py -v`:
+  focused contract tests passed (synthetic bindings only).
+- `python -B -m pip install --disable-pip-version-check -r requirements.txt`
+  with `PIP_NO_CACHE_DIR=1`: existing requirements installed after initial
+  validation stopped on missing NumPy; no dependency declarations changed.
+- `python -B -m unittest discover -s tests -v`: full suite passed.
+- `python -B src/run_supervised_build.py`: passed, deterministic, with no
+  persistent application artifacts; local harness only.
+- `git diff --check`: passed.
 
-The order is:
+An in-process development exercise using the actual manifest declarations
+returned six blocked origins, zero network clones, no resolved upstream commits,
+closed model geometry, incomplete development gates, and no production launch
+authorization. Its evidence is private and outside the checkout.
+Initial attempts redirecting test/pipeline output to regular files were rejected
+by the existing inherited-descriptor guard; successful reruns used no regular
+file redirection. No upstream invocation or upstream tests were executed.
