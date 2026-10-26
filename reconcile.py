@@ -19,6 +19,7 @@ class Divergence:
     pa: bytes
     pb: bytes
     reason: str
+    key: str | None = None
 
 
 @dataclass(frozen=True)
@@ -106,7 +107,15 @@ def reconcile(anchor, head_a, head_b, log_a, log_b):
     pa = canonical_projection(log_a)
     pb = canonical_projection(log_b)
     if pa != pb:
-        return Divergence(pa, pb, "invariant outcomes differ")
+        def grouped(payload):
+            groups = {}
+            for item in json.loads(payload):
+                groups.setdefault(item["key"], []).append(item)
+            return groups
+        left, right = grouped(pa), grouped(pb)
+        key = next(k for k in sorted(left.keys() | right.keys())
+                   if left.get(k) != right.get(k))
+        return Divergence(pa, pb, f"invariant outcomes differ at {key!r}", key)
 
     # Genesis anchors use SHA-512, session heads use SHA-256, and the
     # reconciliation seal uses SHA-512 over the exact UTF-8/byte concatenation.
