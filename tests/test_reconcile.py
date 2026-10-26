@@ -197,6 +197,43 @@ class ReconcileTests(unittest.TestCase):
         self.assertTrue(verify_reconciled(genesis.block_id, head_a, head_b, block))
         self.assertEqual(anchor_bytes, coordinator.genesis.block_id.encode("utf-8"))
 
+    def test_metadata_does_not_affect_projection(self):
+        log_a = {
+            "timestamp": "2026-01-01T00:00:00Z",
+            "session_id": "session-a",
+            "hostname": "host-a",
+            "transport": {"protocol": "tcp", "port": 8000},
+            "outcomes": [
+                {
+                    "key": "alpha",
+                    "value": {"passed": True},
+                    "timestamp": "2026-01-01T00:00:01Z",
+                    "session_id": "session-a",
+                    "hostname": "host-a",
+                    "transport": {"sequence": 1, "latency": 0.1},
+                },
+                {"key": "beta", "value": 7},
+            ],
+        }
+        log_b = {
+            "timestamp": "2026-05-01T12:00:00Z",
+            "session_id": "session-b",
+            "hostname": "host-b",
+            "transport": {"protocol": "udp", "port": 9000},
+            "outcomes": [
+                {
+                    "key": "alpha",
+                    "value": {"passed": True},
+                    "timestamp": "2026-05-01T12:00:02Z",
+                    "session_id": "session-b",
+                    "hostname": "host-b",
+                    "transport": {"sequence": 42, "latency": 0.2},
+                },
+                {"key": "beta", "value": 7},
+            ],
+        }
+        self.assertEqual(canonical_projection(log_a), canonical_projection(log_b))
+
 
 if __name__ == "__main__":
     unittest.main()

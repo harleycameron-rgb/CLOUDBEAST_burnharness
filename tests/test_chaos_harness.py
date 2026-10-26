@@ -19,7 +19,7 @@ class ChaosInjectorTests(unittest.TestCase):
 
     def test_brownian_generator_accumulates_each_step(self):
         with patch.object(
-            chaos_harness.random, "uniform", side_effect=[0.1, -0.2, 0.05]
+            chaos_harness.random.Random, "uniform", side_effect=[0.1, -0.2, 0.05]
         ) as uniform:
             result = chaos_harness.ChaosInjector.brownian(0.5, steps=3)
 
@@ -29,7 +29,7 @@ class ChaosInjectorTests(unittest.TestCase):
 
     def test_permutation_shuffles_a_copy(self):
         values = [1, 2, 3]
-        with patch.object(chaos_harness.random, "shuffle", side_effect=lambda items: items.reverse()):
+        with patch.object(chaos_harness.random.Random, "shuffle", side_effect=lambda items: items.reverse()):
             result = chaos_harness.ChaosInjector.permutation(values)
 
         self.assertEqual(result, [3, 2, 1])
@@ -43,10 +43,10 @@ class MutationFuzzerTests(unittest.TestCase):
         for index, mutation in enumerate(expected):
             with self.subTest(mutation=index):
                 with patch.object(
-                    chaos_harness.random, "choice",
+                    chaos_harness.random.Random, "choice",
                     side_effect=lambda options, index=index: options[index],
                 ), patch.object(
-                    chaos_harness.random, "uniform",
+                    chaos_harness.random.Random, "uniform",
                     return_value=1.5 if index == 4 else 0.1,
                 ):
                     result = chaos_harness.MutationFuzzer.mutate_field(0.5)
@@ -61,8 +61,8 @@ class MutationFuzzerTests(unittest.TestCase):
     def test_mutate_dict_changes_only_a_copy(self):
         original = {"stability": 0.5, "curvature": 0.2}
         with patch.object(
-            chaos_harness.random, "choice", side_effect=lambda options: options[0]
-        ), patch.object(chaos_harness.random, "uniform", return_value=0.1):
+            chaos_harness.random.Random, "choice", side_effect=lambda options: options[0]
+        ), patch.object(chaos_harness.random.Random, "uniform", return_value=0.1):
             mutated = chaos_harness.MutationFuzzer.mutate_dict(original)
 
         self.assertEqual(original, {"stability": 0.5, "curvature": 0.2})
