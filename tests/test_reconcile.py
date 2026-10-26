@@ -82,6 +82,13 @@ class ReconcileTests(unittest.TestCase):
         self.assertEqual(block.key, "beta")
         self.assertIn("beta", block.reason)
 
+    def test_divergence_key_handles_missing_and_duplicate_outcomes(self):
+        for outcomes in ([{"key":"alpha","value":{"passed":True}}],
+                         self.log_b["outcomes"] + [{"key":"beta","value":7}]):
+            changed = {**self.log_b,"outcomes":outcomes}
+            block = reconcile("genesis-anchor",self.head_a,make_head(changed),self.log_a,changed)
+            self.assertEqual(block.key,"beta")
+
     def test_tampered_head_does_not_verify(self):
         block = reconcile("genesis-anchor", self.head_a, self.head_b,
                           self.log_a, self.log_b)
