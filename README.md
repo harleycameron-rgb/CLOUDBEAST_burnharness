@@ -38,6 +38,21 @@ Python bytecode cache files during local runs.
 readiness report without reading manifest files. The conceptual runtime reports
 symbolic references only and does not load referenced artifacts.
 
+## Invariant Tap local test / topology / retest
+
+`invariant_harvest.py` adds a metadata-only local capture adapter, declared
+interface topology, explicit retest statuses and in-memory SHA-512 evidence.
+The supervised verification step checks and seals that evidence across both
+passes. No sensor driver or upstream source loader is added; synthetic local
+reproduction never qualifies an upstream origin or production launch.
+
+The local suite passes 189 unittest tests (23 new), with 17 additional tests
+and 69 subtests passing and two sibling-resolution checks skipped. See
+[the implementation and evidence matrix](docs/INVARIANT_HARVEST.md) and
+[the recorded validation summary](docs/evidence/invariant_harvest_validation.json)
+for exact commands, tested commit, dependencies and limits. Invariant Helm and
+Invariant Exoskeleton remain proposals, not integrated components.
+
 ## Components
 
 - `src/run_supervised_build.py` runs and verifies the supervised pipeline.

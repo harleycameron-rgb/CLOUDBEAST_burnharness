@@ -1,0 +1,63 @@
+{
+  "schema": "invariant-harvest-validation/1",
+  "base_commit": "32a191095b82eb196a751d5a79cdf806266f8333",
+  "implementation_commit": "66f7f399f6d1ba905a9c113604a9ff4fa0de79f8",
+  "branch": "ignition/invariant-harvest-v0.1",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pytest": "9.2.0"
+  },
+  "commands": [
+    {
+      "command": "python -B -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "tests": 189,
+      "failures": 0,
+      "errors": 0,
+      "new_integration_tests": 23
+    },
+    {
+      "command": "python -B src/run_supervised_build.py",
+      "exit_code": 0,
+      "passed": true,
+      "deterministic": true,
+      "persistent_artifacts": false,
+      "tap_status": "reproduced",
+      "upstream_verified": false
+    },
+    {
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -B -m pytest -p no:cacheprovider -s -q tests/test_resolver.py backend/tests/test_runtime_stub.py test_harness.py",
+      "exit_code": 0,
+      "passed": 17,
+      "skipped": 2,
+      "subtests_passed": 69
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "skipped": [
+    "tests/test_resolver.py::test_resolve_known_leg",
+    "tests/test_resolver.py::test_resolve_all_couplers"
+  ],
+  "skip_reason": "required sibling repositories not cloned",
+  "initial_failure": "baseline unittest discovery imported test_resolver without declared pytest installed; isolated dependency installation resolved it",
+  "supervised_sentinel_sha512": "b086e4fc2f8f4ea96acfdf995e28174ad5c976dbcca5723723cbc0a782fdba88d9dba676bc9495cf4fc85d9108fc64c62593a313849a0f39e4c25b9f394d3d09",
+  "local_fixture_evidence_sha512": "8ba10846c68560487d263615de92bc09cf74f1a3db87bf6d9ad13393ee3f3e7dfd7f3960ebdfc7f21d4ce74fb7382b77a1092706e8a6aa507ddb1f3ce1e1b165",
+  "authority": {
+    "runtime_scope": "local_fixture_only",
+    "upstream_verified": false,
+    "issuer_authenticated": false,
+    "production_launch_authorized": false
+  },
+  "unexecuted": [
+    "upstream Invariant Tap invocation/tests",
+    "six upstream origin gates",
+    "physical sensor/media validation",
+    "OS-level containment validation",
+    "Helm/Exoskeleton adapters"
+  ],
+  "evidence_limit": "Development command summaries and local equality commitments, not an independently verified execution receipt. No raw media or private inputs retained."
+}
