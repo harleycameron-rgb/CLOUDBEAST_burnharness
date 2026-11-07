@@ -13,6 +13,7 @@ sys.dont_write_bytecode = True
 from benchmarks.fire import ADAPTERS, build_registry
 from causal_lkzm.harness import burn
 from coupler_cycle import COUPLER_SEQUENCE, load_coupler, load_leg
+from invariant_harvest import local_fixture, verify_evidence
 from stabiliser import Stabiliser
 from superblock.superblock import build_superblock, verify_chain
 from system_validation import check_environment, validate_system
@@ -26,6 +27,7 @@ def _preload_runtime():
     """Import all modules before the no-filesystem execution guard is engaged."""
     manifest_modules = (
         "burnharness_protocol",
+        "invariant_harvest",
         "coupler_cycle",
         "UNIFIED_FIELD_ZIPGATE.geometry.ignition.ignition_algebra",
         "couplers.organism_runtime",
@@ -99,7 +101,11 @@ def _run_once():
         raise RuntimeError("causal burn verification failed")
     stabiliser.record("causal_burn", burn_report)
 
+    tap_evidence = local_fixture()
+    tap_reproduced = (verify_evidence(tap_evidence)
+                      and tap_evidence["body"]["retest"]["status"] == "reproduced")
     verification = {
+        "invariant_tap_local_retest": tap_reproduced,
         "connectors_passed": connectors_passed,
         "environment_ready": validation["environment_ready"],
         "system_ready": validation["system_ready"],
@@ -108,7 +114,9 @@ def _run_once():
     }
     if not all(verification.values()):
         raise RuntimeError("supervised verification failed")
-    stabiliser.record("verification", verification)
+    stabiliser.record("verification", {
+        **verification, "invariant_tap_evidence_sha512": tap_evidence["sha512"],
+    })
     steps = stabiliser.finish()
     return {
         "steps": steps,
@@ -117,6 +125,7 @@ def _run_once():
             "superblock": block,
             "burn_report": burn_report,
             "verification": verification,
+            "invariant_tap": tap_evidence,
         },
     }
 
