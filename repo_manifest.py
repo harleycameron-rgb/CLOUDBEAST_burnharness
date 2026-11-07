@@ -36,6 +36,7 @@ def get_manifest():
         },
         "imports": {
             "burnharness_protocol": "burnharness_protocol",
+            "invariant_harvest": "invariant_harvest",
             "coupler_cycle": "coupler_cycle",
             "ignition_algebra": (
                 "UNIFIED_FIELD_ZIPGATE.geometry.ignition.ignition_algebra"
