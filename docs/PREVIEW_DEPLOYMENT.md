@@ -28,3 +28,19 @@ Environment: the isolated development venv recorded in INVARIANT_HARVEST.md.
 - `git diff --check`: passed.
 
 Browser tests verify actual numerical evidence, same-fixture repeatability, no application localStorage, clear/reset, responsive layout and source-pause behavior in the illustration. iPhone is Chromium emulation, not physical Safari. Hosted guard compatibility requires an actual live POST smoke test and is not inferred from these local tests. The native gate and upstream verification remain CLOSED/false.
+
+## Actual hosted result
+
+User-approved isolated deployment is READY in team `waxtablet`, project `burnharness-ignition-preview` (`prj_cGdkVwLxRXkZFhofpnEzGfe5GPSs`).
+
+- URL: https://burnharness-ignition-preview.vercel.app/
+- Orrery: https://burnharness-ignition-preview.vercel.app/orrery.html
+- Immutable tested deployment: https://burnharness-ignition-preview-h0umtcqpp-waxtablet.vercel.app/
+- Deployment ID: `dpl_8r8BB4ZyzPrTAJBp7a92v5v3FpBR`
+- Deployed source commit: `fa4e1482ec13a1380385154cecb9ca07a8306f88`.
+
+Vercel assigned the new project's first deployment target `production` even though staging was requested. This is isolated from all existing projects/custom domains; Vercel Authentication protects all its deployment URLs and no custom domains are assigned. It is a protected test site, not promotion to the existing WaxTablet/Scandoc sites. No merge, DNS, GitHub permissions or existing production project changes occurred.
+
+Actual authenticated HTTPS checks passed: root interface, health, POST local retest, stabiliser-packet preservation, gate CLOSED/upstream false, deterministic repeat, separate Orrery labels and deployed build.json source pin. The live evidence SHA-512 matches the prior local fixture: `8ba10846c68560487d263615de92bc09cf74f1a3db87bf6d9ad13393ee3f3e7dfd7f3960ebdfc7f21d4ce74fb7382b77a1092706e8a6aa507ddb1f3ce1e1b165`.
+
+Remote Chromium automation was attempted but blocked by the managed environment's TLS certificate trust (`ERR_CERT_AUTHORITY_INVALID`). No TLS checks were disabled. Live HTTP checks instead used the configured trusted CA through Python HTTPS, with a temporary protected-access cookie held in memory. Local desktop and emulated iPhone browser checks passed. Physical iPhone Safari and other real-device behavior remain unverified. Access links/credentials are not committed; sign in with the owning Vercel account when prompted.

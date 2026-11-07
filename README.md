@@ -46,12 +46,23 @@ The supervised verification step checks and seals that evidence across both
 passes. No sensor driver or upstream source loader is added; synthetic local
 reproduction never qualifies an upstream origin or production launch.
 
-The local suite passes 189 unittest tests (23 new), with 17 additional tests
+The initial integration revision passed 189 unittest tests (23 new), with 17 additional tests
 and 69 subtests passing and two sibling-resolution checks skipped. See
 [the implementation and evidence matrix](docs/INVARIANT_HARVEST.md) and
 [the recorded validation summary](docs/evidence/invariant_harvest_validation.json)
 for exact commands, tested commit, dependencies and limits. Invariant Helm and
 Invariant Exoskeleton remain proposals, not integrated components.
+
+## Protected web preview
+
+The approved isolated test site is https://burnharness-ignition-preview.vercel.app/.
+It runs the reviewed synthetic fixture and shows declared topology plus derived
+evidence; the native gate stays CLOSED. A separate scripted Burning Orrery is
+available at `/orrery.html`, without engine coupling or recorded-future claims.
+The hosting revision passes 197 local unittest tests and four browser scenarios;
+live authenticated HTTP checks also passed. Vercel sign-in may be required.
+See [deployment evidence and boundaries](docs/PREVIEW_DEPLOYMENT.md). Existing
+production domains remain unchanged; the PR remains unmerged.
 
 ## Components
 
