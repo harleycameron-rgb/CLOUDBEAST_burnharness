@@ -1,0 +1,28 @@
+{
+  "schema": "burnharness-preview-validation/1",
+  "source_commit": "fa4e1482ec13a1380385154cecb9ca07a8306f88",
+  "deployment": "dpl_8r8BB4ZyzPrTAJBp7a92v5v3FpBR",
+  "url": "https://burnharness-ignition-preview.vercel.app/",
+  "status": "READY",
+  "platform_target": "production",
+  "scope": "new isolated protected preview project; no existing production changes",
+  "local_tests": {
+    "unittest_passed": 197,
+    "browser_scenarios_passed": 4
+  },
+  "hosted_https_passed": [
+    "root interface",
+    "health",
+    "actual POST retest with packet preservation and closed gate",
+    "deterministic repeat",
+    "separate Orrery disclosures",
+    "source manifest commit pin"
+  ],
+  "hosted_browser": "attempted; managed Chromium certificate trust failed, no bypass used",
+  "physical_devices": "unverified",
+  "nativeGate": "CLOSED",
+  "upstream_verified": false,
+  "custom_domains": [],
+  "public_without_vercel_authentication": false,
+  "merged": false
+}

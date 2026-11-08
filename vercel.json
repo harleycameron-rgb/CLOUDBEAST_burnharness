@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "functions": {"api/index.py": {"maxDuration": 60, "excludeFiles": "{tests/**,backend/tests/**,**/__pycache__/**,**/*.pyc,docs/**}"}},
+  "rewrites": [
+    {"source": "/api/harvest", "destination": "/api/index"},
+    {"source": "/runtime", "destination": "/api/index"},
+    {"source": "/api/health", "destination": "/api/index"}
+  ],
+  "headers": [{"source": "/(.*)", "headers": [
+    {"key": "Cache-Control", "value": "no-store"},
+    {"key": "X-Content-Type-Options", "value": "nosniff"},
+    {"key": "Referrer-Policy", "value": "no-referrer"},
+    {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"}
+  ]}]
+}
